@@ -17,7 +17,7 @@ int Insert(st_insert * insert){
 	int particion;
 	char * pathPart;
 	char* path;
-	structMetadata * metadata;
+	st_metadata * metadata;
 	structParticion * part;
 
 

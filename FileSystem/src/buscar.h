@@ -10,8 +10,10 @@
 
 
 char * buscarKey(char * name, int key, int particion);
-structRegistro * buscarEnLista(t_list *list, int key);
-structRegistro * buscarEnArchivo(char * path);
+structRegistro * buscarEnLista(st_tabla * data, uint16_t key);
+structRegistro * buscarEnParticion(char * path, uint16_t key);
+structRegistro * buscarEnTemporales(char * name, uint16_t key);
+structRegistro * buscarEnArchivo(char * path, uint16_t key);
 
 
 

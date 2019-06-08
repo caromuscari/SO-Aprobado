@@ -22,7 +22,7 @@ extern t_log* alog;
 extern structConfig * config;
 
 void* hiloconsola(){
-	int flag = 1;
+	//int flag = 1;
 
 	char *request;
 	char* ingreso;
@@ -31,7 +31,7 @@ void* hiloconsola(){
 
 	log_info(alog, "Se creo el hilo consola");
 
-	while(flag){
+	while(1){
 
 		ingreso = malloc(sizeof(char) * tamBuffer);
 
@@ -43,9 +43,9 @@ void* hiloconsola(){
 		{
 			case 1:
 				log_info(alog, "Recibi un Insert");
-				structInsert * insert;
+				st_insert * insert;
+				insert = cargarInsert(request);
 
-				insert = cargarInsert(request, true);
 				if(insert != NULL){
 					if(string_length(insert->value) <= config->tam_value)
 					{
@@ -59,91 +59,81 @@ void* hiloconsola(){
 				}else{
 					mostrarRespuesta(1);
 				}
-				free(insert->nameTable);
-				free(insert->value);
-				free(insert);
+
+				destroyInsert(insert);
 				break;
 
 			case 2:
 				log_info(alog, "Recibi un Select");
-				structSelect * select;
+				st_select * select;
 				char * key;
-
 				select = cargarSelect(request);
 
 				if(select != NULL){
 					respuesta = realizarSelect(select, &key);
 
-					if(respuesta != 10){
+					if(respuesta != 10){//Revisar
 						mostrarRespuesta(respuesta);
 					}else{
 						log_info(alog, key);
 						printf("%s",key);
 					}
-
 				}else{
 					mostrarRespuesta(1);
 				}
 
-				free(select->nameTable);
-				free(select);
-
+				destoySelect(select);
 				break;
 
 			case 3:
 				log_info(alog, "Recibi un Create");
-				structCreate * create;
-
+				st_create * create;
 				create = cargarCreate(request);
 
 				if(create != NULL){
 					respuesta = realizarCreate(create);
-
 					actualizar_bitmap();
-
 					mostrarRespuesta(respuesta);
 
 				}else{
 					mostrarRespuesta(1);
 				}
 
-				free(create->nameTable);
-				free(create->tipoConsistencia);
-				free(create);
+				destroyCreate(create);
 				break;
 
 			case 4:
 				log_info(alog, "Recibi un Drop");
-				structDrop * drop;
-
+				st_drop * drop;
 				drop = cargarDrop(request);
 
 				if(drop != NULL){
 					respuesta = realizarDrop(drop);
-
 					actualizar_bitmap();
-
 					mostrarRespuesta(respuesta);
 
 				}else{
 					mostrarRespuesta(1);
 				}
 
-				free(drop->nameTable);
-				free(drop);
+				destroyDrop(drop);
 				break;
 
 			case 5: //describe
 				log_info(alog, "Recibi un Describe");
-				//structDescribe * describe;
+				st_describe * describe;
+				char* buffer;
+				describe = cargarDescribe(request);
 
-				//describe = cargarDescribe(request);
+				if(describe == NULL){
+					respuesta = realizarDescribeGlobal(&buffer);
+				}else{
+					respuesta = realizarDescribe(describe,&buffer);
+				}
+				//Ver la respuesta
+				mostrarRespuesta(respuesta);
 
-				//respuesta = realizarDescribe(describe);
-
-
-				//free(describe);
-				//free(respuesta);
+				destroyDescribe(describe);
 				break;
 
 			default:
@@ -156,26 +146,6 @@ void* hiloconsola(){
 
 	log_info(alog, "Sale del hilo consola");
 	pthread_exit(NULL);
-}
-
-int getEnumFromString ( char *string ) {
-    static struct {
-        char *s;
-        enum OPERACION e;
-    } map[] = {
-        { "INSERT", INSERT },
-        { "SELECT", SELECT },
-        { "CREATE", CREATE },
-		{ "DROP", DROP }
-    };
-
-    for ( int i = 0 ; i < sizeof(map)/sizeof(map[0]); i++ ) {
-
-        if (string_starts_with(string,map[i].s)) {
-            return map[i].e;
-        }
-    }
-    return -1;
 }
 
 
@@ -227,6 +197,11 @@ void mostrarRespuesta(int respuesta){
 			log_info(alog, "No se pudo realizar el Insert");
 			printf("No se pudo realizar el Insert");
 			break;
+		case 12:
+			log_info(alog, "No se pudo realizar la request");
+			printf("No se pudo realizar la request");
+			break;
+
 	}
 
 }

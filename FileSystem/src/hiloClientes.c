@@ -40,102 +40,84 @@ void tratarCliente(int socketC){
 			case 1:
 				log_info(alog, "Recibi un Insert");
 				st_insert * insert;
-
 				insert = desserealizarInsert(recibido->buffer);
-				if(insert != NULL){
-					if(string_length(insert->value) <= config->tam_value)
-					{
-						respuesta = realizarInsert(insert);
 
-						enviarRespuesta(respuesta, &buffer);
+				if(string_length(insert->value) <= config->tam_value)
+				{
+					respuesta = realizarInsert(insert);
+					enviarRespuesta(respuesta, &buffer, socketC, &status);
 
-					}else{
-						enviarRespuesta(3, &buffer);
-					}
 				}else{
-					enviarRespuesta(1, &buffer);
+					enviarRespuesta(3, &buffer, socketC, &status);
 				}
-				free(insert->nameTable);
-				free(insert->value);
-				free(insert);
-				free(buffer);
+
+				destroyInsert(insert);
+				//free(buffer);
 				break;
 
 			case 2:
 				log_info(alog, "Recibi un Select");
 				st_select * select;
+				select = deserealizarSelect(recibido->buffer);
 
-				//select = desserealizarSelect(recibido->buffer);
+				respuesta = realizarSelect(select, &buffer);
+				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
-				if(select != NULL){
-					respuesta = realizarSelect(select, &buffer);
-
-					enviarRespuesta(respuesta, &buffer);
-
-				}else{
-					enviarRespuesta(1,&buffer);
-				}
-
-				free(select->nameTable);
-				free(select);
+				destoySelect(select);
 				free(buffer);
-
 				break;
 
 			case 3:
 				log_info(alog, "Recibi un Create");
 				st_create * create;
+				create = deserealizarCreate(recibido->buffer);
 
-				//create = desserealizarCreate(recibido->buffer);
+				respuesta = realizarCreate(create);
+				actualizar_bitmap();
+				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
-				if(create != NULL){
-					respuesta = realizarCreate(create);
-
-					actualizar_bitmap();
-
-					enviarRespuesta(respuesta, &buffer);
-
-				}else{
-					enviarRespuesta(1, &buffer);
-				}
-
-				free(create->nameTable);
-				free(create->tipoConsistencia);
-				free(create);
-				free(buffer);
+				destroyCreate(create);
+				//free(buffer);
 				break;
 
 			case 4:
 				log_info(alog, "Recibi un Drop");
 				st_drop * drop;
+				drop = deserealizarDrop(recibido->buffer);
 
-				//drop = desserealizarDrop(recibido->buffer);
+				respuesta = realizarDrop(drop);
+				actualizar_bitmap();
+				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
-				if(drop != NULL){
-					respuesta = realizarDrop(drop);
-
-					actualizar_bitmap();
-
-					enviarRespuesta(respuesta, &buffer);
-
-				}else{
-					enviarRespuesta(1, &buffer);
-				}
-
-				free(drop->nameTable);
-				free(drop);
-				free(buffer);
+				destroyDrop(drop);
+				//free(buffer);
 				break;
 
 			case 5: //describe
 				log_info(alog, "Recibi un Describe");
+				st_describe * describe;
+				describe = deserealizarDescribe(recibido->buffer);
+
+				respuesta = realizarDescribe(describe, &buffer);
+				enviarRespuesta(respuesta, &buffer, socketC, &status);
+
+				destroyDescribe(describe);
+				free(buffer);
 				break;
 
-			default:
-				flag = false;
-				enviarRespuesta(15, &buffer); //Modificar numero
+			case 6:
+				log_info(alog, "Recibi un Describe Global");
+
+				respuesta = realizarDescribeGlobal(&buffer);
+				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
 				free(buffer);
+				break;
+			default:
+				flag = false;
+				enviarRespuesta(15, &buffer, socketC, &status); //Modificar numero
+
+				//free(buffer);
 
 		}
 
@@ -150,6 +132,15 @@ void tratarCliente(int socketC){
 	pthread_exit(NULL);
 }
 
-void enviarRespuesta(int codigo, char ** buffer){
+void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status){
 
+	header * head = malloc(sizeof(header));
+
+	head->letra = 'F';
+	head->codigo = codigo;
+	head->sizeData = sizeof(buffer);
+
+	message * mensaje = createMessage(head, buffer);
+
+	enviar_message(socketC, mensaje, alog, status);
 }

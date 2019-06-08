@@ -55,6 +55,11 @@ void * hiloselect(){
 				cliente->hilo = hilo;
 
 				dictionary_put(clientes, string_itoa(nuevo_socket), cliente);
+
+				char * value = string_itoa(config->tam_value);
+
+				enviarRespuesta(0,&value, nuevo_socket, &controlador);
+
 			}else{
 				log_info(alog, "Se conecto un cliente incorrecto");
 				close(nuevo_socket);

@@ -10,8 +10,9 @@
 
 #include "manejoArchivos.h"
 #include "archivos.h"
+#include <funcionesCompartidas/listaMetadata.h>
 
-structMetadata * leerMetadata(char * archivo);
+st_metadata * leerMetadata(char * archivo);
 int verificar_bloque();
 char * armar_path(char * archivo);
 bool crearMetadata(st_create * c, char * path);
@@ -22,6 +23,8 @@ structParticion * leerParticion(char * path);
 void actualizar_bitmap();
 char * armar_PathBloque(char * bloque);
 void actualizar_Particion(structActualizar * a);
+t_list * listarDirectorio();
+structRegistro * leerBloque(char* bloque, uint16_t key);
 
 
 #endif /* SRC_OPERACIONES_H_ */

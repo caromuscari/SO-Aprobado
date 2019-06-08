@@ -13,6 +13,8 @@
 #include "Funciones.h"
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <dirent.h>
+#include <funcionesCompartidas/listaMetadata.h>
 
 extern structConfig * config;
 extern t_bitarray* bitmap;
@@ -21,9 +23,9 @@ extern int cantBloques;
 extern char* posicion;
 extern struct stat mystat;
 
-structMetadata * leerMetadata(char * archivo){
+st_metadata * leerMetadata(char * archivo){
 	char *path;
-	structMetadata * metadata = malloc(sizeof(structMetadata));
+	st_metadata * metadata = malloc(sizeof(st_metadata));
 	t_config *configuracion;
 
 	path = armar_path(archivo);
@@ -92,7 +94,7 @@ char * armar_PathBloque(char * bloque){
 
 }*/
 
-bool crearMetadata(structCreate * c, char * path){
+bool crearMetadata(st_create * c, char * path){
 	char * contenido;
 	FILE * archivo;
 	char * meta = string_new();
@@ -116,7 +118,7 @@ bool crearMetadata(structCreate * c, char * path){
 	}
 }
 
-int crearParticiones(structCreate * c, char * path){
+int crearParticiones(st_create * c, char * path){
 	FILE * archivo;
 	char * contenido;
 	char * completo;
@@ -218,3 +220,70 @@ void actualizar_Particion(structActualizar * a){
 	string_iterate_lines(bloques, (void*)free);
 	free(bloques);
 }
+
+t_list * listarDirectorio(){
+	DIR *d;
+	struct dirent *dir;
+	t_list * lista;
+	char * nombre = string_from_format("%s/Tables", config->montaje);
+    d = opendir(nombre);
+    if (d)
+    {
+    	lista = list_create();
+        while ((dir = readdir(d)) != NULL)
+        {
+        	st_metadata * meta;
+        	char * name = strdup(dir->d_name);
+        	meta = leerMetadata(name);
+        	list_add(lista, meta);
+
+        	free(name);
+        }
+        closedir(d);
+    }
+    free(nombre);
+
+    return lista;
+}
+
+structRegistro * leerBloque(char* bloque, uint16_t key){
+
+	FILE * fbloque;
+	char * linea;
+	size_t tamBuffer = 100;
+	char** split;
+	structRegistro * reg;
+	char * path;
+
+	path = armar_PathBloque(bloque);
+
+	fbloque = fopen(path,"r");
+
+	while(getline(&linea, &tamBuffer, fbloque) != -1){
+		split = string_split(linea,";");
+		if(atoi(split[1]) == key){
+			if(reg == NULL){
+				reg = malloc(sizeof(structRegistro));
+				reg->time = atoi(split[0]);
+				reg->key = atoi(split[1]);
+				reg->value = strtok(split[2], "\n");
+			}else{
+				if(reg->time < atoi(split[0])){
+					reg->time = atoi(split[0]);
+					reg->key = atoi(split[1]);
+					reg->value = strtok(split[2], "\n");
+				}
+			}
+		}
+		string_iterate_lines(split, (void*)free);
+		free(split);
+		free(linea);
+	}
+
+	fclose(fbloque);
+	free(path);
+
+	return reg;
+}
+
+

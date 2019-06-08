@@ -14,6 +14,7 @@
 #include "Funciones.h"
 #include "operaciones.h"
 #include "buscar.h"
+#include <semaphore.h>
 
 extern t_dictionary * memtable;
 
@@ -21,43 +22,49 @@ extern t_dictionary * memtable;
 int realizarInsert(st_insert * insert){
 
 	int respuesta;
-	t_list * lista;
-	structMetadata * metadata;
+	st_metadata * metadata;
+	st_tabla * data;
 
 	structRegistro * registro;
 
+	if(string_contains(insert->value,";")){
+		respuesta = 1;
+		return respuesta;
+	}
+
 	if(validarArchivos(insert->nameTable, &respuesta)){
-
-		/*value = string_new();
-
-		string_append(&value,string_itoa(insert->timestamp));
-		string_append(&value,";");
-		string_append(&value,string_itoa(insert->key));
-		string_append(&value,";");
-		string_append(&value,insert->value);*/
 
 		registro = malloc(sizeof(structRegistro *));
 		registro->time = insert->timestamp;
 		registro->key = insert->key;
 		registro->value = insert->value;
 
-		metadata = leerMetadata(insert->nameTable);
+		metadata = leerMetadata(insert->nameTable); //Es necesario?
 		if(dictionary_has_key(memtable, insert->nameTable)){
-			lista = dictionary_get(memtable, insert->nameTable);
+			data = dictionary_get(memtable, insert->nameTable);
 
-			list_add(lista, registro);
+			sem_wait(&data->semaforo);
+			list_add(data->lista, registro);
+			sem_post(&data->semaforo);
 
 		}else{
-			lista = list_create();
-			list_add(lista, registro);
+			data = malloc(sizeof(st_tabla));
+			dictionary_put(memtable,insert->nameTable, data);
 
-			dictionary_put(memtable,insert->nameTable, lista);
+			sem_init(&data->semaforo,0,1);
+			data->lista = list_create();
+
+			sem_wait(&data->semaforo);
+			list_add(data->lista, registro);
+			sem_post(&data->semaforo);
 		}
 
 		respuesta = 5;
 
 		free(metadata->consistency);
 		free(metadata);
+	}else{
+		respuesta = 4;
 	}
 
 	return respuesta;
@@ -66,7 +73,7 @@ int realizarInsert(st_insert * insert){
 int realizarSelect(st_select * select, char ** value){
 
 	int respuesta;
-	structMetadata * metadata;
+	st_metadata * metadata;
 	int particion;
 
 	if(validarArchivos(select->nameTable, &respuesta)){
@@ -103,17 +110,21 @@ int realizarCreate(st_create * create){
 			if(!crearMetadata(create,path)){
 				eliminarDirectorio(path);
 				free(path);
-				return 10;
+				respuesta = 10;
+				return respuesta;
 			}
 
 			part = crearParticiones(create, path);
-			if(part != 0){
-				for (int i = 1; i < part; ++i) {
-					eliminarParticion(path,i);
+			if(part != -1){
+				if(part != 0){
+					for (int i = 0; i < part; i++) {
+						eliminarParticion(path,i);
+					}
 				}
 				eliminarDirectorio(path);
 				free(path);
-				return 10;
+				respuesta = 10;
+				return respuesta;
 			}
 
 			free(path);
@@ -130,7 +141,7 @@ int realizarCreate(st_create * create){
 
 int realizarDrop(st_drop * drop){
 	int respuesta;
-	structMetadata * metadata;
+	st_metadata * metadata;
 	char * path;
 
 	if(validarArchivos(drop->nameTable, &respuesta)){
@@ -149,8 +160,44 @@ int realizarDrop(st_drop * drop){
 		free(path);
 		free(metadata->consistency);
 		free(metadata);
+	}else{
+		respuesta = 4;
 	}
 
+
+	return respuesta;
+}
+
+int realizarDescribe(st_describe * describe, char ** buffer){
+	int respuesta;
+	st_metadata * m;
+	size_t size;
+
+	if(validarArchivos(describe->nameTable, &respuesta)){
+		m = leerMetadata(describe->nameTable);
+		//*buffer = string_from_format("CONSISTENCY=%s\nPARTITIONS=%d\nCOMPACTION_TIME=%d", m->consistency, m->partitions, m->compaction_time);
+		*buffer = serealizarMetaData(m, &size);
+		respuesta = 13;
+	}else{
+		respuesta = 4;
+	}
+
+	return respuesta;
+}
+
+int realizarDescribeGlobal(char ** buffer){
+	int respuesta;
+	t_list* tablas;
+	size_t size;
+
+	tablas = listarDirectorio();
+
+	if(tablas != NULL){
+		*buffer = serealizarListaMetaData(tablas,&size);
+		respuesta = 13;
+	}else{
+		respuesta = 12;
+	}
 
 	return respuesta;
 }
@@ -170,7 +217,6 @@ bool validarArchivos(char * archivo, int * respuesta){
 	}
 
 	fclose(file);
-
 	free(path);
 
 	return true;

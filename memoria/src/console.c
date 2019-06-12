@@ -1,7 +1,7 @@
 // console
 #include "console.h"
 
-void makeCommand(char *command,int socketClient){
+void makeCommand(char *command){
   int typeCommand = getEnumFromString(command);
   switch(typeCommand)
 		{
@@ -12,8 +12,8 @@ void makeCommand(char *command,int socketClient){
           //createInstruccList(insert,INSERT);
           printf("[+] Executing INSERT");
           sleep(1);
-          printf("[+]Sending INSERT to FileSystem.\n");
-          messageAction(&typeCommand,insert,socketClient);
+          //printf("[+]Sending INSERT to FileSystem.\n");
+          //messageAction(&typeCommand,insert,socketClient);
         }break;
       }
       case SELECT:{
@@ -32,12 +32,12 @@ void makeCommand(char *command,int socketClient){
 
 }
 
-void console(int socket){
+void console(){
   char *command ;
   printf("[+] Write a LQL command: \n");
   command = readline("[>] ");
   while(strcmp(command,"exit") != 0){
-    makeCommand(command,socket);
+    makeCommand(command);
     free(command);
     printf("------------------------------\n");
     command = readline("[>] ");

@@ -36,7 +36,7 @@ int realizarDrop(st_drop * drop);
 int realizarDescribe(st_describe * describe, char ** buffer);
 int realizarDescribeGlobal(char ** buffer);
 bool validarArchivos(char * archivo, int* respuesta);
-
+bool existeDirectorio(char * ruta, int * respuesta);
 
 
 #endif /* SRC_MANEJOARCHIVOS_H_ */

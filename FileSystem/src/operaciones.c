@@ -26,14 +26,14 @@ extern struct stat mystat;
 st_metadata * leerMetadata(char * archivo){
 	char *path;
 	st_metadata * metadata = malloc(sizeof(st_metadata));
+	metadata->consistency = string_new();
 	t_config *configuracion;
 
 	path = armar_path(archivo);
 	string_append(&path,"/Metadata");
 
 	configuracion = config_create(path);
-
-	string_append(&metadata->consistency, config_get_string_value(configuracion, "CONSISTENCY"));
+    string_append(&metadata->consistency, config_get_string_value(configuracion, "CONSISTENCY"));
 	metadata->partitions = config_get_int_value(configuracion, "PARTITIONS");
 	metadata->compaction_time = config_get_int_value(configuracion, "COMPACTION_TIME");
 

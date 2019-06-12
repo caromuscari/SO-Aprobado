@@ -154,52 +154,40 @@ void mostrarRespuesta(int respuesta){
 	switch(respuesta)
 	{
 		case 1:
-			log_info(alog,"La estructura del request es incorrecta");
-			printf("La estructura del request es incorrecta");
+			log_error(alog,"La estructura del request es incorrecta");
 			break;
 		case 2:
-			log_info(alog,"El mensaje recibido es incorrecto");
-			printf("El mensaje recibido es incorrecto");
+			log_error(alog,"El mensaje recibido es incorrecto");
 			break;
 		case 3:
-			log_info(alog,"El value que se desea ingresar supera el tamaño maximo");
-			printf("El value que se desea ingresar supera el tamaño maximo");
+			log_error(alog,"El value que se desea ingresar supera el tamaño maximo");
 			break;
 		case 4:
-			log_info(alog,"El tabla ingresada no existe");
-			printf("El tabla ingresada no existe");
+			log_error(alog,"La tabla ingresada no existe");
 			break;
 		case 5:
 			log_info(alog,"El INSERT se realizo correctamente");
-			printf("El INSERT se realizo correctamente");
 			break;
 		case 6:
-			log_info(alog,"La key ingresada no existe");
-			printf("La key ingresada no existe");
+			log_error(alog,"La key ingresada no existe");
 			break;
 		case 7:
-			log_info(alog,"La tabla ingresada ya existe");
-			printf("La tabla ingresada ya existe");
+			log_error(alog,"La tabla ingresada ya existe");
 			break;
 		case 8:
 			log_info(alog, "La tabla se creo correctamente");
-			printf("La tabla se creo correctamente");
 			break;
 		case 9:
-			log_info(alog, "La tabla se elimino correctamente");
-			printf("La tabla se elimino correctamente");
+			log_error(alog, "La tabla se elimino correctamente");
 			break;
 		case 10:
-			log_info(alog, "No se pudo crear la tabla");
-			printf("No se pudo crear la tabla");
+			log_error(alog, "No se pudo crear la tabla");
 			break;
 		case 11:
-			log_info(alog, "No se pudo realizar el Insert");
-			printf("No se pudo realizar el Insert");
+			log_error(alog, "No se pudo realizar el Insert");
 			break;
 		case 12:
-			log_info(alog, "No se pudo realizar la request");
-			printf("No se pudo realizar la request");
+			log_error(alog, "No se pudo realizar la request");
 			break;
 
 	}

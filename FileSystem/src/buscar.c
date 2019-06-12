@@ -32,7 +32,7 @@ char * buscarKey(char * name, int key, int particion){
 		if(reg != NULL){
 			time = reg->time;
 			value = strdup(reg->value);
-			free(reg);
+			//free(reg);
 		}
 	}
 
@@ -78,12 +78,12 @@ structRegistro * buscarEnLista(st_tabla * data, uint16_t key){
 				reg = malloc(sizeof(structRegistro));
 				reg->time = prueba->time;
 				reg->key = prueba->key;
-				reg->value = prueba->value;
+				reg->value = strdup(prueba->value);
 			}else{
 				if(reg->time < prueba->time){
 					reg->time = prueba->time;
 					reg->key = prueba->key;
-					reg->value = prueba->value;
+					reg->value = strdup(prueba->value);
 				}
 			}
 		}
@@ -109,7 +109,8 @@ structRegistro * buscarEnParticion(char * path, uint16_t key){
 			reg = malloc(sizeof(structRegistro));
 			reg->time = prueba->time;
 			reg->key = prueba->key;
-			reg->value = prueba->value;
+			reg->value = string_new();
+			string_append(&reg->value, prueba->value);
 
 			flag = 1;
 

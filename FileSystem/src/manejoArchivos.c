@@ -15,6 +15,7 @@
 #include "operaciones.h"
 #include "buscar.h"
 #include <semaphore.h>
+#include <sys/stat.h>
 
 extern t_dictionary * memtable;
 
@@ -32,12 +33,13 @@ int realizarInsert(st_insert * insert){
 		return respuesta;
 	}
 
-	if(validarArchivos(insert->nameTable, &respuesta)){
+	if(existeDirectorio(insert->nameTable, &respuesta)){
 
 		registro = malloc(sizeof(structRegistro *));
 		registro->time = insert->timestamp;
 		registro->key = insert->key;
-		registro->value = insert->value;
+		registro->value = string_new();
+		string_append(&registro->value, insert->value);
 
 		metadata = leerMetadata(insert->nameTable); //Es necesario?
 		if(dictionary_has_key(memtable, insert->nameTable)){
@@ -76,7 +78,7 @@ int realizarSelect(st_select * select, char ** value){
 	st_metadata * metadata;
 	int particion;
 
-	if(validarArchivos(select->nameTable, &respuesta)){
+	if(existeDirectorio(select->nameTable, &respuesta)){
 		metadata = leerMetadata(select->nameTable);
 
 		particion = select->key % metadata->partitions;
@@ -101,7 +103,7 @@ int realizarCreate(st_create * create){
 	char * path;
 	int part;
 
-	if(!validarArchivos(create->nameTable, &respuesta)){
+	if(!existeDirectorio(create->nameTable, &respuesta)){
 			path = armar_path(create->nameTable);
 			char * pathmkdir= string_from_format("sudo mkdir -p %s",path);
 			system(pathmkdir);
@@ -220,6 +222,23 @@ bool validarArchivos(char * archivo, int * respuesta){
 	free(path);
 
 	return true;
+}
+
+bool existeDirectorio(char * ruta, int * respuesta){
+
+    struct stat s;
+    char* path = string_new();
+    path = strdup(armar_path(ruta));
+    int err = stat(path, &s);
+    if(-1 != err) {
+
+        if(S_ISDIR(s.st_mode)) {
+            return true;
+        }
+    }
+    free(path);
+    *respuesta = 4;
+    return false;
 }
 
 

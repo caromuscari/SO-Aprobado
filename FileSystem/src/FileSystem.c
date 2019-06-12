@@ -52,12 +52,12 @@ int main(int argc, char *argv[]) {
 
 
 	if(!(metadata ==-1 || bitm ==-1)){
-		pthread_create(&hiloSelect, NULL, (void*)hiloselect,NULL);
+		//pthread_create(&hiloSelect, NULL, (void*)hiloselect,NULL);
 		pthread_create(&hiloConsola, NULL, (void*)hiloconsola,NULL);
 		//pthread_create(&hiloDump, NULL, (void*)hilodump,NULL);
 
 
-		pthread_join(hiloSelect,NULL);
+		//pthread_join(hiloSelect,NULL);
 		pthread_join(hiloConsola, NULL);
 		//pthread_join(hiloDump, NULL);
 	}

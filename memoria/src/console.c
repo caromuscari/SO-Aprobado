@@ -3,16 +3,16 @@
 
 void makeCommand(char *command){
   int typeCommand = getEnumFromString(command);
-  switch(typeCommand)
-		{
-			case INSERT:{
+  switch(typeCommand){
+		case INSERT:{
 				printf("[+] I got INSERT.");
         st_insert * insert;
         if((insert = cargarInsert(command))){
           //createInstruccList(insert,INSERT);
           printf("[+] Executing INSERT");
           sleep(1);
-        }break;
+        }
+          break;
       }
       case SELECT:{
         printf("[+] I got SELECT\n");
@@ -20,9 +20,30 @@ void makeCommand(char *command){
         if((select = cargarSelect(command))){
           printf("[+] Executing SELECT.\n");
           sleep(1);
-        }break;
+       }
+       break;
       }
-    }
+
+      case CREATE:{
+
+      break;
+      }
+
+      case DROP:{
+
+      break;
+      }
+      case DESCRIBE:{
+
+
+    break;
+            }
+     /* case JOURNAL:{
+
+            break;
+            }
+  */
+  }
 
 }
 

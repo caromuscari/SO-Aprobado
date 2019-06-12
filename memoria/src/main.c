@@ -22,6 +22,7 @@ int main(int argc, char const *argv[]) {
   pthread_t server;
   pthread_t client;
 
+
   //int control = 0;
   //t_log *file_log = crear_archivo_log("Memoria", true,"./logC");
   //int socketClient = establecerConexion(IP_FS,PORT_FS,file_log,&control);

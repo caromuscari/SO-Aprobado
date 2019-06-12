@@ -4,7 +4,7 @@ t_log *file_log;
 t_log *log_server;
 
 void messageAction(header *req, void *buffer, int socketClient) {
-    header response;
+    header request;
     message *bufferMensaje = NULL;
     size_t sizebuffer = 0;
     int control = 0;
@@ -16,10 +16,10 @@ void messageAction(header *req, void *buffer, int socketClient) {
             printf("[+] Key [%d]\n", insert->key);
             printf("[+] Value [%s]\n", insert->value);
             printf("[+] TimeStamp [%d]\n", insert->timestamp);
-            response.letra = 'M';
-            response.codigo = 1;
-            response.sizeData = 0;
-            bufferMensaje = createMessage(&response, "");
+            request.letra = 'M';
+            request.codigo = 1;
+            request.sizeData = 0;
+            bufferMensaje = createMessage(&request, "");
             enviar_message(socketClient, bufferMensaje, file_log, &control);
             break;
         }
@@ -28,10 +28,10 @@ void messageAction(header *req, void *buffer, int socketClient) {
           printf("[+] We got a SELECT\n");
           printf("[+] Table [%s]\n", select->nameTable);
           printf("[+] Key [%d]\n", select->key);
-          response.letra = 'M';
-          response.codigo = 1;
-          response.sizeData = 0;
-          bufferMensaje = createMessage(&response, "");
+          request.letra = 'M';
+          request.codigo = 1;
+          request.sizeData = 0;
+          bufferMensaje = createMessage(&request, "");
           enviar_message(socketClient, bufferMensaje, file_log, &control);
 
           break;

@@ -6,10 +6,10 @@ extern t_log *log_server;
 
 
 void driver(void *recibido,header request, int client){
-    //we have to know who is seending us the message
+    //we have to know who is sending us the message
     if(request.letra == 'K'){
 
-        // once we know that the sender is de kernel, we have to know which operation is he given us
+        // once we know that the sender is the kernel, we have to know which operation is he given us
         //and send it to the FL
 
         switch (request.codigo){
@@ -28,6 +28,7 @@ void driver(void *recibido,header request, int client){
               break;
 
 
+        }
     }
 }
 
@@ -46,7 +47,7 @@ void *start_server() {
 		void *recibido;
 		recibido = getMessage(client, &request, &control);
 		if (recibido == NULL) {
-			perror("[-] It's an empy package :( \n");
+			perror("[-] It's an empty package :( \n");
 			return NULL;
 		}
 		driver(recibido, request, client);

@@ -12,20 +12,14 @@ void makeCommand(char *command){
           //createInstruccList(insert,INSERT);
           printf("[+] Executing INSERT");
           sleep(1);
-          //printf("[+]Sending INSERT to FileSystem.\n");
-          //messageAction(&typeCommand,insert,socketClient);
         }break;
       }
       case SELECT:{
-        //log_info(file_log,"[+] I got SELECT."); ---> got error here
         printf("[+] I got SELECT\n");
         st_select * select;
         if((select = cargarSelect(command))){
-        //  createInstruccList(select,SELECT);
-          //log_info(file_log,"[+] Executing SELECT");----> error here too
           printf("[+] Executing SELECT.\n");
           sleep(1);
-          printf("[+]Sending SELECT to FileSystem.\n");
         }break;
       }
     }

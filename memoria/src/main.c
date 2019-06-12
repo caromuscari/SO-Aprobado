@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <funcionesCompartidas/log.h>
 #include "console.h"
-#include "console.c"
 #include "server.h"
-#include "server.c"
 #include <commons/collections/list.h>
 #include <pthread.h>
 

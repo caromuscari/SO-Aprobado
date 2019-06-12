@@ -14,9 +14,9 @@
 #include <commons/log.h>
 #include <stdlib.h>
 #include <commons/collections/list.h>
-#include "conections.c"
+#include "conections.h"
 
-void *start_server(char *PORT);
-void driver(void *recibido,header request);
+void *start_server();
+void driver(void *recibido,header request, int client);
 
 #endif //MEM_SERVER_H

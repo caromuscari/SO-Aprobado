@@ -12,6 +12,7 @@
 
 void* hiloconsola();
 void mostrarRespuesta(int respuesta);
-
+void mostrarTabla(st_metadata * meta);
+void liberarMetadata(st_metadata * meta);
 
 #endif /* FILESYSTEM_SRC_HILOCONSOLA_H_ */

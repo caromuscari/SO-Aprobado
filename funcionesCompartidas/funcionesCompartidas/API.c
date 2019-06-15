@@ -253,10 +253,11 @@ int getEnumFromString(char *string) {
             {"INSERT", INSERT},
             {"SELECT", SELECT},
             {"CREATE", CREATE},
-            {"DROP",   DROP}
+            {"DROP",   DROP},
+			{"DESCRIBE", DESCRIBE}
     };
 
-    for (int i = 0; i < sizeof(map) / sizeof(map[0]); i++) {
+    for (unsigned int i = 0; i < sizeof(map) / sizeof(map[0]); i++) {
 
         if (string_starts_with(string, map[i].s)) {
             return map[i].e;

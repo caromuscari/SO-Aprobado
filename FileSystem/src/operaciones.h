@@ -11,6 +11,7 @@
 #include "manejoArchivos.h"
 #include "archivos.h"
 #include <funcionesCompartidas/listaMetadata.h>
+#include <commons/collections/dictionary.h>
 
 st_metadata * leerMetadata(char * archivo);
 int verificar_bloque();

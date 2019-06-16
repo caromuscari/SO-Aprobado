@@ -29,7 +29,7 @@ typedef struct{
 
 t_list* listaDeSegmentos;
 
-
+void *inicializarMemoria();
 
 
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

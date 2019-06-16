@@ -28,7 +28,7 @@ st_insert *cargarInsert(char *comando) {
             return NULL;
         }
     } else {
-        insert->timestamp = time(0);
+        insert->timestamp = obtenerMilisegundosDeHoy();
     }
 
     listSplit2 = string_split(listSplit[0], " ");

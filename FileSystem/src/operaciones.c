@@ -28,10 +28,14 @@ st_metadata * leerMetadata(char * archivo){
 	st_metadata * metadata = malloc(sizeof(st_metadata));
 	t_config *configuracion;
 
+	metadata->consistency = strdup("");
+
 	path = armar_path(archivo);
 	string_append(&path,"/Metadata");
 
 	configuracion = config_create(path);
+
+	//metadata->nameTable = strdup(archivo);
 
 	string_append(&metadata->consistency, config_get_string_value(configuracion, "CONSISTENCY"));
 	metadata->partitions = config_get_int_value(configuracion, "PARTITIONS");
@@ -153,9 +157,10 @@ int crearParticiones(st_create * c, char * path){
 }
 
 void eliminarDirectorio(char * path){
-	char * pathrm= string_from_format("sudo rm -rf %s",path);
-	system(pathrm);
-	free(pathrm);
+	char * meta = string_from_format("%s/Metadata", path);
+	remove(meta);
+	remove(path);
+	free(meta);
 }
 
 void eliminarParticion(char *path, int particion){
@@ -235,7 +240,7 @@ t_list * listarDirectorio(){
         	st_metadata * meta;
         	char * name = strdup(dir->d_name);
         	meta = leerMetadata(name);
-        	list_add(lista, meta);
+        	list_add(lista,meta);
 
         	free(name);
         }

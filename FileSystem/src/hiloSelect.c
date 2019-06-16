@@ -21,7 +21,6 @@ extern t_dictionary * clientes;
 extern structConfig * config;
 
 void * hiloselect(){
-	//sockets
 
 	controlador=0;
 

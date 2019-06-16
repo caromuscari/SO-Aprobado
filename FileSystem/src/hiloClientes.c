@@ -15,6 +15,7 @@
 #include "Funciones.h"
 #include "manejoArchivos.h"
 #include "operaciones.h"
+#include <stddef.h>
 
 
 extern t_log* alog;
@@ -30,6 +31,7 @@ void tratarCliente(int socketC){
 		mensaje * recibido = malloc(sizeof(mensaje));
 		int respuesta;
 		char * buffer;
+		size_t size;
 
 		recibido->buffer = getMessage(socketC, &(recibido->head), &status);
 
@@ -96,9 +98,13 @@ void tratarCliente(int socketC){
 			case 5: //describe
 				log_info(alog, "Recibi un Describe");
 				st_describe * describe;
+				st_metadata * meta;
 				describe = deserealizarDescribe(recibido->buffer);
 
-				respuesta = realizarDescribe(describe, &buffer);
+				respuesta = realizarDescribe(describe, &meta);
+
+				buffer = serealizarMetaData(meta, &size);
+
 				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
 				destroyDescribe(describe);
@@ -108,7 +114,11 @@ void tratarCliente(int socketC){
 			case 6:
 				log_info(alog, "Recibi un Describe Global");
 
-				respuesta = realizarDescribeGlobal(&buffer);
+				t_list * tabla;
+
+				respuesta = realizarDescribeGlobal(&tabla);
+
+				buffer = serealizarListaMetaData(tabla,&size);
 				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
 				free(buffer);

@@ -15,7 +15,10 @@
 #include "operaciones.h"
 #include "buscar.h"
 #include <semaphore.h>
+#include <funcionesCompartidas/listaMetadata.h>
 #include <sys/stat.h>
+#include <dirent.h>
+#include <errno.h>
 
 extern t_dictionary * memtable;
 
@@ -23,7 +26,6 @@ extern t_dictionary * memtable;
 int realizarInsert(st_insert * insert){
 
 	int respuesta;
-	st_metadata * metadata;
 	st_tabla * data;
 
 	structRegistro * registro;
@@ -41,7 +43,7 @@ int realizarInsert(st_insert * insert){
 		registro->value = string_new();
 		string_append(&registro->value, insert->value);
 
-		metadata = leerMetadata(insert->nameTable); //Es necesario?
+
 		if(dictionary_has_key(memtable, insert->nameTable)){
 			data = dictionary_get(memtable, insert->nameTable);
 
@@ -63,8 +65,6 @@ int realizarInsert(st_insert * insert){
 
 		respuesta = 5;
 
-		free(metadata->consistency);
-		free(metadata);
 	}else{
 		respuesta = 4;
 	}
@@ -105,9 +105,7 @@ int realizarCreate(st_create * create){
 
 	if(!existeDirectorio(create->nameTable, &respuesta)){
 			path = armar_path(create->nameTable);
-			char * pathmkdir= string_from_format("sudo mkdir -p %s",path);
-			system(pathmkdir);
-			free(pathmkdir);
+			mkdir(path, ACCESSPERMS);
 
 			if(!crearMetadata(create,path)){
 				eliminarDirectorio(path);
@@ -151,7 +149,7 @@ int realizarDrop(st_drop * drop){
 
 		path = armar_path(drop->nameTable);
 
-		for (int i = 1; i <= metadata->partitions; i++) {
+		for (int i = 0; i < metadata->partitions; i++) {
 			eliminarParticion(path, i);
 		}
 
@@ -170,15 +168,12 @@ int realizarDrop(st_drop * drop){
 	return respuesta;
 }
 
-int realizarDescribe(st_describe * describe, char ** buffer){
+int realizarDescribe(st_describe * describe, st_metadata ** m){
 	int respuesta;
-	st_metadata * m;
-	size_t size;
+
 
 	if(validarArchivos(describe->nameTable, &respuesta)){
-		m = leerMetadata(describe->nameTable);
-		//*buffer = string_from_format("CONSISTENCY=%s\nPARTITIONS=%d\nCOMPACTION_TIME=%d", m->consistency, m->partitions, m->compaction_time);
-		*buffer = serealizarMetaData(m, &size);
+		*m = leerMetadata(describe->nameTable);
 		respuesta = 13;
 	}else{
 		respuesta = 4;
@@ -187,15 +182,12 @@ int realizarDescribe(st_describe * describe, char ** buffer){
 	return respuesta;
 }
 
-int realizarDescribeGlobal(char ** buffer){
+int realizarDescribeGlobal(t_list ** tablas){
 	int respuesta;
-	t_list* tablas;
-	size_t size;
 
-	tablas = listarDirectorio();
+	*tablas = listarDirectorio();
 
 	if(tablas != NULL){
-		*buffer = serealizarListaMetaData(tablas,&size);
 		respuesta = 13;
 	}else{
 		respuesta = 12;
@@ -205,20 +197,25 @@ int realizarDescribeGlobal(char ** buffer){
 }
 
 bool validarArchivos(char * archivo, int * respuesta){
-	FILE * file;
 	char *path;
+	DIR * directory;
 
 	path = armar_path(archivo);
 
-	file = fopen(path,"r+");
+	directory = opendir(path);
 
-	if(file == NULL){
+	if(directory){
+		closedir(directory);
+	}else if(ENOENT == errno){
 		*respuesta = 4;
+		free(path);
+		return false;
+	}else{
+		*respuesta = 12;
 		free(path);
 		return false;
 	}
 
-	fclose(file);
 	free(path);
 
 	return true;

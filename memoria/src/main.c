@@ -4,6 +4,7 @@
 #include "server.h"
 #include <commons/collections/list.h>
 #include <pthread.h>
+#include "segmentacionPaginada.h"
 
 #define IPFILESYSTEM "192.168.0.21"
 #define PORTFILESYSTEM "8080"
@@ -22,11 +23,12 @@ int main(int argc, char const *argv[]) {
   pthread_t server;
   pthread_t client;
 
-  int control = 0;
-  t_log *file_log = crear_archivo_log("Memoria", true,"./logC");
-  int socketClient = establecerConexion(IP_FS,PORT_FS,file_log,&control);
 
-  console(socketClient);
+  //int control = 0;
+  //t_log *file_log = crear_archivo_log("Memoria", true,"./logC");
+  //int socketClient = establecerConexion(IP_FS,PORT_FS,file_log,&control);
+  inicializarMemoria();
+  console(); //al final no nos conectamos a nadie en la parte de consola
   pthread_create(&server,NULL, &start_server, MYPORT);
   //pthread_create(&client,NULL, &connectToSeeds,(void *) totalSeeds);
 
@@ -35,3 +37,8 @@ int main(int argc, char const *argv[]) {
 
   return 0;
 }
+
+
+
+
+

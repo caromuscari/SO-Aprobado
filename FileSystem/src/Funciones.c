@@ -47,7 +47,6 @@ void inicializar(){
 void archivoDeConfiguracion(char* argv)
 {
 	t_config *configuracion;
-	printf("ruta archivo de configuacion: %s \n", argv);
 	configuracion = config_create(argv);
 	string_append(&config->puerto, config_get_string_value(configuracion, "PUERTO_ESCUCHA​"));
 	string_append(&config->montaje, config_get_string_value(configuracion, "PUNTO_MONTAJE"));
@@ -56,7 +55,6 @@ void archivoDeConfiguracion(char* argv)
 	config->tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP");
 
 	log_info(alog, "Lee el archivo de configuracion");
-
 
 	config_destroy(configuracion);
 }

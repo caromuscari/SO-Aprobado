@@ -8,15 +8,15 @@
 #include <commons/string.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include "time.h"
+#include <stdint.h>
 
 enum OPERACION {
     INSERT = 1,
     SELECT = 2,
     CREATE = 3,
     DROP = 4,
-    DESCRIBE = 5,
-    DESCRIBE_GLOBAL = 6
+    DESCRIBE = 5
 };
 
 typedef struct {
@@ -43,7 +43,7 @@ typedef struct {
 typedef struct {
     enum OPERACION operacion;
     char *nameTable;
-    int key;
+    uint16_t key;
 } st_select;
 
 typedef struct {
@@ -55,9 +55,9 @@ typedef struct {
 typedef struct {
     enum OPERACION operacion;
     char *nameTable;
-    int key;
+    uint16_t key;
     char *value;
-    int timestamp;
+    double timestamp;
 } st_insert;
 
 typedef struct {

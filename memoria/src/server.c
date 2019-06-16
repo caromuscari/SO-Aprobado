@@ -5,12 +5,13 @@
 extern t_log *log_server;
 
 
-void driver(void *recibido,header request, int client){
+/*void driver(void *recibido,header request, int client){
+	// recibido es el paquete serealizado que nos mandan
     //we have to know who is sending us the message
     if(request.letra == 'K'){
 
         // once we know that the sender is the kernel, we have to know which operation is he given us
-        //and send it to the FL
+        //and send it to the FL si no esta en memoria
 
         switch (request.codigo){
             case INSERT:
@@ -30,7 +31,7 @@ void driver(void *recibido,header request, int client){
 
         }
     }
-}
+} */
 
 char* PORT = "8081";
 void *start_server() {
@@ -50,7 +51,7 @@ void *start_server() {
 			perror("[-] It's an empty package :( \n");
 			return NULL;
 		}
-		driver(recibido, request, client);
+	//	driver(recibido, request, socketServer);
 		free(recibido);
 		close(client);
 		}

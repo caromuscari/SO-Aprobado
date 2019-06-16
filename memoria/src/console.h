@@ -16,6 +16,6 @@
 #include "conections.h"
 
 
-void console(int socket);
+void console();
 
 #endif //MEM_CONSOLE_H

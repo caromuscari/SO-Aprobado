@@ -32,7 +32,8 @@ char * buscarKey(char * name, int key, int particion){
 		if(reg != NULL){
 			time = reg->time;
 			value = strdup(reg->value);
-			//free(reg);
+			free(reg->value);
+			free(reg);
 		}
 	}
 
@@ -45,6 +46,7 @@ char * buscarKey(char * name, int key, int particion){
 			value = strdup(reg->value);
 		}
 
+		free(reg->value);
 		free(reg);
 	}
 	free(completo);
@@ -57,6 +59,7 @@ char * buscarKey(char * name, int key, int particion){
 			value = strdup(reg->value);
 		}
 
+		free(reg->value);
 		free(reg);
 	}
 
@@ -67,6 +70,7 @@ char * buscarKey(char * name, int key, int particion){
 structRegistro * buscarEnLista(st_tabla * data, uint16_t key){
 	structRegistro * reg, *prueba;
 	int size;
+	int flag = 0;
 
 	sem_wait(&data->semaforo);
 
@@ -74,11 +78,13 @@ structRegistro * buscarEnLista(st_tabla * data, uint16_t key){
 	for(int i = 0; i < size; i++){
 		prueba = list_get(data->lista, i);
 		if(prueba->key == key){
-			if(reg == NULL){
+			if(flag == 0){
 				reg = malloc(sizeof(structRegistro));
 				reg->time = prueba->time;
 				reg->key = prueba->key;
 				reg->value = strdup(prueba->value);
+
+				flag = 1;
 			}else{
 				if(reg->time < prueba->time){
 					reg->time = prueba->time;
@@ -117,13 +123,15 @@ structRegistro * buscarEnParticion(char * path, uint16_t key){
 			free(prueba->value);
 			free(prueba);
 		}
+		i++;
 	}
 
 	string_iterate_lines(part->bloques, (void*)free);
 	free(part->bloques);
 	free(part);
 
-	return reg;
+	if(flag == 0) return NULL;
+	else return reg;
 }
 
 structRegistro * buscarEnTemporales(char * name, uint16_t key){
@@ -132,7 +140,7 @@ structRegistro * buscarEnTemporales(char * name, uint16_t key){
 	DIR *d;
 	struct dirent *dir;
 	char * path;
-	int time = 0;
+	int time = 0, flag = 0;
 	char * nombre = armar_path(name);
     d = opendir(nombre);
     if (d)
@@ -149,6 +157,7 @@ structRegistro * buscarEnTemporales(char * name, uint16_t key){
         				time = reg->time;
         				final = reg;
         			}
+        			flag = 1;
         			free(reg->value);
         			free(reg);
         		}
@@ -161,42 +170,47 @@ structRegistro * buscarEnTemporales(char * name, uint16_t key){
     }
     free(nombre);
 
-	return final;
+	if(flag == 0) return NULL;
+	else return final;
 }
 
 structRegistro * buscarEnArchivo(char * path, uint16_t key){
 	structRegistro * reg, * prueba;
 	structParticion * part;
-	int i = 0;
+	int i = 0, flag = 0;
 
 	part = leerParticion(path);
 
 	while(part->bloques[i] != NULL){
 		prueba = leerBloque(part->bloques[i], key);
 		if(prueba != NULL){
-			if(reg == NULL){
+			if(flag == 0){
 				reg = malloc(sizeof(structRegistro));
 				reg->time = prueba->time;
 				reg->key = prueba->key;
-				reg->value = prueba->value;
+				reg->value = strdup(prueba->value);
+
+				flag = 1;
 			}else{
 				if(reg->time < prueba->time){
 					reg->time = prueba->time;
 					reg->key = prueba->key;
-					reg->value = prueba->value;
+					reg->value = strdup(prueba->value);
 				}
 			}
 
 			free(prueba->value);
 			free(prueba);
 		}
+		i++;
 	}
 
 	string_iterate_lines(part->bloques, (void*)free);
 	free(part->bloques);
 	free(part);
 
-	return reg;
+	if(flag == 0)return NULL;
+	else return reg;
 }
 
 

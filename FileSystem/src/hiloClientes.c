@@ -16,6 +16,8 @@
 #include "manejoArchivos.h"
 #include "operaciones.h"
 #include <stddef.h>
+#include <signal.h>
+#include "Funciones.h"
 
 
 extern t_log* alog;
@@ -26,6 +28,8 @@ void tratarCliente(int socketC){
 
 	int status=0;
 	bool flag = true;
+
+	signal(SIGKILL,senial);
 
 	while(flag){
 		mensaje * recibido = malloc(sizeof(mensaje));
@@ -107,6 +111,7 @@ void tratarCliente(int socketC){
 
 				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
+				liberarMetadata(meta);
 				destroyDescribe(describe);
 				free(buffer);
 				break;
@@ -154,3 +159,4 @@ void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status){
 
 	enviar_message(socketC, mensaje, alog, status);
 }
+

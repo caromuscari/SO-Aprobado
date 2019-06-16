@@ -35,7 +35,7 @@ int realizarInsert(st_insert * insert){
 		return respuesta;
 	}
 
-	if(existeDirectorio(insert->nameTable, &respuesta)){
+	if(validarArchivos(insert->nameTable, &respuesta)){
 
 		registro = malloc(sizeof(structRegistro *));
 		registro->time = insert->timestamp;
@@ -65,8 +65,6 @@ int realizarInsert(st_insert * insert){
 
 		respuesta = 5;
 
-	}else{
-		respuesta = 4;
 	}
 
 	return respuesta;
@@ -78,7 +76,7 @@ int realizarSelect(st_select * select, char ** value){
 	st_metadata * metadata;
 	int particion;
 
-	if(existeDirectorio(select->nameTable, &respuesta)){
+	if(validarArchivos(select->nameTable, &respuesta)){
 		metadata = leerMetadata(select->nameTable);
 
 		particion = select->key % metadata->partitions;
@@ -88,11 +86,10 @@ int realizarSelect(st_select * select, char ** value){
 		if(*value ==NULL){
 			respuesta = 6;
 		}else{
-			respuesta = 10;
+			respuesta = 14;
 		}
 
-		free(metadata->consistency);
-		free(metadata);
+		liberarMetadata(metadata);
 	}
 
 	return respuesta;
@@ -103,7 +100,7 @@ int realizarCreate(st_create * create){
 	char * path;
 	int part;
 
-	if(!existeDirectorio(create->nameTable, &respuesta)){
+	if(!validarArchivos(create->nameTable, &respuesta)){
 			path = armar_path(create->nameTable);
 			mkdir(path, ACCESSPERMS);
 
@@ -143,11 +140,25 @@ int realizarDrop(st_drop * drop){
 	int respuesta;
 	st_metadata * metadata;
 	char * path;
+	st_tabla * data;
 
 	if(validarArchivos(drop->nameTable, &respuesta)){
 		metadata = leerMetadata(drop->nameTable);
 
 		path = armar_path(drop->nameTable);
+
+		if(dictionary_has_key(memtable, drop->nameTable)){
+			data = dictionary_get(memtable, drop->nameTable);
+
+			sem_wait(&data->semaforo);
+
+			list_iterate(data->lista,(void*)liberarTabla);
+			list_destroy(data->lista);
+
+			sem_post(&data->semaforo);
+
+			free(dictionary_remove(memtable,drop->nameTable));
+		}
 
 		for (int i = 0; i < metadata->partitions; i++) {
 			eliminarParticion(path, i);
@@ -158,12 +169,8 @@ int realizarDrop(st_drop * drop){
 		respuesta = 9;
 
 		free(path);
-		free(metadata->consistency);
-		free(metadata);
-	}else{
-		respuesta = 4;
+		liberarMetadata(metadata);
 	}
-
 
 	return respuesta;
 }
@@ -171,12 +178,9 @@ int realizarDrop(st_drop * drop){
 int realizarDescribe(st_describe * describe, st_metadata ** m){
 	int respuesta;
 
-
 	if(validarArchivos(describe->nameTable, &respuesta)){
 		*m = leerMetadata(describe->nameTable);
-		respuesta = 13;
-	}else{
-		respuesta = 4;
+		respuesta = 15;
 	}
 
 	return respuesta;
@@ -236,6 +240,11 @@ bool existeDirectorio(char * ruta, int * respuesta){
     free(path);
     *respuesta = 4;
     return false;
+}
+
+void liberarTabla(structRegistro * reg){
+	free(reg->value);
+	free(reg);
 }
 
 

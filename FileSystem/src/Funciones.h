@@ -8,6 +8,8 @@
 #ifndef FILE_SYSTEM_SRC_FUNCIONES_H_
 #define FILE_SYSTEM_SRC_FUNCIONES_H_
 
+#include "hiloClientes.h"
+
 typedef struct {
 	char * puerto;
 	char * montaje;
@@ -23,6 +25,9 @@ void archivoDeConfiguracion(char* argv);
 int leer_metadata();
 int abrir_bitmap();
 void finalizar();
+void finalizarFile();
+void cerrarClientes(char * key, cliente_t * cliente);
+void senial();
 
 
 #endif /* FILE_SYSTEM_SRC_FUNCIONES_H_ */

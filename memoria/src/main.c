@@ -20,22 +20,23 @@ char *PORT_FS = PORTFILESYSTEM;
 
 int main(int argc, char const *argv[]) {
 
-  pthread_t server;
-  pthread_t client;
+	pthread_t server;
+	pthread_t client;
 
 
-  //int control = 0;
-  //t_log *file_log = crear_archivo_log("Memoria", true,"./logC");
-  //int socketClient = establecerConexion(IP_FS,PORT_FS,file_log,&control);
-  inicializarMemoria();
-  console(); //al final no nos conectamos a nadie en la parte de consola
-  pthread_create(&server,NULL, &start_server, MYPORT);
-  //pthread_create(&client,NULL, &connectToSeeds,(void *) totalSeeds);
+	//int control = 0;
+	t_log *file_log = crear_archivo_log("Memoria", true,"./logC");
+	//int socketClient = establecerConexion(IP_FS,PORT_FS,file_log,&control);
+	inicializarMemoria();
+	log_info(file_log, "la memoria se inicio correctamente");
+	console(); //al final no nos conectamos a nadie en la parte de consola
+	pthread_create(&server,NULL, &start_server, MYPORT);
+	//pthread_create(&client,NULL, &connectToSeeds,(void *) totalSeeds);
 
-  pthread_join(server,NULL);
-  //pthread_join(client,NULL);
+	pthread_join(server,NULL);
+	//pthread_join(client,NULL);
 
-  return 0;
+	return 0;
 }
 
 

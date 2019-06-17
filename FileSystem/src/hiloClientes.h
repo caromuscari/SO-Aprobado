@@ -25,6 +25,7 @@ typedef struct {
 
 void tratarCliente(int socketC);
 void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status);
+void senial();
 
 
 #endif /* FILE_SYSTEM_SRC_HILOMENSAJES_H_ */

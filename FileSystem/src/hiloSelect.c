@@ -13,6 +13,8 @@
 #include <commons/collections/dictionary.h>
 #include "Funciones.h"
 #include "hiloClientes.h"
+#include <signal.h>
+#include "Funciones.h"
 
 extern int controlador;
 extern int socketfs;
@@ -23,6 +25,8 @@ extern structConfig * config;
 void * hiloselect(){
 
 	controlador=0;
+
+	signal(SIGKILL,senial);
 
 	log_info(alog, "Se creo el hilo servidor");
 
@@ -68,11 +72,8 @@ void * hiloselect(){
 			free(recibido);
 
 		}
-
 	}
-
 
 	pthread_exit(NULL);
 }
-
 

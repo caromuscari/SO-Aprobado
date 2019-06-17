@@ -26,7 +26,6 @@ extern struct stat mystat;
 st_metadata * leerMetadata(char * archivo){
 	char *path;
 	st_metadata * metadata = malloc(sizeof(st_metadata));
-	metadata->consistency = string_new();
 	t_config *configuracion;
 
 	metadata->consistency = strdup("");
@@ -36,7 +35,7 @@ st_metadata * leerMetadata(char * archivo){
 
 	configuracion = config_create(path);
 
-	//metadata->nameTable = strdup(archivo);
+	metadata->nameTable = strdup(archivo);
 
 	string_append(&metadata->consistency, config_get_string_value(configuracion, "CONSISTENCY"));
 	metadata->partitions = config_get_int_value(configuracion, "PARTITIONS");
@@ -93,11 +92,6 @@ char * armar_PathBloque(char * bloque){
 
 	return path;
 }
-
-/*char * path_bin(char * name, int particion){
-	char * path = armar_path(name);
-
-}*/
 
 bool crearMetadata(st_create * c, char * path){
 	char * contenido;
@@ -260,6 +254,7 @@ structRegistro * leerBloque(char* bloque, uint16_t key){
 	char** split;
 	structRegistro * reg;
 	char * path;
+	int flag = 0;
 
 	path = armar_PathBloque(bloque);
 
@@ -268,11 +263,13 @@ structRegistro * leerBloque(char* bloque, uint16_t key){
 	while(getline(&linea, &tamBuffer, fbloque) != -1){
 		split = string_split(linea,";");
 		if(atoi(split[1]) == key){
-			if(reg == NULL){
+			if(flag == 0){
 				reg = malloc(sizeof(structRegistro));
 				reg->time = atoi(split[0]);
 				reg->key = atoi(split[1]);
 				reg->value = strtok(split[2], "\n");
+
+				flag = 1;
 			}else{
 				if(reg->time < atoi(split[0])){
 					reg->time = atoi(split[0]);
@@ -289,7 +286,8 @@ structRegistro * leerBloque(char* bloque, uint16_t key){
 	fclose(fbloque);
 	free(path);
 
-	return reg;
+	if(flag == 0) return NULL;
+	else return reg;
 }
 
 

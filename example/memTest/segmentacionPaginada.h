@@ -9,12 +9,12 @@
 #define SRC_SEGMENTACIONPAGINADA_H_
 
 #include <commons/collections/list.h>
+#include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <funcionesCompartidas/log.h>
 
 t_log * file_log;
-
-void * memoriaPrincipal;
 
 typedef struct{
 	char* nombreTabla;
@@ -23,13 +23,15 @@ typedef struct{
 
 typedef struct{
 	int nroDePagina;
-	void* pagina;
+	void *direccionValor;
 	int flagModificado;
-}st_tablaDePaginas;
+	
+}st_pagina;
 
 t_list* listaDeSegmentos;
+t_list* listaDePaginas;
 
-void *inicializarMemoria();
+
 
 
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

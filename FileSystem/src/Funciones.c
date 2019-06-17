@@ -20,6 +20,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "Funciones.h"
+#include <signal.h>
+#include <pthread.h>
 
 extern struct stat mystat;
 
@@ -33,6 +35,8 @@ extern t_log* alog;
 extern t_bitarray* bitmap;
 extern char* posicion;
 extern int bitm;
+
+extern pthread_t hiloConsola, hiloSelect,hiloDump;
 
 void inicializar(){
 	config = malloc(sizeof(structConfig));
@@ -125,7 +129,7 @@ int abrir_bitmap()
 
 void finalizar(){
 
-	log_info(alog, "Esta por finalizar las variables");
+	log_info(alog, "Esta por finalizar el File System");
 
 	free(config->montaje);
 	free(magic_number);
@@ -137,7 +141,6 @@ void finalizar(){
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
 	}
-	//Falta cerrar los hilos de clientes que hayan quedado abiertos
 	dictionary_clean(clientes);
 	dictionary_destroy(clientes);
 
@@ -146,5 +149,19 @@ void finalizar(){
 	liberar_log(alog);
 }
 
+void finalizarFile(){
+	pthread_kill(hiloSelect,SIGKILL);
+	pthread_kill(hiloConsola,SIGKILL);
+	dictionary_iterator(clientes,(void*)cerrarClientes);
+	pthread_kill(hiloDump,SIGKILL);
+}
+
+void cerrarClientes(char * key, cliente_t * cliente){
+	pthread_kill(cliente->hilo,SIGKILL);
+}
+
+void senial(){
+	pthread_exit(NULL);
+}
 
 

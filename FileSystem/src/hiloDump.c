@@ -29,10 +29,12 @@ void crearTemporal(char * key, st_tabla* data){
 
 void* hilodump(){
 
+	signal(SIGKILL,senial);
+
 	while(1){
 		sleep(config->tiempo_dump);
 
-		dictionary_iterator(memtable,(void*)crearTemporal);
+		//dictionary_iterator(memtable,(void*)crearTemporal);
 	}
 
 	pthread_exit(NULL);

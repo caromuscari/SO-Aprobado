@@ -38,6 +38,7 @@ int realizarDescribe(st_describe * describe, st_metadata ** m);
 int realizarDescribeGlobal(t_list ** tablas);
 bool validarArchivos(char * archivo, int* respuesta);
 bool existeDirectorio(char * ruta, int * respuesta);
+void liberarTabla(structRegistro * reg);
 
 
 #endif /* SRC_MANEJOARCHIVOS_H_ */

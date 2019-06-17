@@ -33,8 +33,7 @@ int Insert(st_insert * insert){
 
 		respuesta = escribir(particion,part, insert);
 
-		free(metadata->consistency);
-		free(metadata);
+		liberarMetadata(metadata);
 	}else respuesta = 6;
 
 	return respuesta;

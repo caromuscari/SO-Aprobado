@@ -32,13 +32,13 @@ void * mostrarPagina(st_pagina tablaDePaginas[],int numeroPagina){
 
 int main(int argc, char const *argv[]) {
 
-	st_pagina tablaDePaginas[cantidad], *puntero;
-	puntero = tablaDePaginas;
+	st_pagina tablaDePaginas[cantidad], *punteroTabla;
+	punteroTabla = tablaDePaginas;
 
 
-	cargarPagina(puntero,0,1,"hola");
-	cargarPagina(puntero,1,0,"chau");
-	cargarPagina(puntero,2,1,"azul");
+	cargarPagina(punteroTabla,0,1,"hola");
+	cargarPagina(punteroTabla,1,0,"chau");
+	cargarPagina(punteroTabla,2,1,"azul");
 
 	mostrarPagina(tablaDePaginas,1);
 	mostrarPagina(tablaDePaginas,0);

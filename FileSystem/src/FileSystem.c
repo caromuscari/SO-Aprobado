@@ -17,6 +17,7 @@
 #include "hiloSelect.h"
 #include "hiloConsola.h"
 #include "hiloDump.h"
+#include "hiloInotify.h"
 #include <commons/collections/dictionary.h>
 #include <commons/bitarray.h>
 #include <sys/stat.h>
@@ -34,7 +35,7 @@ char* posicion;
 int bitm;
 
 structConfig * config;
-pthread_t hiloConsola, hiloSelect,hiloDump;
+pthread_t hiloConsola, hiloSelect,hiloDump, hiloInotify;
 t_dictionary * clientes, *memtable;
 
 struct stat mystat;
@@ -52,14 +53,16 @@ int main(int argc, char *argv[]) {
 
 
 	if(!(metadata ==-1 || bitm ==-1)){
-		//pthread_create(&hiloSelect, NULL, (void*)hiloselect,NULL);
-		pthread_create(&hiloConsola, NULL, (void*)hiloconsola,NULL);
-		//pthread_create(&hiloDump, NULL, (void*)hilodump,NULL);
+        pthread_create(&hiloInotify, NULL, (void*)hiloinotify,argv[1]);
+        //pthread_create(&hiloSelect, NULL, (void*)hiloselect,NULL);
+        pthread_create(&hiloConsola, NULL, (void*)hiloconsola,NULL);
+        //pthread_create(&hiloDump, NULL, (void*)hilodump,NULL);
 
 
-		//pthread_join(hiloSelect,NULL);
-		pthread_join(hiloConsola, NULL);
-		//pthread_join(hiloDump, NULL);
+        pthread_join(hiloInotify, NULL);
+        //pthread_join(hiloSelect,NULL);
+        pthread_join(hiloConsola, NULL);
+        //pthread_join(hiloDump, NULL);
 	}
 
 

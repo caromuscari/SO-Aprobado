@@ -291,3 +291,26 @@ structRegistro * leerBloque(char* bloque, uint16_t key){
 }
 
 
+int crearArchivoTemporal(char * pathCompleto){
+    FILE * archivo;
+    char * contenido;
+    int bit;
+    int flag=-1;
+
+    bit = verificar_bloque();
+    if(bit != -1){
+        bitarray_set_bit(bitmap,bit);
+        contenido = string_from_format("SIZE=0\nBLOQUES=[%d]", bit);
+
+        archivo = fopen(pathCompleto, "a+");
+
+        fputs(contenido,archivo);
+
+        fclose(archivo);
+
+        free(contenido);
+    }
+
+
+    return bit;
+}

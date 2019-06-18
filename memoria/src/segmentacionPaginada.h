@@ -12,13 +12,9 @@
 #include <stdlib.h>
 #include <funcionesCompartidas/log.h>
 
-t_log * file_log;
-
-void * memoriaPrincipal;
-
 typedef struct{
 	char* nombreTabla;
-	t_list tablaDePaginas;
+	t_list* tablaDePaginas;
 }st_segmento;
 
 typedef struct{
@@ -27,7 +23,7 @@ typedef struct{
 	int flagModificado;
 }st_tablaDePaginas;
 
-t_list* listaDeSegmentos;
+
 
 void *inicializarMemoria();
 

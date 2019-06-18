@@ -7,14 +7,18 @@
 
 #include "segmentacionPaginada.h"
 
-void* inicializarMemoria(){
+extern t_log *file_log;
+
+void* memoriaPrincipal;
+t_list* listaDeSegmentos;
+t_list* listaPaginasGlobal;
+
+void inicializarMemoria(){
 	memoriaPrincipal = malloc(1000); // aca voy a poner el tamaño segun el largo de value que me pase fs: ts+value+key
-	if (memoriaPrincipal == NULL){
-		log_info(file_log, "no se pudo asignar ese espacio de memoria");
-		return NULL;
-	}
+
 	listaDeSegmentos = list_create();
 	log_info(file_log, "se creo la lista de segmentos");
-	return memoriaPrincipal;
+
 }
+
 

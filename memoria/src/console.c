@@ -8,7 +8,7 @@ void makeCommand(char *command){
 				printf("[+] I got INSERT.");
         st_insert * insert;
         if((insert = cargarInsert(command))){
-          //createInstruccList(insert,INSERT);
+        	//createInstruccList(insert,INSERT);
           printf("[+] Executing INSERT");
           sleep(1);
         }
@@ -35,9 +35,8 @@ void makeCommand(char *command){
       }
       case DESCRIBE:{
 
-
-    break;
-            }
+  	  break;
+      }
      /* case JOURNAL:{
 
             break;

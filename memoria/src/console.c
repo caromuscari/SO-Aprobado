@@ -1,6 +1,8 @@
 // console
 #include "console.h"
 
+extern t_log *file_log;
+
 void makeCommand(char *command){
   int typeCommand = getEnumFromString(command);
   switch(typeCommand){
@@ -15,12 +17,15 @@ void makeCommand(char *command){
           break;
       }
       case SELECT:{
-        printf("[+] I got SELECT\n");
+        log_info(file_log, "[+] El comando es un SELECT\n");
         st_select * select;
         if((select = cargarSelect(command))){
-          printf("[+] Executing SELECT.\n");
-          sleep(1);
+        	log_info(file_log, "[+] Ejecutando SELECT.\n");
+        	comandoSelect(select);
+        	sleep(1);
        }
+
+       log_info(file_log, "[+] No se pudo ejecutar el SELECT. \n");
        break;
       }
 

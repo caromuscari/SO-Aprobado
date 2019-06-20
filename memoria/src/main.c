@@ -30,6 +30,7 @@ int main(int argc, char const *argv[]) {
 	inicializarMemoria();
 //	log_info(file_log, "la memoria se inicio correctamente");
 	console(); //al final no nos conectamos a nadie en la parte de consola
+
 	pthread_create(&server,NULL, &start_server, MYPORT);
 	//pthread_create(&client,NULL, &connectToSeeds,(void *) totalSeeds);
 

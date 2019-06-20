@@ -18,4 +18,6 @@
 
 void console();
 
+void makeCommand(char *command);
+
 #endif //MEM_CONSOLE_H

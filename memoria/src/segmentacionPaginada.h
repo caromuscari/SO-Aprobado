@@ -9,6 +9,7 @@
 #define SRC_SEGMENTACIONPAGINADA_H_
 
 #include <commons/collections/list.h>
+#include <funcionesCompartidas/API.h>
 #include <stdlib.h>
 #include <funcionesCompartidas/log.h>
 
@@ -25,7 +26,10 @@ typedef struct{
 
 
 
-void *inicializarMemoria();
+void inicializarMemoria();
 
+char* comandoSelect(st_select* comandoSelect);
+
+st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla);
 
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

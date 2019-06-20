@@ -32,4 +32,6 @@ char* comandoSelect(st_select* comandoSelect);
 
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla);
 
+st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key);
+
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

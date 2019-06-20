@@ -33,10 +33,11 @@ char* comandoSelect(st_select* comandoSelect){
 	segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoSelect->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
 		log_info(file_log, "segmento encontrado");
-		void* paginaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
+		st_tablaDePaginas* paginaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
 		if(paginaEncontrada){
-			paginaEncontrada += sizeof(double) + sizeof(uint16_t);
-			char* value = memcpy(value, paginaEncontrada, sizeof(char*));
+			int tamanio_value = 4;
+			char* value = malloc(tamanio_value); // aca iria el tamaño max que me pasa file system
+			memcpy(value, paginaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), tamanio_value);
 			return value;
 		}
 		return "no se encontro la pag";
@@ -48,17 +49,20 @@ st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 	bool mismoNombreTabla(st_segmento* segmento){
 		return 0 == strcmp(segmento->nombreTabla, nombreTabla);
 	}
-	return list_find(listaDeSegmentos, mismoNombreTabla);
+	return (st_segmento*)list_find(listaDeSegmentos, mismoNombreTabla);
 }
 
 //double time, uint16_t key, char* value
-void* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
+st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 	bool paginaConEsaKey(void* pagina){
 		pagina += sizeof(double);
-		uint16_t* keyAComparar = memcpy(keyAComparar, pagina, sizeof(uint16_t));
-		return key == *keyAComparar;
+		uint16_t keyAComparar;
+		memcpy(&keyAComparar, pagina, sizeof(uint16_t));
+		return key == keyAComparar;
 	}
-	return list_find(tablaDePaginas, paginaConEsaKey);
+
+	st_tablaDePaginas* paginaDeLaTabla = (st_tablaDePaginas*) list_find(tablaDePaginas, paginaConEsaKey);
+	return paginaDeLaTabla;
 }
 
 

@@ -35,9 +35,9 @@ void makeCommand(char *command,st_pagina *punteroTabla){
         printf("[+] I got SELECT\n");
         st_select * select;
         if((select = cargarSelect(command))){
+          comandoSelect(punteroTabla,select->key);
           printf("[+] Executing SELECT.\n");
-          sleep(1);
-       }
+          }
        break;
       }
 

@@ -18,14 +18,15 @@ int verificar_bloque();
 char * armar_path(char * archivo);
 bool crearMetadata(st_create * c, char * path);
 int crearParticiones(st_create * c, char * path);
+void eliminarTemporales(char * path);
 void eliminarDirectorio(char *path);
 void eliminarParticion(char *path, int particion);
 structParticion * leerParticion(char * path);
 void actualizar_bitmap();
 char * armar_PathBloque(char * bloque);
 void actualizar_Particion(structActualizar * a);
-t_list * listarDirectorio();
-structRegistro * leerBloque(char* bloque, uint16_t key);
+t_dictionary * listarDirectorio();
+structRegistro * leerBloque(char* bloque, uint16_t key, char ** flag);
 int crearArchivoTemporal(char * pathCompleto);
 
 

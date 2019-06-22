@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "archivos.h"
 #include <commons/bitarray.h>
+#include "hiloConsola.h"
 
 extern int tBloques;
 extern t_bitarray* bitmap;

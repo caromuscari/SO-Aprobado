@@ -15,6 +15,8 @@
 #include <sys/mman.h>
 #include <dirent.h>
 #include <funcionesCompartidas/listaMetadata.h>
+#include "hiloCompactacion.h"
+#include "buscar.h"
 
 extern structConfig * config;
 extern t_bitarray* bitmap;
@@ -151,6 +153,39 @@ int crearParticiones(st_create * c, char * path){
 	return flag;
 }
 
+void eliminarTemporales(char * path){
+	FILE * archivo;
+	structParticion * contenido;
+	int i = 1;
+	char * temp = string_from_format("%s/%d.tmp",path,i);
+
+	archivo = fopen(temp, "r");
+
+	while(archivo != NULL){
+		fclose(archivo);
+
+		contenido = leerParticion(temp);
+		while(contenido->bloques[i] != NULL)
+		{
+			bitarray_clean_bit(bitmap,atoi(contenido->bloques[i]));
+			i++;
+		}
+		remove(temp);
+
+		free(temp);
+		string_iterate_lines(contenido->bloques, (void*)free);
+		free(contenido->bloques);
+		free(contenido);
+
+
+		i++;
+		temp = string_from_format("%s/%d.tmp",path,i);
+		archivo = fopen(temp, "r");
+	}
+
+	free(temp);
+}
+
 void eliminarDirectorio(char * path){
 	char * meta = string_from_format("%s/Metadata", path);
 	remove(meta);
@@ -221,21 +256,28 @@ void actualizar_Particion(structActualizar * a){
 	free(bloques);
 }
 
-t_list * listarDirectorio(){
+t_dictionary * listarDirectorio(){
 	DIR *d;
 	struct dirent *dir;
-	t_list * lista;
+	t_dictionary * tablas;
 	char * nombre = string_from_format("%s/Tables", config->montaje);
     d = opendir(nombre);
     if (d)
     {
-    	lista = list_create();
+    	tablas = dictionary_create();
         while ((dir = readdir(d)) != NULL)
         {
-        	st_metadata * meta;
         	char * name = strdup(dir->d_name);
-        	meta = leerMetadata(name);
-        	list_add(lista,meta);
+
+        	if(!string_equals_ignore_case(name,".") && !string_equals_ignore_case(name,"..")){
+        		st_tablaCompac * tabla = malloc(sizeof(st_tablaCompac));
+        		tabla->meta = leerMetadata(name);
+
+        		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,name);
+        		pthread_detach(tabla->hilo);
+
+        		dictionary_put(tablas, name, tabla);
+        	}
 
         	free(name);
         }
@@ -243,10 +285,10 @@ t_list * listarDirectorio(){
     }
     free(nombre);
 
-    return lista;
+    return tablas;
 }
 
-structRegistro * leerBloque(char* bloque, uint16_t key){
+structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 
 	FILE * fbloque;
 	char * linea;
@@ -255,36 +297,68 @@ structRegistro * leerBloque(char* bloque, uint16_t key){
 	structRegistro * reg;
 	char * path;
 	int flag = 0;
+	char * value;
 
 	path = armar_PathBloque(bloque);
 
 	fbloque = fopen(path,"r");
 
-	while(getline(&linea, &tamBuffer, fbloque) != -1){
-		split = string_split(linea,";");
-		if(atoi(split[1]) == key){
-			if(flag == 0){
-				reg = malloc(sizeof(structRegistro));
-				reg->time = atoi(split[0]);
-				reg->key = atoi(split[1]);
-				reg->value = strtok(split[2], "\n");
+	if(*exep != NULL){
+		linea = malloc(sizeof(char) * tamBuffer);
+		getline(&linea, &tamBuffer, fbloque);
+		value = string_from_format("%s%s", *exep, linea);
 
-				flag = 1;
-			}else{
-				if(reg->time < atoi(split[0])){
-					reg->time = atoi(split[0]);
-					reg->key = atoi(split[1]);
-					reg->value = strtok(split[2], "\n");
-				}
-			}
+		split = string_split(value,";");
+		if(atoi(split[1]) == key){
+			reg = malloc(sizeof(structRegistro));
+			reg->time = atol(split[0]);
+			reg->key = atoi(split[1]);
+			reg->value = strtok(split[2], "\n");
+
+			flag = 1;
 		}
+
+		free(*exep);
+
 		string_iterate_lines(split, (void*)free);
 		free(split);
 		free(linea);
 	}
 
+	linea = malloc(sizeof(char) * tamBuffer);
+	while(getline(&linea, 0, fbloque) != -1){
+		split = string_split(linea,";");
+		if(split[0] != NULL){
+			if(split[1] == NULL) *exep = strdup(linea);
+			else if(split[2] != NULL && string_contains(split[2], "\n")){
+				if(atoi(split[1]) == key){
+					if(flag == 0){
+						reg = malloc(sizeof(structRegistro));
+						reg->time = atol(split[0]);
+						reg->key = atoi(split[1]);
+						reg->value = strtok(split[2], "\n");
+
+						flag = 1;
+					}else if(reg->time < atol(split[0])){
+							reg->time = atol(split[0]);
+							reg->key = atoi(split[1]);
+							reg->value = strtok(split[2], "\n");
+						}
+				}
+			}else *exep = strdup(linea);
+		}else *exep = strdup(linea);
+
+
+		string_iterate_lines(split, (void*)free);
+		free(split);
+		free(linea);
+
+		linea = malloc(sizeof(char) * tamBuffer);
+	}
+
 	fclose(fbloque);
 	free(path);
+	free(linea);
 
 	if(flag == 0) return NULL;
 	else return reg;

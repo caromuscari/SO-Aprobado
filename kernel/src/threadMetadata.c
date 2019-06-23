@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <commons/string.h>
 
-t_list *listMetadata;
+t_list *listMetadata = NULL;
 extern config *configuracion;
 extern t_log *file_log;
 pthread_mutex_t mutex;
@@ -23,7 +23,7 @@ void showLista() {
     }
 }
 
-st_metadata *getTabla(char *nameTable) {
+char *getTabla(char *nameTable) {
     st_metadata * result = NULL;
     pthread_mutex_lock(&mutex);
     int search_tabla(st_metadata *p) {
@@ -31,7 +31,25 @@ st_metadata *getTabla(char *nameTable) {
     }
     result = list_find(listMetadata, (void *) search_tabla);
     pthread_mutex_unlock(&mutex);
-    return result;
+    return strdup(result->consistency);
+}
+
+void updateListaMetadata(t_list * nuevaLista){
+    pthread_mutex_lock(&mutex);
+    if (listMetadata != NULL) {
+        destroyListaMetaData(listMetadata);
+    }
+    listMetadata = nuevaLista;
+    pthread_mutex_unlock(&mutex);
+}
+
+void cleanList(){
+    pthread_mutex_lock(&mutex);
+    if(listMetadata != NULL){
+        destroyListaMetaData(listMetadata);
+    }
+    list_create(listMetadata);
+    pthread_mutex_unlock(&mutex);
 }
 
 void *schedulerMetadata() {
@@ -62,22 +80,14 @@ void *schedulerMetadata() {
                 buffer = getMessage(socketClient, &response, &control);
                 if (buffer) {
                     error = false;
-                    pthread_mutex_lock(&mutex);
-                    if (listMetadata != NULL) {
-                        destroyListaMetaData(listMetadata);
-                    }
-                    listMetadata = deserealizarListaMetaData(buffer, response.sizeData);
-                    pthread_mutex_unlock(&mutex);
+                    updateListaMetadata(deserealizarListaMetaData(buffer, response.sizeData));
                     close(socketClient);
                     free(buffer);
                 }
             }
         }
         if (error) {
-            if (listMetadata != NULL) {
-                destroyListaMetaData(listMetadata);
-            }
-            list_create(listMetadata);
+            cleanList();
         }
         sleep(configuracion->MULTIPROCESAMIENTO);
     }

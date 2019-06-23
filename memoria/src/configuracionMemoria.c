@@ -1,5 +1,7 @@
 #include "configuracionMemoria.h"
 
+extern t_log *file_log;
+
 t_configuracionMemoria configuracionMemoria;
 
 t_configuracionMemoria leerConfiguracion(char* path){

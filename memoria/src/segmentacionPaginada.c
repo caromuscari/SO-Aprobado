@@ -126,7 +126,7 @@ int algoritmoLRU(){
 
 	st_segmento* segmento = listaDeSegmentos->head;
 
-	for(int i = 0, )
+//	for(int i = 0, )
 
 
 
@@ -142,11 +142,11 @@ st_tablaDePaginas* paginaConTiempoMenorPorSegmento(t_list* listaPaginas){
 	t_list* listaPaginasConFlagEnCero = list_filter(listaPaginas, tieneFlagEnCero);
 
 	st_tablaDePaginas* paginaConMenorTime;
-
-	for(int i = 1; i< list_size(listaPaginasConFlagEnCero) -1; i++){
-
-		}
-	}
+//
+//	for(int i = 1; i< list_size(listaPaginasConFlagEnCero) -1; i++){
+//
+//		}
+//	}
 }
 
 

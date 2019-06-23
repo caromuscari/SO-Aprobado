@@ -58,18 +58,17 @@ int main(int argc, char **argv){
     if(inicializar(argv[1]) < 0){
         return -1;
     }
-
-    t_list * lista = cargarListMemoria();
-    updateListaMemorias(lista);
-    lista = cargarListMemoria2();
-    updateListaMemorias(lista);
-//    pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
-//    pthread_create(&pthreadMemoria,NULL,loadPoolMemori,NULL);
-//    pthread_create(&pthreadMetadata,NULL,schedulerMetadata, NULL);
-//    consola();
-//    pthread_cancel(plafinifcador);
-//    pthread_cancel(pthreadMemoria);
-//    pthread_cancel(pthreadMetadata);
-//    log_destroy(file_log);
+//    t_list * lista = cargarListMemoria();
+//    updateListaMemorias(lista);
+//    lista = cargarListMemoria2();
+//    updateListaMemorias(lista);
+    pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
+    pthread_create(&pthreadMemoria,NULL,loadPoolMemori,NULL);
+    pthread_create(&pthreadMetadata,NULL,schedulerMetadata, NULL);
+    consola();
+    pthread_cancel(plafinifcador);
+    pthread_cancel(pthreadMemoria);
+    pthread_cancel(pthreadMetadata);
+    log_destroy(file_log);
     return 0;
 }

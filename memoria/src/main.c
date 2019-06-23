@@ -13,7 +13,6 @@
 #define MYPORT "8081"
 
 t_log *file_log;
-t_log *log_server;
 
 char *IP_FS = IPFILESYSTEM;
 char *PORT_FS = PORTFILESYSTEM;
@@ -28,23 +27,24 @@ int main(int argc, char const *argv[]) {
 	pthread_t server;
 	pthread_t client;
 
-	t_configuracionMemoria configMemoria = leerConfiguracion("/home/utnso/workspace/tp-2019-1c-misc/memoria/memoriaConfig.config");
+    file_log = crear_archivo_log("Memoria", true,"./logC");
+
+	t_configuracionMemoria configMemoria = leerConfiguracion("/home/miguelchauca/Documents/Operativo/workSpace/tp-2019-1c-misc/memoria/memoriaConf.config");
 	int tamanioMemoria = configMemoria.tamanioMemoria;
 
 	int cantPaginas = tamanioMemoria / (sizeof(double) + sizeof(uint16_t) + tamanioValue);
 	t_condicion* marco = malloc(cantPaginas);
-	//int control = 0;
-	file_log = crear_archivo_log("Memoria", true,"./logC");
-	//int socketClient = establecerConexion(IP_FS,PORT_FS,file_log,&control);
+
 	inicializarMemoria();
 	log_info(file_log, "la memoria se inicio correctamente");
+
+    pthread_create(&server,NULL, &start_server, MYPORT);
+    //pthread_create(&client,NULL, &connectToSeeds,(void *) totalSeeds);
+
+//    pthread_join(server,NULL);
+//    //pthread_join(client,NULL);
+
 	console();
-
-	pthread_create(&server,NULL, &start_server, MYPORT);
-	//pthread_create(&client,NULL, &connectToSeeds,(void *) totalSeeds);
-
-	pthread_join(server,NULL);
-	//pthread_join(client,NULL);
 
 	return 0;
 }

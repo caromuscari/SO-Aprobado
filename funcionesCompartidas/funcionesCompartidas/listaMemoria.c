@@ -9,8 +9,9 @@ void *serealizarDataMemoria(st_data_memoria *memoria, size_t *size_buffer)
     st_size_memoria sizeMemoria;
     sizeMemoria.ip = strlen(memoria->ip) + 1;
     sizeMemoria.puerto = strlen(memoria->puerto) + 1;
+    sizeMemoria.numero = sizeof(memoria->numero);
 
-    size_t sizeBuffer = sizeMemoria.ip + sizeMemoria.puerto + sizeof(sizeMemoria);
+    size_t sizeBuffer = sizeMemoria.ip + sizeMemoria.puerto + sizeMemoria.numero + sizeof(sizeMemoria);
     *size_buffer = sizeBuffer;
     void *buffer = malloc(sizeBuffer);
     int offset = 0;
@@ -22,6 +23,9 @@ void *serealizarDataMemoria(st_data_memoria *memoria, size_t *size_buffer)
     offset += sizeMemoria.ip;
 
     memcpy((buffer + offset), memoria->puerto, sizeMemoria.puerto);
+    offset += sizeMemoria.puerto;
+
+    memcpy((buffer + offset), &memoria->numero, sizeMemoria.numero);
 
     return buffer;
 }
@@ -41,6 +45,10 @@ st_data_memoria *deserealizarDataMemoria(void *buffer, size_t *size_buffer)
     dataMemoria->puerto = malloc(sizeMemoria.puerto);
     memcpy(dataMemoria->puerto, (buffer + offset), sizeMemoria.puerto);
     offset += sizeMemoria.puerto;
+
+    memcpy(&dataMemoria->numero,(buffer + offset), sizeMemoria.numero);
+    offset += sizeMemoria.numero;
+
     if (size_buffer)
     {
         *size_buffer = offset;

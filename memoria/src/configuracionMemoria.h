@@ -33,8 +33,6 @@ typedef struct{
 
 }t_configuracionMemoria;
 
-t_configuracionMemoria configuracionMemoria;
-
 t_configuracionMemoria leerConfiguracion(char* path);
 
 int tamanioArray(void** array);

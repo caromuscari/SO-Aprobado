@@ -144,15 +144,9 @@ st_tablaDePaginas* paginaConTiempoMenorPorSegmento(t_list* listaPaginas){
 	st_tablaDePaginas* paginaConMenorTime;
 
 	for(int i = 1; i< list_size(listaPaginasConFlagEnCero) -1; i++){
-		paginaConMenorTime = listaPaginasConFlagEnCero[0];
-		double menorTime = obtenerTimeDePag(paginaConMenorTime);
-		if(obtenerTimeDePag(listaPaginasConFlagEnCero[i+1]) < menorTime){
-			paginaConMenorTime = listaPaginasConFlagEnCero[i+1];
-			menorTime = obtenerTimeDePag(listaPaginasConFlagEnCero[i+1]);
+
 		}
 	}
-
-	return paginaConMenorTime;
 }
 
 

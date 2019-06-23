@@ -9,16 +9,15 @@
 #define SRC_SEGMENTACIONPAGINADA_H_
 
 #include <commons/collections/list.h>
+#include <funcionesCompartidas/API.h>
 #include <stdlib.h>
 #include <funcionesCompartidas/log.h>
-
-t_log * file_log;
-
-void * memoriaPrincipal;
+#include "configuracionMemoria.h"
+#include <time.h>
 
 typedef struct{
 	char* nombreTabla;
-	t_list tablaDePaginas;
+	t_list* tablaDePaginas;
 }st_segmento;
 
 typedef struct{
@@ -27,9 +26,24 @@ typedef struct{
 	int flagModificado;
 }st_tablaDePaginas;
 
-t_list* listaDeSegmentos;
+typedef enum{
+	LIBRE = 0,
+	OCUPADO = 1
+}t_condicion;
 
-void *inicializarMemoria();
+void inicializarMemoria();
+
+char* comandoSelect(st_select* comandoSelect);
+
+st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla);
+
+st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key);
+
+double timeEnMiliseg();
+
+int buscarMarcoLibre();
+
+int algoritmoLRU();
 
 
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

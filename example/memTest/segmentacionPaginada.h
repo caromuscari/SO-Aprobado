@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <funcionesCompartidas/log.h>
 
+#define cantidad 2
+
 t_log * file_log;
 
 typedef struct{
@@ -24,13 +26,16 @@ typedef struct{
 typedef struct{
 	int nroDePagina;
 	void *direccionValor;
-	int flagModificado;
-	
+	char *nbrePagina;
+
 }st_pagina;
 
 t_list* listaDeSegmentos;
 t_list* listaDePaginas;
 
+
+void comandoInsert(st_pagina *puntero,int numeroPagina,char *nombrePagina,char* valor);
+void * comandoSelect(st_pagina tablaDePaginas[],int numeroPagina);
 
 
 

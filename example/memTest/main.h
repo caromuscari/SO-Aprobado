@@ -1,5 +1,5 @@
-#ifndef MEM_CONSOLE_H
-#define MEM_CONSOLE_H
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <readline/readline.h>
 #include <commons/log.h>
@@ -12,12 +12,14 @@
 #include <unistd.h>
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/log.h>
-#include <pthread.h>
-#include "conections.h"
+#include "segmentacionPaginada.h"
+//#include "segmentacionPaginada.c"
+#include "console.h"
+#include "console.c"
+//#include <pthread.h>
+//#include "conections.h"
 
 
-void console();
+int main(int argc, char const *argv[]);
 
-void makeCommand(char *command);
-
-#endif //MEM_CONSOLE_H
+#endif //MAIN_H

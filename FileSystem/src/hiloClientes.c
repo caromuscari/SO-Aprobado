@@ -18,11 +18,13 @@
 #include <stddef.h>
 #include <signal.h>
 #include "Funciones.h"
+#include "hiloConsola.h"
 
 
 extern t_log* alog;
 extern t_dictionary * clientes;
 extern structConfig * config;
+extern t_list * listaTabla;
 
 void tratarCliente(int socketC){
 
@@ -107,11 +109,11 @@ void tratarCliente(int socketC){
 
 				respuesta = realizarDescribe(describe, &meta);
 
-				buffer = serealizarMetaData(meta, &size);
+				buffer = serealizarMetaData(meta, &size);//Probar
 
 				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
-				liberarMetadata(meta);
+				//liberarMetadata(meta);
 				destroyDescribe(describe);
 				free(buffer);
 				break;
@@ -119,18 +121,16 @@ void tratarCliente(int socketC){
 			case 6:
 				log_info(alog, "Recibi un Describe Global");
 
-				t_list * tabla;
+				respuesta = realizarDescribeGlobal();
 
-				respuesta = realizarDescribeGlobal(&tabla);
-
-				buffer = serealizarListaMetaData(tabla,&size);
+				buffer = serealizarListaMetaData(listaTabla,&size);
 				enviarRespuesta(respuesta, &buffer, socketC, &status);
 
 				free(buffer);
 				break;
 			default:
 				flag = false;
-				enviarRespuesta(15, &buffer, socketC, &status); //Modificar numero
+				enviarRespuesta(16, &buffer, socketC, &status); //Modificar numero
 
 				//free(buffer);
 
@@ -138,6 +138,8 @@ void tratarCliente(int socketC){
 
 		free(recibido->buffer);
 		free(recibido);
+
+		sleep(config->retardo);
 	}
 
 	log_info(alog, "se desconecto el socket client %d",socketC);

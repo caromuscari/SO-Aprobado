@@ -1,5 +1,6 @@
 #include "configuracionMemoria.h"
 
+t_configuracionMemoria configuracionMemoria;
 
 t_configuracionMemoria leerConfiguracion(char* path){
 	archivoConfiguracionMemoria = config_create(path);

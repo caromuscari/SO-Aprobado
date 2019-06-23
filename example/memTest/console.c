@@ -1,31 +1,43 @@
 // console
 #include "console.h"
 
-extern t_log *file_log;
 
-void makeCommand(char *command){
+
+//comandoInsert(punteroTabla,command[1],command[2],command[3])
+  //INSERT [NOMBRE_TABLA] [KEY] “[VALUE]”
+  //INSERT TABLA2 4 "giuliana"
+
+
+
+//	cargarPagina(punteroTabla,0,1,"hola");
+
+
+//mostrarPagina(tablaDePaginas,1);
+
+
+
+void makeCommand(char *command,st_pagina *punteroTabla){
   int typeCommand = getEnumFromString(command);
   switch(typeCommand){
 		case INSERT:{
-				printf("[+] I got INSERT.");
+				printf("[+] I got INSERT. \n");
         st_insert * insert;
         if((insert = cargarInsert(command))){
-        	comandoInsert(insert);
-        	printf("[+] Executing INSERT");
-        	sleep(1);
+
+          printf("%s\n",insert->value);
+          comandoInsert(punteroTabla,insert->key,insert->nameTable,insert->value);
+          //createInstruccList(insert,INSERT);
+          printf("[+] Executing INSERT");
         }
           break;
       }
       case SELECT:{
-        log_info(file_log, "[+] El comando es un SELECT\n");
+        printf("[+] I got SELECT\n");
         st_select * select;
         if((select = cargarSelect(command))){
-        	log_info(file_log, "[+] Ejecutando SELECT.\n");
-        	comandoSelect(select);
-        	sleep(1);
-       }
-
-       log_info(file_log, "[+] No se pudo ejecutar el SELECT. \n");
+          comandoSelect(punteroTabla,select->key);
+          printf("[+] Executing SELECT.\n");
+          }
        break;
       }
 
@@ -40,8 +52,9 @@ void makeCommand(char *command){
       }
       case DESCRIBE:{
 
-  	  break;
-      }
+
+    break;
+            }
      /* case JOURNAL:{
 
             break;
@@ -51,12 +64,13 @@ void makeCommand(char *command){
 
 }
 
-void console(){
+void console(st_pagina *punteroTabla){
+
   char *command ;
   printf("[+] Write a LQL command: \n");
   command = readline("[>] ");
   while(strcmp(command,"exit") != 0){
-    makeCommand(command);
+    makeCommand(command,punteroTabla);
     free(command);
     printf("------------------------------\n");
     command = readline("[>] ");

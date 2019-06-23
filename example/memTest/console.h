@@ -12,12 +12,16 @@
 #include <unistd.h>
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/log.h>
-#include <pthread.h>
-#include "conections.h"
+#include "segmentacionPaginada.h"
+#include "segmentacionPaginada.c"
+//#include <pthread.h>
+//#include "conections.h"
 
 
-void console();
 
-void makeCommand(char *command);
 
+
+
+void console(st_pagina *punteroTabla);
+//void makeCommand(char *command);
 #endif //MEM_CONSOLE_H

@@ -22,6 +22,7 @@
 #include <commons/bitarray.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include "buscar.h"
 
 
 char* magic_number;
@@ -37,7 +38,8 @@ int bitm;
 
 structConfig * config;
 pthread_t hiloConsola, hiloSelect,hiloDump, hiloInotify;
-t_dictionary * clientes, *memtable;
+t_dictionary * clientes, *memtable, *tablas;
+t_list * listaTabla;
 
 struct stat mystat;
 
@@ -55,6 +57,9 @@ int main(int argc, char *argv[]) {
 
 	if(!(metadata ==-1 || bitm ==-1)){
 		signal(SIGINT,finalizarFile);
+
+		tablas = listarDirectorio();
+
         pthread_create(&hiloInotify, NULL, (void*)hiloinotify,argv[1]);
 		pthread_create(&hiloSelect, NULL, (void*)hiloselect,NULL);
 		pthread_create(&hiloConsola, NULL, (void*)hiloconsola,NULL);

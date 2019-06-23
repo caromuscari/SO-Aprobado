@@ -326,7 +326,7 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 	}
 
 	linea = malloc(sizeof(char) * tamBuffer);
-	while(getline(&linea, 0, fbloque) != -1){
+	while(getline(&linea, &tamBuffer, fbloque) != -1){
 		split = string_split(linea,";");
 		if(split[0] != NULL){
 			if(split[1] == NULL) *exep = strdup(linea);

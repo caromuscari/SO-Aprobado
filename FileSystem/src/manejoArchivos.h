@@ -35,7 +35,7 @@ int realizarSelect(st_select * select, char ** value);
 int realizarCreate(st_create * create);
 int realizarDrop(st_drop * drop);
 int realizarDescribe(st_describe * describe, st_metadata ** m);
-int realizarDescribeGlobal(t_list ** tablas);
+int realizarDescribeGlobal();
 bool validarArchivos(char * archivo, int* respuesta);
 bool existeDirectorio(char * ruta, int * respuesta);
 void liberarTabla(structRegistro * reg);

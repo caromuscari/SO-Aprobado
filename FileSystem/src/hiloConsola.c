@@ -23,9 +23,9 @@
 
 extern t_log* alog;
 extern structConfig * config;
+extern t_list * listaTabla;
 
 void* hiloconsola(){
-	int flag = 1;
 
 	char *request;
 	char* ingreso;
@@ -36,7 +36,7 @@ void* hiloconsola(){
 
 	log_info(alog, "Se creo el hilo consola");
 
-	while(flag){
+	while(1){
 
 		printf("Ingrese una Request:\n");
 		ingreso = malloc(sizeof(char) * tamBuffer);
@@ -78,7 +78,7 @@ void* hiloconsola(){
 				if(select != NULL){
 					respuesta = realizarSelect(select, &value);
 
-					if(respuesta != 14){//Revisar
+					if(respuesta != 14){
 						mostrarRespuesta(respuesta);
 					}else{
 						log_info(alog, value);
@@ -129,27 +129,25 @@ void* hiloconsola(){
 				log_info(alog, "Request de tipo DESCRIBE");
 				st_describe * describe;
 				st_metadata * meta;
-				t_list * tabla;
 				describe = cargarDescribe(request);
 
 				if(describe == NULL){
-					respuesta = realizarDescribeGlobal(&tabla);
+					respuesta = realizarDescribeGlobal();
 
 					mostrarRespuesta(respuesta);
-					list_iterate(tabla,(void*)mostrarTabla);
-					list_iterate(tabla,(void*)liberarMetadata);
+					list_iterate(listaTabla,(void*)mostrarTabla);
+					list_destroy(listaTabla);
 				}else{
 					respuesta = realizarDescribe(describe,&meta);
 
 					mostrarRespuesta(respuesta);
 					if(respuesta == 15){
 						mostrarTabla(meta);
-						liberarMetadata(meta);
 					}
 
+					destroyDescribe(describe);
 				}
 
-				destroyDescribe(describe);
 				break;
 
 			default:
@@ -158,6 +156,7 @@ void* hiloconsola(){
 			}
 		free(ingreso);
 
+		//sleep(config->retardo);
 	}
 
 	log_info(alog, "Sale del hilo consola");

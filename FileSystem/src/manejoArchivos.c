@@ -18,9 +18,11 @@
 #include <funcionesCompartidas/listaMetadata.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <errno.h>
+#include "hiloConsola.h"
+#include "hiloCompactacion.h"
 
-extern t_dictionary * memtable;
+extern t_dictionary * memtable, *tablas;
+extern t_list * listaTabla;
 
 
 int realizarInsert(st_insert * insert){
@@ -124,6 +126,12 @@ int realizarCreate(st_create * create){
 				return respuesta;
 			}
 
+			st_tablaCompac * tabla = malloc(sizeof(st_tablaCompac));
+			tabla->meta = leerMetadata(create->nameTable);
+			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,create->nameTable);
+			pthread_detach(tabla->hilo);
+			dictionary_put(tablas, create->nameTable, tabla);
+
 			free(path);
 
 			respuesta = 8;
@@ -138,12 +146,13 @@ int realizarCreate(st_create * create){
 
 int realizarDrop(st_drop * drop){
 	int respuesta;
-	st_metadata * metadata;
 	char * path;
 	st_tabla * data;
+	st_tablaCompac * tabla;
 
 	if(validarArchivos(drop->nameTable, &respuesta)){
-		metadata = leerMetadata(drop->nameTable);
+
+		tabla = dictionary_remove(tablas, drop->nameTable);
 
 		path = armar_path(drop->nameTable);
 
@@ -156,20 +165,26 @@ int realizarDrop(st_drop * drop){
 			list_destroy(data->lista);
 
 			sem_post(&data->semaforo);
+			sem_destroy(&data->semaforo);
 
 			free(dictionary_remove(memtable,drop->nameTable));
 		}
 
-		for (int i = 0; i < metadata->partitions; i++) {
+		for (int i = 0; i < tabla->meta->partitions; i++) {
 			eliminarParticion(path, i);
 		}
 
+		eliminarTemporales(path);
+
 		eliminarDirectorio(path);
+
+		pthread_kill(tabla->hilo,SIGKILL);
 
 		respuesta = 9;
 
 		free(path);
-		liberarMetadata(metadata);
+		liberarMetadata(tabla->meta);
+		free(tabla);
 	}
 
 	return respuesta;
@@ -178,20 +193,22 @@ int realizarDrop(st_drop * drop){
 int realizarDescribe(st_describe * describe, st_metadata ** m){
 	int respuesta;
 
-	if(validarArchivos(describe->nameTable, &respuesta)){
-		*m = leerMetadata(describe->nameTable);
+	if(dictionary_has_key(tablas, describe->nameTable)){
+		st_tablaCompac * tabla = dictionary_get(tablas,describe->nameTable);
+		*m = tabla->meta;
 		respuesta = 15;
-	}
+	}else respuesta = 4;
 
 	return respuesta;
 }
 
-int realizarDescribeGlobal(t_list ** tablas){
+int realizarDescribeGlobal(){
 	int respuesta;
 
-	*tablas = listarDirectorio();
+	listaTabla = list_create();
+	dictionary_iterator(tablas,(void*)obtenerMetadatas);
 
-	if(tablas != NULL){
+	if(list_size(listaTabla) != 0){
 		respuesta = 13;
 	}else{
 		respuesta = 12;

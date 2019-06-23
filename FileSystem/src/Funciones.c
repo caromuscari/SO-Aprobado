@@ -30,7 +30,7 @@ extern int tBloques;
 extern int cantBloques;
 
 extern structConfig * config;
-extern t_dictionary * clientes, *memtable;
+extern t_dictionary * clientes, *memtable, *tablas;
 extern t_log* alog;
 extern t_bitarray* bitmap;
 extern char* posicion;
@@ -141,6 +141,9 @@ void finalizar(){
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
 	}
+	dictionary_clean(tablas);
+	dictionary_destroy(tablas);
+
 	dictionary_clean(clientes);
 	dictionary_destroy(clientes);
 
@@ -153,11 +156,16 @@ void finalizarFile(){
 	pthread_kill(hiloSelect,SIGKILL);
 	pthread_kill(hiloConsola,SIGKILL);
 	dictionary_iterator(clientes,(void*)cerrarClientes);
+	dictionary_iterator(tablas,(void*)cerrarTablas);
 	pthread_kill(hiloDump,SIGKILL);
 }
 
 void cerrarClientes(char * key, cliente_t * cliente){
 	pthread_kill(cliente->hilo,SIGKILL);
+}
+
+void cerrarTablas(char * key, st_tablaCompac * tabla){
+	pthread_kill(tabla->hilo,SIGKILL);
 }
 
 void senial(){

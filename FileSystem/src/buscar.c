@@ -11,8 +11,10 @@
 #include "operaciones.h"
 #include "buscar.h"
 #include <dirent.h>
+#include "Funciones.h"
 
 extern t_dictionary * memtable;
+extern t_list * listaTabla;
 
 char * buscarKey(char * name, int key, int particion){
 	char * value;
@@ -64,7 +66,8 @@ char * buscarKey(char * name, int key, int particion){
 	}
 
 	free(path);
-	return value;
+	if(time != 0) return string_from_format("%d;%d;%s", time, key, value);
+	else return NULL;
 }
 
 structRegistro * buscarEnLista(st_tabla * data, uint16_t key){
@@ -93,7 +96,6 @@ structRegistro * buscarEnLista(st_tabla * data, uint16_t key){
 				}
 			}
 		}
-		//free(prueba); No se si va
 	}
 
 	sem_post(&data->semaforo);
@@ -106,11 +108,12 @@ structRegistro * buscarEnParticion(char * path, uint16_t key){
 	structRegistro * reg, * prueba;
 	structParticion * part;
 	int i = 0, flag = 0;
+	char * exep;
 
 	part = leerParticion(path);
 
 	while(part->bloques[i] != NULL && flag == 0){
-		prueba = leerBloque(part->bloques[i], key);
+		prueba = leerBloque(part->bloques[i], key, &exep);
 		if(prueba != NULL){
 			reg = malloc(sizeof(structRegistro));
 			reg->time = prueba->time;
@@ -148,7 +151,7 @@ structRegistro * buscarEnTemporales(char * name, uint16_t key){
         while ((dir = readdir(d)) != NULL)
         {
         	char * name = strdup(dir->d_name);
-        	if(string_ends_with(name,".tmp")){
+        	if(string_ends_with(name,".tmp") || string_ends_with(name,".tmpc")){
         		path = string_from_format("%s/%s", nombre, name);
         		reg = buscarEnArchivo(path,key);
 
@@ -178,11 +181,12 @@ structRegistro * buscarEnArchivo(char * path, uint16_t key){
 	structRegistro * reg, * prueba;
 	structParticion * part;
 	int i = 0, flag = 0;
+	char * exep;
 
 	part = leerParticion(path);
 
 	while(part->bloques[i] != NULL){
-		prueba = leerBloque(part->bloques[i], key);
+		prueba = leerBloque(part->bloques[i], key, &exep);
 		if(prueba != NULL){
 			if(flag == 0){
 				reg = malloc(sizeof(structRegistro));
@@ -211,6 +215,38 @@ structRegistro * buscarEnArchivo(char * path, uint16_t key){
 
 	if(flag == 0)return NULL;
 	else return reg;
+}
+/*
+t_list * listaTablas(){
+	DIR *d;
+	struct dirent *dir;
+	t_list * lista;
+	char * nombre = string_from_format("%s/Tables", config->montaje);
+    d = opendir(nombre);
+    if (d)
+    {
+    	lista = list_create();
+	    while ((dir = readdir(d)) != NULL)
+        {
+	    	st_metadata * meta;
+	        char * name = strdup(dir->d_name);
+
+	        if(!string_equals_ignore_case(name,".") && !string_equals_ignore_case(name,"..")){
+	        	meta = leerMetadata(name);
+	        	list_add(lista,meta);
+	        }
+	        free(name);
+	    }
+	    closedir(d);
+	}
+    free(nombre);
+
+    return lista;
+}*/
+
+void obtenerMetadatas(char * key, st_tablaCompac * tabla){
+
+	list_add(listaTabla, tabla->meta);
 }
 
 

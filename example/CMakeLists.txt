@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
-project(example C)
+project(Kernel C)
 
 set(CMAKE_C_STANDARD 11)
-set(PATH_KERNEL "./listaMetadata.c")
+set(PATH_KERNEL "listaMemoria.c")
 add_executable(Kernel ${PATH_KERNEL})
 target_link_libraries(Kernel -lreadline -lpthread -lcommons -lcompartidas)

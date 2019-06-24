@@ -7,3 +7,4 @@ compiler:
 	gcc -o "listaMemoria.o" ./listaMemoria.c -lcommons -lcompartidas
 	gcc -o "serverMemoria.o" ./serverMemoria.c -lcommons -lcompartidas
 	gcc -o "listaMetaData.o" ./listaMetadata.c -lcommons -lcompartidas
+	gcc -o "registro.o" ./registro.c -lcommons -lcompartidas

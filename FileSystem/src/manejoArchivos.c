@@ -23,6 +23,7 @@
 
 extern t_dictionary * memtable, *tablas;
 extern t_list * listaTabla;
+extern t_log* alog;
 
 
 int realizarInsert(st_insert * insert){
@@ -75,23 +76,32 @@ int realizarInsert(st_insert * insert){
 int realizarSelect(st_select * select, char ** value){
 
 	int respuesta;
-	st_metadata * metadata;
 	int particion;
+	st_tablaCompac * tabla;
+	int valor;
 
 	if(validarArchivos(select->nameTable, &respuesta)){
-		metadata = leerMetadata(select->nameTable);
 
-		particion = select->key % metadata->partitions;
+		tabla = dictionary_get(tablas, select->nameTable);
 
-		*value = buscarKey(select->nameTable,select->key, particion);
-
-		if(*value ==NULL){
-			respuesta = 6;
+		sem_getvalue(&tabla->compactacion, &valor);
+		if(valor != 1){
+			sem_t *sem= malloc(sizeof(sem_t));
+			sem_init(sem,0,0);
+			list_add(tabla->sem,sem);
+			log_info(alog, "Se bloquea la tabla");
+			sem_wait(sem);
 		}else{
-			respuesta = 14;
-		}
+			particion = select->key % tabla->meta->partitions;
 
-		liberarMetadata(metadata);
+			*value = buscarKey(select->nameTable,select->key, particion);
+
+			if(*value ==NULL){
+				respuesta = 6;
+			}else{
+				respuesta = 14;
+			}
+		}
 	}
 
 	return respuesta;

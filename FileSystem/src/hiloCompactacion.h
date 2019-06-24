@@ -10,8 +10,9 @@
 
 
 void hilocompactacion(char * name);
+void desbloquear(sem_t *semaforo);
 t_list * llenarTabla(char * path);
-void leerTemporal(int temp, t_dictionary * lista);
+void leerTemporal(char * path, t_dictionary * lista, int totalPart);
 void generarParticion(char * path, int part, t_dictionary * lista);
 
 

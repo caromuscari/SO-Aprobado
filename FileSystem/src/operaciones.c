@@ -226,22 +226,16 @@ structParticion * leerParticion(char * path){
 	return contenido;
 }
 
-void actualizar_Particion(structActualizar * a){
-	char * path = armar_path(a->nameTable);
-	char * pathPart = string_from_format("%s/%d.bin",path , a->particion);
+void actualizar_bloques(char * path,int bit){
 	t_config *configuracion;
-	int size;
 	char ** bloques;
 	int i;
 
 	configuracion = config_create(path);
 
-	size = config_get_int_value(configuracion, "SIZE");
-	config_set_value(configuracion, "SIZE", string_itoa(size+(a->size)));
-
 	bloques = config_get_array_value(configuracion, "BLOQUES");
 	while(bloques[i] != NULL) i++;
-	bloques[i] = string_itoa(a->bit);
+	bloques[i] = string_itoa(bit);
 	bloques[i++] = NULL;
 
 	config_get_string_value(configuracion, "BLOQUES");
@@ -250,10 +244,22 @@ void actualizar_Particion(structActualizar * a){
 
 	config_destroy(configuracion);
 
-	free(path);
-	free(pathPart);
 	string_iterate_lines(bloques, (void*)free);
 	free(bloques);
+}
+
+void actualizar_size(char * path,int size){
+	t_config *configuracion;
+	int sizeF;
+
+	configuracion = config_create(path);
+
+	sizeF = config_get_int_value(configuracion, "SIZE");
+	config_set_value(configuracion, "SIZE", string_itoa(sizeF+size));
+
+	config_save(configuracion);
+
+	config_destroy(configuracion);
 }
 
 t_dictionary * listarDirectorio(){
@@ -272,6 +278,10 @@ t_dictionary * listarDirectorio(){
         	if(!string_equals_ignore_case(name,".") && !string_equals_ignore_case(name,"..")){
         		st_tablaCompac * tabla = malloc(sizeof(st_tablaCompac));
         		tabla->meta = leerMetadata(name);
+
+        		sem_init(&tabla->compactacion,0,1);
+        		sem_init(&tabla->opcional,0,0);
+        		tabla->sem = list_create();
 
         		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,name);
         		pthread_detach(tabla->hilo);
@@ -369,7 +379,6 @@ int crearArchivoTemporal(char * pathCompleto){
     FILE * archivo;
     char * contenido;
     int bit;
-    int flag=-1;
 
     bit = verificar_bloque();
     if(bit != -1){

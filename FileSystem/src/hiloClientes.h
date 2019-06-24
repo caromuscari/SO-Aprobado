@@ -20,11 +20,10 @@ typedef struct {
 typedef struct {
 	int socket;
 	pthread_t hilo;
-	sem_t semaforo;
 }cliente_t;
 
 void tratarCliente(int socketC);
-void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status);
+void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status, size_t tam);
 void senial();
 
 

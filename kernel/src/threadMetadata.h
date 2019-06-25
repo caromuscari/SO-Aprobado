@@ -12,4 +12,5 @@
 #include "load_config.h"
 
 void * schedulerMetadata();
+char *getTabla(char *nameTable);
 #endif //KERNEL_THREADMETADATA_H

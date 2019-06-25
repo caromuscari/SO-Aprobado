@@ -61,7 +61,7 @@ void * hiloselect(){
 
 				char * value = string_itoa(config->tam_value);
 
-				enviarRespuesta(0,&value, nuevo_socket, &controlador);
+				enviarRespuesta(0,&value, nuevo_socket, &controlador, sizeof(value));
 
 			}else{
 				log_info(alog, "Se conecto un cliente incorrecto");

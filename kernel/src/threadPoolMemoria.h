@@ -13,6 +13,20 @@
 #include <funcionesCompartidas/listaMemoria.h>
 #include <pthread.h>
 
+enum TypeCriterio {
+    StrongConsistency = 1,
+    StrongHashConsistency = 2,
+    EventualConsistency = 3
+};
+typedef struct {
+    st_data_memoria * memoria;
+    bool activo;
+    t_list * tags;
+    t_list * tipos;
+    int count;
+} st_kernel_memoria;
 void *loadPoolMemori();
+void updateListaMemorias(t_list * nuevaLista);
+bool setTipoConsistencia(int number, enum TypeCriterio tipo);
 
 #endif //KERNEL_THREADPOOLMEMORIA_H

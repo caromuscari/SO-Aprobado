@@ -13,7 +13,9 @@
 #include <funcionesCompartidas/listaMetadata.h>
 
 typedef struct {
-	sem_t semaforo;
+	sem_t compactacion;
+	sem_t opcional;
+	t_list * sem;
 	st_metadata * meta;
 	pthread_t hilo;
 

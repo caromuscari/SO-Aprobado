@@ -53,10 +53,10 @@ void tratarCliente(int socketC){
 				if(string_length(insert->value) <= config->tam_value)
 				{
 					respuesta = realizarInsert(insert);
-					enviarRespuesta(respuesta, &buffer, socketC, &status);
+					enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
 
 				}else{
-					enviarRespuesta(3, &buffer, socketC, &status);
+					enviarRespuesta(3, &buffer, socketC, &status, sizeof(buffer));
 				}
 
 				destroyInsert(insert);
@@ -69,7 +69,7 @@ void tratarCliente(int socketC){
 				select = deserealizarSelect(recibido->buffer);
 
 				respuesta = realizarSelect(select, &buffer);
-				enviarRespuesta(respuesta, &buffer, socketC, &status);
+				enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
 
 				destoySelect(select);
 				free(buffer);
@@ -82,7 +82,7 @@ void tratarCliente(int socketC){
 
 				respuesta = realizarCreate(create);
 				actualizar_bitmap();
-				enviarRespuesta(respuesta, &buffer, socketC, &status);
+				enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
 
 				destroyCreate(create);
 				//free(buffer);
@@ -95,7 +95,7 @@ void tratarCliente(int socketC){
 
 				respuesta = realizarDrop(drop);
 				actualizar_bitmap();
-				enviarRespuesta(respuesta, &buffer, socketC, &status);
+				enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
 
 				destroyDrop(drop);
 				//free(buffer);
@@ -111,7 +111,7 @@ void tratarCliente(int socketC){
 
 				buffer = serealizarMetaData(meta, &size);//Probar
 
-				enviarRespuesta(respuesta, &buffer, socketC, &status);
+				enviarRespuesta(respuesta, &buffer, socketC, &status, size);
 
 				//liberarMetadata(meta);
 				destroyDescribe(describe);
@@ -124,13 +124,13 @@ void tratarCliente(int socketC){
 				respuesta = realizarDescribeGlobal();
 
 				buffer = serealizarListaMetaData(listaTabla,&size);
-				enviarRespuesta(respuesta, &buffer, socketC, &status);
+				enviarRespuesta(respuesta, &buffer, socketC, &status,size);//Enviar el size_t
 
 				free(buffer);
 				break;
 			default:
 				flag = false;
-				enviarRespuesta(16, &buffer, socketC, &status); //Modificar numero
+				enviarRespuesta(16, &buffer, socketC, &status, sizeof(buffer)); //Modificar numero
 
 				//free(buffer);
 
@@ -149,13 +149,13 @@ void tratarCliente(int socketC){
 	pthread_exit(NULL);
 }
 
-void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status){
+void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status, size_t tam){
 
 	header * head = malloc(sizeof(header));
 
 	head->letra = 'F';
 	head->codigo = codigo;
-	head->sizeData = sizeof(buffer);
+	head->sizeData = tam;
 
 	message * mensaje = createMessage(head, buffer);
 

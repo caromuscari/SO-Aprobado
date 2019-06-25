@@ -10,9 +10,9 @@
 #include <commons/bitarray.h>
 #include "hiloConsola.h"
 
-extern int tBloques;
-extern t_bitarray* bitmap;
-
+//extern int tBloques;
+//extern t_bitarray* bitmap;
+/*
 int Insert(st_insert * insert){
 	int respuesta;
 	int particion;
@@ -97,4 +97,4 @@ int escribir(int particion, structParticion * part, st_insert * insert){
 
 	return respuesta;
 }
-
+*/

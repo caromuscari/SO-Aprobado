@@ -11,7 +11,7 @@ create-dirs:
 	mkdir -p build/funcionesCompartidas
 
 build/libcompartidas.so: create-dirs $(OBJS)
-	$(CC)  -shared -Wall -Wextra -o "build/libcompartidas.so" $(OBJS)
+	$(CC)  -shared -Wall -Wextra -o "build/libcompartidas.so" $(OBJS) -lcommons
 
 build/funcionesCompartidas/%.o: funcionesCompartidas/%.c
 	$(CC)  -c -Wall -Wextra -fmessage-length=0 -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"

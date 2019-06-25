@@ -2,7 +2,14 @@
 
 // console
 #include "server.h"
-extern t_log *log_server;
+extern t_log *file_log;
+
+t_list * listClient;
+
+typedef struct {
+    pthread_t hilo;
+    int client;
+} st_client;
 
 
 /*void driver(void *recibido,header request, int client){
@@ -34,26 +41,26 @@ extern t_log *log_server;
 } */
 
 char* PORT = "8081";
+
+void * atenderMensaje(st_client * client){
+    int control = 0;
+    header request;
+    void * buffer = getMessage(client->client,&request,&control);
+    printf("client = %d\n",client->client);
+
+}
+
 void *start_server() {
 	printf("[+] Starting server.. \n");
 	int control = 0;
-	int socketServer = makeListenSock(PORT, log_server, &control);
-	int client = aceptar_conexion(socketServer, log_server, &control);
-	if (control == 0) {
-		log_info(log_server, "[+] So far so good..\n");
+	int socketServer = makeListenSock(PORT, file_log, &control);
+	int client;
+	st_client * newClient;
+	while (true){
+        client = aceptar_conexion(socketServer, file_log, &control);
+        newClient = malloc(sizeof(newClient));
+        newClient->client = client;
+        pthread_create(&newClient->hilo,NULL,(void *)atenderMensaje,newClient);
+        pthread_detach(newClient->hilo);
 	}
-	printf("[+] Memory [ID: %d] connected\n", client);
-	while (true) {
-		header request;
-		void *recibido;
-		recibido = getMessage(client, &request, &control);
-		if (recibido == NULL) {
-			perror("[-] It's an empty package :( \n");
-			return NULL;
-		}
-	//	driver(recibido, request, socketServer);
-		free(recibido);
-		close(client);
-		}
 }
-

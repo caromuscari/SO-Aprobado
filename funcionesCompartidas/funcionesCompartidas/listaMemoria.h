@@ -8,16 +8,20 @@
 #include <string.h>
 #include <stdlib.h>
 #include <commons/collections/list.h>
+
 typedef struct
 {
   char *ip;
   char *puerto;
+  int numero;
 } st_data_memoria;
 
 typedef struct
 {
   size_t ip;
   size_t puerto;
+  size_t numero;
+  size_t tipo;
 } __attribute__((packed)) st_size_memoria;
 void *serealizarDataMemoria(st_data_memoria *memoria, size_t *size_buffer);
 st_data_memoria *deserealizarDataMemoria(void *buffer, size_t *size_buffer);

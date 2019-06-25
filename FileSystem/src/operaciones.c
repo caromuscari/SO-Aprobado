@@ -21,6 +21,7 @@
 extern structConfig * config;
 extern t_bitarray* bitmap;
 extern int cantBloques;
+extern int tBloques;
 
 extern char* posicion;
 extern struct stat mystat;
@@ -226,22 +227,16 @@ structParticion * leerParticion(char * path){
 	return contenido;
 }
 
-void actualizar_Particion(structActualizar * a){
-	char * path = armar_path(a->nameTable);
-	char * pathPart = string_from_format("%s/%d.bin",path , a->particion);
+void actualizar_bloques(char * path,int bit){
 	t_config *configuracion;
-	int size;
 	char ** bloques;
 	int i;
 
 	configuracion = config_create(path);
 
-	size = config_get_int_value(configuracion, "SIZE");
-	config_set_value(configuracion, "SIZE", string_itoa(size+(a->size)));
-
 	bloques = config_get_array_value(configuracion, "BLOQUES");
 	while(bloques[i] != NULL) i++;
-	bloques[i] = string_itoa(a->bit);
+	bloques[i] = string_itoa(bit);
 	bloques[i++] = NULL;
 
 	config_get_string_value(configuracion, "BLOQUES");
@@ -250,10 +245,22 @@ void actualizar_Particion(structActualizar * a){
 
 	config_destroy(configuracion);
 
-	free(path);
-	free(pathPart);
 	string_iterate_lines(bloques, (void*)free);
 	free(bloques);
+}
+
+void actualizar_size(char * path,int size){
+	t_config *configuracion;
+	int sizeF;
+
+	configuracion = config_create(path);
+
+	sizeF = config_get_int_value(configuracion, "SIZE");
+	config_set_value(configuracion, "SIZE", string_itoa(sizeF+size));
+
+	config_save(configuracion);
+
+	config_destroy(configuracion);
 }
 
 t_dictionary * listarDirectorio(){
@@ -272,6 +279,10 @@ t_dictionary * listarDirectorio(){
         	if(!string_equals_ignore_case(name,".") && !string_equals_ignore_case(name,"..")){
         		st_tablaCompac * tabla = malloc(sizeof(st_tablaCompac));
         		tabla->meta = leerMetadata(name);
+
+        		sem_init(&tabla->compactacion,0,1);
+        		sem_init(&tabla->opcional,0,0);
+        		tabla->sem = list_create();
 
         		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,name);
         		pthread_detach(tabla->hilo);
@@ -364,28 +375,30 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 	else return reg;
 }
 
-bool chequearBitValido(int bit){
+bool chequearBitValido(int* bit){
     return bit != -1;
 }
 
-void* seteoBit(int bit){
-    bitarray_set_bit(bitmap,bit);
+void* seteoBit(int* bit){
+    bitarray_set_bit(bitmap,*bit);
 }
 
-char* armarStrBloques(char * strBloques, int bit){
-    if(strBloques != ""){
-        string_append_with_format(&strBloques, ",%d", bit);
+char* armarStrBloques(char * strBloques, int *bit){
+    if(!string_is_empty(strBloques)){
+        string_append_with_format(&strBloques, ",%d", *bit);
     }else{
-        string_append_with_format(&strBloques, "%d", bit);
+        string_append_with_format(&strBloques, "%d", *bit);
     }
     return strBloques;
 }
 
-t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio){
+t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio_size){
     FILE * archivo;
     char * contenido;
     t_list* bits = list_create();
-    int flag=-1, tamanio_bloque = 0;
+    int tamanio = (int)tamanio_size;
+    //OBTENER TAMANIO DE LA METADATA!
+    int flag=-1, tamanio_bloque = tBloques;
     while(tamanio > 0){
         int bit = verificar_bloque();
         list_add(bits, &bit);
@@ -398,7 +411,7 @@ t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio){
     if(valido){
         list_iterate(bits, (void*) seteoBit);
         char* strBloques = list_fold(bits, string_new(), (void*)armarStrBloques);
-        contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", tamanio, strBloques);
+        contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", tamanio_size, strBloques);
 
         archivo = fopen(pathCompleto, "a+");
 

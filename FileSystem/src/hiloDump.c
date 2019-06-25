@@ -16,12 +16,13 @@ void crearTemporal(char * key, st_tabla* data){
     char* nombreArchivo = buscarNombreProximoTemporal(key);
     char* str = list_fold(data->lista, string_new(), (void*)armarStrLista);
 
-    int nbloque = crearArchivoTemporal(nombreArchivo);
+    t_list* bloques = crearArchivoTemporal(nombreArchivo, sizeof(str));
     structParticion * dataBlq = leerParticion(nombreArchivo);
 
 
-    if(nbloque >= 0){
-        char* path = armar_PathBloque(string_itoa(nbloque));
+    if(bloques->elements_count > 0){
+        //ITERAR POR EL TAMANIO Y PONER DATA
+        /*char* path = armar_PathBloque(string_itoa(nbloque));
         FILE *write_ptr;
 
         write_ptr = fopen(path,"wb");
@@ -29,7 +30,7 @@ void crearTemporal(char * key, st_tabla* data){
         fwrite(str,sizeof(str),string_length(str),write_ptr);
         fclose(write_ptr);
 
-        free(path);
+        free(path);*/
     }
 
 

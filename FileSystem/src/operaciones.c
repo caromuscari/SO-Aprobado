@@ -364,17 +364,41 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 	else return reg;
 }
 
+bool chequearBitValido(int bit){
+    return bit != -1;
+}
 
-int crearArchivoTemporal(char * pathCompleto){
+void* seteoBit(int bit){
+    bitarray_set_bit(bitmap,bit);
+}
+
+char* armarStrBloques(char * strBloques, int bit){
+    if(strBloques != ""){
+        string_append_with_format(&strBloques, ",%d", bit);
+    }else{
+        string_append_with_format(&strBloques, "%d", bit);
+    }
+    return strBloques;
+}
+
+t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio){
     FILE * archivo;
     char * contenido;
-    int bit;
-    int flag=-1;
+    t_list* bits = list_create();
+    int flag=-1, tamanio_bloque = 0;
+    while(tamanio > 0){
+        int bit = verificar_bloque();
+        list_add(bits, &bit);
+        tamanio -= tamanio_bloque;
+    }
 
-    bit = verificar_bloque();
-    if(bit != -1){
-        bitarray_set_bit(bitmap,bit);
-        contenido = string_from_format("SIZE=0\nBLOQUES=[%d]", bit);
+    bool valido = list_all_satisfy(bits, chequearBitValido);
+
+
+    if(valido){
+        list_iterate(bits, (void*) seteoBit);
+        char* strBloques = list_fold(bits, string_new(), (void*)armarStrBloques);
+        contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", tamanio, strBloques);
 
         archivo = fopen(pathCompleto, "a+");
 
@@ -386,5 +410,5 @@ int crearArchivoTemporal(char * pathCompleto){
     }
 
 
-    return bit;
+    return bits;
 }

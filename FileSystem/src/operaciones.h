@@ -27,7 +27,7 @@ char * armar_PathBloque(char * bloque);
 void actualizar_Particion(structActualizar * a);
 t_dictionary * listarDirectorio();
 structRegistro * leerBloque(char* bloque, uint16_t key, char ** flag);
-int crearArchivoTemporal(char * pathCompleto);
+t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio);
 
 
 #endif /* SRC_OPERACIONES_H_ */

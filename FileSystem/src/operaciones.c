@@ -376,7 +376,7 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 }
 
 bool chequearBitValido(int* bit){
-    return bit != -1;
+    return *bit != -1;
 }
 
 void* seteoBit(int* bit){
@@ -397,15 +397,14 @@ t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio_size){
     char * contenido;
     t_list* bits = list_create();
     int tamanio = (int)tamanio_size;
-    //OBTENER TAMANIO DE LA METADATA!
-    int flag=-1, tamanio_bloque = tBloques;
+    int tamanio_bloque = tBloques;
     while(tamanio > 0){
         int bit = verificar_bloque();
         list_add(bits, &bit);
         tamanio -= tamanio_bloque;
     }
 
-    bool valido = list_all_satisfy(bits, chequearBitValido);
+    bool valido = list_all_satisfy(bits, (void*)chequearBitValido);
 
 
     if(valido){

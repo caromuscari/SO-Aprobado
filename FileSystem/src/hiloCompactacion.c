@@ -25,7 +25,7 @@ extern t_log* alog;
 void hilocompactacion(char * name){
 
 	signal(SIGKILL,senial);
-
+	
 	FILE* archivo;
 	int i = 1;
 	char * pathTabla = armar_path(name);

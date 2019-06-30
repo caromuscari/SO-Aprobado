@@ -10,6 +10,7 @@
 extern structConfig * config;
 extern t_log * alog;
 extern t_dictionary *memtable;
+extern int tBloques;
 
 void crearTemporal(char * key, st_tabla* data){
 	sem_wait(&data->semaforo);
@@ -17,25 +18,39 @@ void crearTemporal(char * key, st_tabla* data){
     char* str = list_fold(data->lista, string_new(), (void*)armarStrLista);
 
     t_list* bloques = crearArchivoTemporal(nombreArchivo, sizeof(str));
+
     structParticion * dataBlq = leerParticion(nombreArchivo);
 
+    int tamanioRestante = (int) sizeof(str), iElem = 0;
 
     if(bloques->elements_count > 0){
         //ITERAR POR EL TAMANIO Y PONER DATA
-        /*char* path = armar_PathBloque(string_itoa(nbloque));
-        FILE *write_ptr;
+        int* numeroBloque = list_get(bloques, 0);
+        int caracteresPorString = tBloques / sizeof(char);
+        while(tamanioRestante > 0 && numeroBloque != NULL){
 
-        write_ptr = fopen(path,"wb");
+            char* path = armar_PathBloque(string_itoa(*numeroBloque));
+            FILE *write_ptr;
 
-        fwrite(str,sizeof(str),string_length(str),write_ptr);
-        fclose(write_ptr);
+            write_ptr = fopen(path,"ab+");
+            char* strBloque = string_substring(str, iElem * caracteresPorString, caracteresPorString);
+            fwrite(strBloque,sizeof(strBloque),string_length(strBloque),write_ptr);
+            fclose(write_ptr);
 
-        free(path);*/
+            free(path);
+            free(strBloque);
+
+            iElem++;
+            numeroBloque = list_get(bloques,iElem);
+            tamanioRestante -= tBloques;
+        }
+
     }
 
 
     free(str);
 	free(nombreArchivo);
+	list_destroy(bloques);
     sem_post(&data->semaforo);
     free(dictionary_remove(memtable,key));
 }

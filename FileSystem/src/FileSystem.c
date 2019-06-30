@@ -35,6 +35,8 @@ int socketfs;
 int controlador;
 char* posicion;
 int bitm;
+char * nombre;
+int loop;
 
 structConfig * config;
 pthread_t hiloConsola, hiloSelect,hiloDump, hiloInotify;

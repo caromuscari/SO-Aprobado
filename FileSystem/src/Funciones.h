@@ -27,9 +27,6 @@ int leer_metadata();
 int abrir_bitmap();
 void finalizar();
 void finalizarFile();
-void cerrarClientes(char * key, cliente_t * cliente);
-void cerrarTablas(char * key, st_tablaCompac * tabla);
-void senial();
 
 
 #endif /* FILE_SYSTEM_SRC_FUNCIONES_H_ */

@@ -28,6 +28,7 @@ extern struct stat mystat;
 extern char* magic_number;
 extern int tBloques;
 extern int cantBloques;
+extern char * nombre;
 
 extern structConfig * config;
 extern t_dictionary * clientes, *memtable, *tablas;
@@ -35,14 +36,16 @@ extern t_log* alog;
 extern t_bitarray* bitmap;
 extern char* posicion;
 extern int bitm;
+extern int loop;
 
-extern pthread_t hiloConsola, hiloSelect,hiloDump;
 
 void inicializar(){
 	config = malloc(sizeof(structConfig));
 	config->montaje = strdup("");
 	magic_number = strdup("");
 	config->puerto = strdup("");
+	nombre = strdup("");
+	loop = 1;
 	clientes = dictionary_create();
 	memtable = dictionary_create();
 	alog = crear_archivo_log("File System", true, "/home/utnso/Escritorio/log.txt");
@@ -119,7 +122,13 @@ int abrir_bitmap()
 	}
 	bitmap = bitarray_create_with_mode(posicion,mystat.st_size, LSB_FIRST);
 
+	/*for(int i = 0; i< bitarray_get_max_bit(bitmap); i++){
+		bitarray_clean_bit(bitmap,i);
+	}*/
+
 	close(fdbitmap);
+
+	posicion = malloc(cantBloques);
 
 	log_info(alog, "Abre el bitmap");
 
@@ -135,6 +144,7 @@ void finalizar(){
 	free(magic_number);
 	free(config->puerto);
 	free(config);
+	free(nombre);
 	if(bitm != -1){
 		memcpy(posicion,bitmap,mystat.st_size);
 		msync(posicion,mystat.st_size,MS_SYNC);
@@ -153,23 +163,7 @@ void finalizar(){
 }
 
 void finalizarFile(){
-	pthread_kill(hiloSelect,SIGKILL);
-	pthread_kill(hiloConsola,SIGKILL);
-	dictionary_iterator(clientes,(void*)cerrarClientes);
-	dictionary_iterator(tablas,(void*)cerrarTablas);
-	pthread_kill(hiloDump,SIGKILL);
-}
-
-void cerrarClientes(char * key, cliente_t * cliente){
-	pthread_kill(cliente->hilo,SIGKILL);
-}
-
-void cerrarTablas(char * key, st_tablaCompac * tabla){
-	pthread_kill(tabla->hilo,SIGKILL);
-}
-
-void senial(){
-	pthread_exit(NULL);
+	loop = 0;
 }
 
 

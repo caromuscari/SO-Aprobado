@@ -28,6 +28,9 @@ void actualizar_bloques(char * path,int bit);
 void actualizar_size(char * path,int size);
 t_dictionary * listarDirectorio();
 structRegistro * leerBloque(char* bloque, uint16_t key, char ** flag);
+bool chequearBitValido(int* bit);
+void seteoBit(int* bit);
+char* armarStrBloques(char * strBloques, int *bit);
 t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio);
 
 

@@ -3,16 +3,21 @@
 //
 
 #include "hiloInotify.h"
+#include <signal.h>
+#include "Funciones.h"
+
 #define EVENT_SIZE  ( sizeof (struct inotify_event) + 24 )
 #define BUF_LEN     ( 1024 * EVENT_SIZE )
 extern t_log* alog;
 extern structConfig * config;
+extern int loop;
 int file_descriptor;
 int watch_descriptor;
 
-void* hiloinotify(char* rutaConfig){
+void hiloinotify(char* rutaConfig){
     log_info(alog, "Inicializa hilo inotify");
-    while(1){
+
+    while(loop){
         char buffer[BUF_LEN];
 
         file_descriptor = inotify_init();

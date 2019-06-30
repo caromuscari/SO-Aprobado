@@ -254,7 +254,8 @@ int getEnumFromString(char *string) {
             {"SELECT", SELECT},
             {"CREATE", CREATE},
             {"DROP",   DROP},
-			{"DESCRIBE", DESCRIBE}
+			{"DESCRIBE", DESCRIBE},
+			{"EXIT", EXIT}
     };
 
     for (unsigned int i = 0; i < sizeof(map) / sizeof(map[0]); i++) {

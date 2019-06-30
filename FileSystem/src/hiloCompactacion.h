@@ -9,7 +9,7 @@
 #define SRC_HILOCOMPACTACION_H_
 
 
-void hilocompactacion(char * name);
+void hilocompactacion();
 void desbloquear(sem_t *semaforo);
 t_list * llenarTabla(char * path);
 void leerTemporal(char * path, t_dictionary * lista, int totalPart);

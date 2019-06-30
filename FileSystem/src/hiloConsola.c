@@ -24,6 +24,7 @@
 extern t_log* alog;
 extern structConfig * config;
 extern t_list * listaTabla;
+extern int loop;
 
 void* hiloconsola(){
 
@@ -32,11 +33,10 @@ void* hiloconsola(){
 	size_t tamBuffer = 100;
 	int respuesta;
 
-	signal(SIGKILL,senial);
 
 	log_info(alog, "Se creo el hilo consola");
 
-	while(1){
+	while(loop){
 
 		printf("Ingrese una Request:\n");
 		ingreso = malloc(sizeof(char) * tamBuffer);
@@ -150,6 +150,9 @@ void* hiloconsola(){
 
 				break;
 
+			case 6:
+				loop = 0;
+				break;
 			default:
 				mostrarRespuesta(2);
 

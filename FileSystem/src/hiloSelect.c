@@ -21,12 +21,12 @@ extern int socketfs;
 extern t_log* alog;
 extern t_dictionary * clientes;
 extern structConfig * config;
+extern int loop;
 
 void * hiloselect(){
 
 	controlador=0;
 
-	signal(SIGKILL,senial);
 
 	log_info(alog, "Se creo el hilo servidor");
 
@@ -35,7 +35,7 @@ void * hiloselect(){
 
 	log_info(alog, "Se creo el socket server");
 
-	while(1)
+	while(loop)
 	{
 		int nuevo_socket = aceptar_conexion(socketfs, alog, &controlador);
 		if(nuevo_socket != -1){

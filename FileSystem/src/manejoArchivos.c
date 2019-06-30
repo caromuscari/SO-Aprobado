@@ -23,7 +23,7 @@
 
 extern t_dictionary * memtable, *tablas;
 extern t_list * listaTabla;
-extern t_log* alog;
+//extern t_log* alog;
 
 
 int realizarInsert(st_insert * insert){
@@ -84,14 +84,19 @@ int realizarSelect(st_select * select, char ** value){
 
 		tabla = dictionary_get(tablas, select->nameTable);
 
-		sem_getvalue(&tabla->compactacion, &valor);
+		/*sem_getvalue(&tabla->compactacion, &valor);
 		if(valor != 1){
 			sem_t *sem= malloc(sizeof(sem_t));
 			sem_init(sem,0,0);
 			list_add(tabla->sem,sem);
 			log_info(alog, "Se bloquea la tabla");
 			sem_wait(sem);
-		}else{
+		}else{*/
+
+		sem_wait(&tabla->compactacion);
+		sem_post(&tabla->compactacion);
+		tabla->contador += 1;
+
 			particion = select->key % tabla->meta->partitions;
 
 			*value = buscarKey(select->nameTable,select->key, particion);
@@ -101,7 +106,16 @@ int realizarSelect(st_select * select, char ** value){
 			}else{
 				respuesta = 14;
 			}
-		}
+			/*
+			if(list_size(tabla->sem) == 1){
+				sem_post(tabla->opcional);
+			}*/
+
+			tabla->contador -= 1;
+			sem_getvalue(&tabla->opcional, &valor);
+			if(tabla->contador == 0 && valor != 0){
+				sem_post(&tabla->opcional);
+			}
 	}
 
 	return respuesta;
@@ -138,7 +152,7 @@ int realizarCreate(st_create * create){
 
 			st_tablaCompac * tabla = malloc(sizeof(st_tablaCompac));
 			tabla->meta = leerMetadata(create->nameTable);
-			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,create->nameTable);
+			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
 			pthread_detach(tabla->hilo);
 			dictionary_put(tablas, create->nameTable, tabla);
 

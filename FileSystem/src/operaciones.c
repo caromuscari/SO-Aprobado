@@ -22,6 +22,7 @@ extern structConfig * config;
 extern t_bitarray* bitmap;
 extern int cantBloques;
 extern int tBloques;
+extern char * nombre;
 
 extern char* posicion;
 extern struct stat mystat;
@@ -53,7 +54,7 @@ st_metadata * leerMetadata(char * archivo){
 int verificar_bloque()
 {
 	int bit = -1;
-	bool comprobar;
+	bool comprobar = true;
 	while(bit < cantBloques && comprobar == true)
 	{
 		bit++;
@@ -267,8 +268,8 @@ t_dictionary * listarDirectorio(){
 	DIR *d;
 	struct dirent *dir;
 	t_dictionary * tablas;
-	char * nombre = string_from_format("%s/Tables", config->montaje);
-    d = opendir(nombre);
+	char * nombreTabla = string_from_format("%s/Tables", config->montaje);
+    d = opendir(nombreTabla);
     if (d)
     {
     	tablas = dictionary_create();
@@ -284,7 +285,9 @@ t_dictionary * listarDirectorio(){
         		sem_init(&tabla->opcional,0,0);
         		tabla->sem = list_create();
 
-        		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,name);
+        		free(nombre);
+        		nombre = strdup(name);
+        		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
         		pthread_detach(tabla->hilo);
 
         		dictionary_put(tablas, name, tabla);
@@ -294,7 +297,7 @@ t_dictionary * listarDirectorio(){
         }
         closedir(d);
     }
-    free(nombre);
+    free(nombreTabla);
 
     return tablas;
 }
@@ -376,10 +379,10 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 }
 
 bool chequearBitValido(int* bit){
-    return bit != -1;
+    return *bit != -1;
 }
 
-void* seteoBit(int* bit){
+void seteoBit(int* bit){
     bitarray_set_bit(bitmap,*bit);
 }
 

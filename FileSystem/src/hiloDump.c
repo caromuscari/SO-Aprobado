@@ -10,6 +10,7 @@
 extern structConfig * config;
 extern t_log * alog;
 extern t_dictionary *memtable;
+extern int loop;
 
 void crearTemporal(char * key, st_tabla* data){
 	sem_wait(&data->semaforo);
@@ -62,8 +63,7 @@ char* buscarNombreProximoTemporal(char* nombreTabla){
 
 void* hilodump(){
 
-	//signal(SIGKILL,senial);
-	while(1){
+	while(loop){
 		sleep(config->tiempo_dump);
 		dictionary_iterator(memtable,(void*)crearTemporal);
 	}

@@ -16,7 +16,8 @@ enum OPERACION {
     SELECT = 2,
     CREATE = 3,
     DROP = 4,
-    DESCRIBE = 5
+    DESCRIBE = 5,
+	EXIT = 6
 };
 
 typedef struct {

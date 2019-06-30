@@ -21,19 +21,24 @@ extern t_dictionary * tablas;
 extern int tBloques;
 extern t_bitarray* bitmap;
 extern t_log* alog;
+extern char * nombre;
+extern int loop;
 
-void hilocompactacion(char * name){
-
-	signal(SIGKILL,senial);
+void hilocompactacion(){
 
 	FILE* archivo;
-	int i = 1;
+	int i = 1, valor;
+	printf("Hilo compactacion\n");
+	printf("Nombre de tabla: %s\n", nombre);
+	char * name = strdup(nombre);
 	char * pathTabla = armar_path(name);
 	char * path, *new;
 	t_dictionary * lista;
 	st_tablaCompac * tabla = dictionary_get(tablas, name);
 
-	while(1){
+
+	while(loop){
+
 		sleep(tabla->meta->compaction_time);
 
 		path = string_from_format("%s/%d.tmp", pathTabla, i);
@@ -64,13 +69,16 @@ void hilocompactacion(char * name){
 			}
 
 			//Bloquear la tabla
-			if(list_size(tabla->sem) != 0){
+			/*if(list_size(tabla->sem) != 0){
 				sem_wait(&tabla->opcional);
 				sem_wait(&tabla->compactacion);
 			}else{
 				log_info(alog, "Se bloquea la compactacion");
 				sem_wait(&tabla->compactacion);
-			}
+			}*/
+
+			sem_wait(&tabla->compactacion);
+			if(tabla->contador != 0) sem_wait(&tabla->opcional);
 
 			eliminarTemporales(pathTabla);
 			for(int j=0;j<tabla->meta->partitions;j++){
@@ -80,8 +88,13 @@ void hilocompactacion(char * name){
 			//Desbloquear la tabla
 			log_info(alog, "Se desbloquea la compactacion");
 			sem_post(&tabla->compactacion);
-			list_iterate(tabla->sem, (void*)desbloquear);
-			list_clean(tabla->sem);
+			/*list_iterate(tabla->sem, (void*)desbloquear);
+			list_clean(tabla->sem);*/
+
+			sem_getvalue(&tabla->opcional, &valor);
+			while(valor != 1){
+				sem_post(&tabla->compactacion);
+			}
 		}
 	}
 

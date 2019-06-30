@@ -12,6 +12,6 @@
 #include "Funciones.h"
 #ifndef FILESYSTEM_HILOINOTIFY_H
 #define FILESYSTEM_HILOINOTIFY_H
-void* hiloinotify(char* rutaConfig);
+void hiloinotify(char* rutaConfig);
 void cambioConfiguracion(char* rutaConfig);
 #endif //FILESYSTEM_HILOINOTIFY_H

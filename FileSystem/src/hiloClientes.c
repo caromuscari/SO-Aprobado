@@ -25,15 +25,15 @@ extern t_log* alog;
 extern t_dictionary * clientes;
 extern structConfig * config;
 extern t_list * listaTabla;
+extern int loop;
 
 void tratarCliente(int socketC){
 
 	int status=0;
 	bool flag = true;
 
-	signal(SIGKILL,senial);
 
-	while(flag){
+	while(loop && flag){
 		mensaje * recibido = malloc(sizeof(mensaje));
 		int respuesta;
 		char * buffer;

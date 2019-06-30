@@ -8,7 +8,6 @@
 
 
 extern structConfig * config;
-extern t_log * alog;
 extern t_dictionary *memtable;
 extern int tBloques;
 extern int loop;
@@ -20,15 +19,14 @@ void crearTemporal(char * key, st_tabla* data){
 
     t_list* bloques = crearArchivoTemporal(nombreArchivo, sizeof(str));
 
-    structParticion * dataBlq = leerParticion(nombreArchivo);
 
     int tamanioRestante = (int) sizeof(str), iElem = 0;
 
     if(bloques->elements_count > 0){
         //ITERAR POR EL TAMANIO Y PONER DATA
         int* numeroBloque = list_get(bloques, 0);
-        int caracteresPorString = tBloques / sizeof(char);
-        while(tamanioRestante > 0 && numeroBloque != NULL){
+        int caracteresPorString = tBloques * 1024/ sizeof(char);
+        while(tamanioRestante > 0 && *numeroBloque != NULL){
 
             char* path = armar_PathBloque(string_itoa(*numeroBloque));
             FILE *write_ptr;
@@ -42,10 +40,11 @@ void crearTemporal(char * key, st_tabla* data){
             free(strBloque);
 
             iElem++;
+            free(numeroBloque);
             numeroBloque = list_get(bloques,iElem);
             tamanioRestante -= tBloques;
-        }
 
+        }
     }
 
 

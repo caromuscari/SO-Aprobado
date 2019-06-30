@@ -402,8 +402,9 @@ t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio_size){
     int tamanio = (int)tamanio_size;
     int tamanio_bloque = tBloques;
     while(tamanio > 0){
-        int bit = verificar_bloque();
-        list_add(bits, &bit);
+        int *bit = malloc(sizeof(int));
+        *bit = verificar_bloque();
+        list_add(bits, bit);
         tamanio -= tamanio_bloque;
     }
 

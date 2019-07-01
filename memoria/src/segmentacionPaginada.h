@@ -40,6 +40,7 @@ typedef struct{
 void inicializarMemoria();
 
 st_registro* comandoSelect(st_select* comandoSelect);
+void insertarDatosEnPagina(void* paginaLibre, st_insert * comandoInsert);
 
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla);
 

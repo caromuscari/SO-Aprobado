@@ -8,18 +8,14 @@
 #include "segmentacionPaginada.h"
 
 extern t_log *file_log;
-extern int tamanioMemoria;
 extern int tamanioValue;
 extern int cantPaginas;
 extern t_list* listaDeMarcos;
-
-void* memoriaPrincipal;
+extern void *memoriaPrincipal;
 t_list* listaDeSegmentos;
 
 
 void inicializarMemoria(){
-	memoriaPrincipal = malloc(tamanioMemoria);
-
 	listaDeSegmentos = list_create();
 	log_info(file_log, "se creo la lista de segmentos");
 
@@ -100,7 +96,7 @@ int comandoInsert(st_insert* comandoInsert){
 	return 0;
 }
 
-insertarDatosEnPagina(void* paginaLibre, st_insert * comandoInsert){
+void insertarDatosEnPagina(void* paginaLibre, st_insert * comandoInsert){
 
 	memcpy(paginaLibre, &comandoInsert->timestamp, sizeof(double));
 	memcpy(paginaLibre + sizeof(double), &comandoInsert->key, sizeof(uint16_t));

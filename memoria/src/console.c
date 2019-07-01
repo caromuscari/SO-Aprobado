@@ -10,7 +10,7 @@ void makeCommand(char *command){
 				printf("[+] I got INSERT.");
         st_insert * insert;
         if((insert = cargarInsert(command))){
-        	comandoInsert(insert);
+        	//comandoInsert(insert);
         	printf("[+] Executing INSERT");
         	sleep(1);
         }
@@ -21,7 +21,7 @@ void makeCommand(char *command){
         st_select * select;
         if((select = cargarSelect(command))){
         	log_info(file_log, "[+] Ejecutando SELECT.\n");
-        	comandoSelect(select);
+        	//comandoSelect(select);
         	sleep(1);
        }
 

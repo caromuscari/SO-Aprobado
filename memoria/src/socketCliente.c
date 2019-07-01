@@ -2,7 +2,7 @@
 
 extern t_log *file_log;
 
-extern t_configuracionMemoria configMemoria;
+extern t_configuracionMemoria * configMemoria;
 
 // CLIENTE
 
@@ -13,7 +13,7 @@ void obtenerSelect(st_select * comandoSelect){
 	header request;
 	void* paqueteDeRespuesta;
 	header respuesta;
-	int socketCliente = establecerConexion(configMemoria.ipFS, configMemoria.puertoFS, file_log, &control);
+	int socketCliente = establecerConexion(configMemoria->IP_FS, configMemoria->PUERTO_FS, file_log, &control);
 	if(socketCliente != -1){
 		request.letra = 'M';
 		request.codigo = SELECT;

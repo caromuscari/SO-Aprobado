@@ -13,7 +13,8 @@
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
-#include "conections.h"
+
+#include "socketCliente.h"
 
 
 void console();

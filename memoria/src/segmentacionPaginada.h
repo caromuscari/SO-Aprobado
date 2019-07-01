@@ -14,6 +14,7 @@
 #include <funcionesCompartidas/log.h>
 #include "configuracionMemoria.h"
 #include <time.h>
+#include <funcionesCompartidas/registroTabla.h>
 
 typedef struct{
 	char* nombreTabla;
@@ -31,19 +32,21 @@ typedef enum{
 	OCUPADO = 1
 }t_condicion;
 
+typedef struct{
+	t_condicion condicion;
+	double timestamp;
+}st_marco;
+
 void inicializarMemoria();
 
-char* comandoSelect(st_select* comandoSelect);
+st_registro* comandoSelect(st_select* comandoSelect);
 
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla);
 
 st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key);
 
-double timeEnMiliseg();
-
 int buscarMarcoLibre();
 
 int algoritmoLRU();
-
 
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

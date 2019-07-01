@@ -14,9 +14,17 @@
 #include <commons/log.h>
 #include <stdlib.h>
 #include <commons/collections/list.h>
-#include "conections.h"
+
+#include "socketCliente.h"
+
+
+typedef struct {
+    pthread_t hilo;
+    int client;
+} st_client;
+
 
 void *start_server();
-void driver(void *recibido,header request, int client);
+
 
 #endif //MEM_SERVER_H

@@ -18,11 +18,11 @@ t_log* file_log;
 t_config * archivoConfiguracionMemoria;
 
 typedef struct{
-	int puerto;
+	char* puerto;
 	char* ipFS;
-	int puertoFS;
-	char** ipSeeds;
-	int* puertoSeeds[100];
+	char* puertoFS;
+	t_list* ipSeeds;
+	t_list* puertoSeeds;
 	int retardoAccesoMP;
 	int retardoAccesoFS;
 	int tamanioMemoria;

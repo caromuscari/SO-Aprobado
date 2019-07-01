@@ -10,8 +10,8 @@
 extern t_log *file_log;
 extern int tamanioMemoria;
 extern int tamanioValue;
-extern t_condicion* marco;
 extern int cantPaginas;
+extern t_list* listaDeMarcos;
 
 void* memoriaPrincipal;
 t_list* listaDeSegmentos;
@@ -35,42 +35,80 @@ actual, junto con el nombre de la tabla en el segmento. Para esto se debe genera
 página (aplicando para este último la misma lógica que el punto anterior).
 */
 
-void comandoInsert(st_insert* comandoInsert){
+int comandoInsert(st_insert* comandoInsert){
+	if(strlen(comandoInsert->value) > tamanioValue){
+		log_info(file_log, "El value es mayor al tamaño máximo.");
+		return -1;
+	}
 	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoInsert->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
 		log_info(file_log, "Segmento encontrado por comando Insert");
-		st_tablaDePaginas* paginaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoInsert->key);
-		int offset = 0;
-		if(paginaEncontrada){
+		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoInsert->key);
+		if(paginaDeTablaEncontrada){
 			log_info(file_log, "Pagina encontrada");
-			memcpy(paginaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
-			double timestamp = obtenerMilisegundosDeHoy();
-			memcpy(paginaEncontrada->pagina, &timestamp, sizeof(double));
-			paginaEncontrada->flagModificado = 1;
-			return;
+			memcpy(paginaDeTablaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
+			memcpy(paginaDeTablaEncontrada->pagina, &comandoInsert->timestamp, sizeof(double));
+			paginaDeTablaEncontrada->flagModificado = 1;
+
+			return 0;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key");
+
+		int posMarcoLibre = buscarMarcoLibre();
+
+		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
+
+		insertarDatosEnPagina(paginaLibre, comandoInsert);
+
+		st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
+		paginaDeTabla->nroDePagina = posMarcoLibre;
+		paginaDeTabla->pagina = paginaLibre;
+		paginaDeTabla->flagModificado = 1;
+
+		list_add(segmentoEncontrado->tablaDePaginas, paginaDeTabla);
+
+		st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
+		marco->condicion = OCUPADO;
+
+		return 0;
 	}
-	else{
-		log_info(file_log, "No se encontro el segmento de esa tabla");
-		//creo el segmento
-		st_segmento* segmento_nuevo= malloc(sizeof(st_segmento));
-		segmento_nuevo->nombreTabla = strdup(comandoInsert->nameTable);
-		segmento_nuevo->tablaDePaginas = list_create();
+	log_info(file_log, "No se encontro el segmento de esa tabla");
+	//creo el segmento
+	st_segmento* segmentoNuevo= malloc(sizeof(st_segmento));
 
-		char* value_mandado = malloc(tamanioValue);
+	segmentoNuevo->nombreTabla = strdup(comandoInsert->nameTable);
+	segmentoNuevo->tablaDePaginas = list_create();
 
+	int posMarcoLibre = buscarMarcoLibre();
 
-		//int marquitoLibre = buscarMarcoEnMemoria();
-		//insertandoElDatoEnElMARCO(marquitoLibre, segmento_nuevo, comandoInsert->key, parametro );
+	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 
-		//Como ya inserte el dato
-	}
+	insertarDatosEnPagina(paginaLibre, comandoInsert);
 
+	st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
+	paginaDeTabla->nroDePagina = posMarcoLibre;
+	paginaDeTabla->pagina = paginaLibre;
+	paginaDeTabla->flagModificado = 1;
+
+	list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
+
+	list_add(listaDeSegmentos, segmentoNuevo);
+
+	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
+	marco->condicion = OCUPADO;
+
+	return 0;
 }
 
-/*
-Esta operación incluye los siguientes pasos:
+insertarDatosEnPagina(void* paginaLibre, st_insert * comandoInsert){
+
+	memcpy(paginaLibre, &comandoInsert->timestamp, sizeof(double));
+	memcpy(paginaLibre + sizeof(double), &comandoInsert->key, sizeof(uint16_t));
+	memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
+}
+
+
+/* SELECT
 Verifica si existe el segmento de la tabla solicitada y busca en las páginas del mismo si contiene key solicitada.
   Si la contiene, devuelve su valor y finaliza el proceso.
 Si no la contiene, envía la solicitud a FileSystem para obtener el valor solicitado y almacenarlo.
@@ -78,21 +116,30 @@ Una vez obtenido se debe solicitar una nueva página libre para almacenar el mis
 se debe ejecutar el algoritmo de reemplazo y, en caso de no poder efectuarlo por estar la memoria full,
 ejecutar el Journal de la memoria.   */
 
-char* comandoSelect(st_select* comandoSelect){
+st_registro* comandoSelect(st_select* comandoSelect){
+	st_registro* registro = malloc(sizeof(st_registro));
+	registro->value = malloc(tamanioValue);
 	st_segmento* segmentoEncontrado;
 	segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoSelect->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
 		log_info(file_log, "Segmento encontrado por comando Select");
-		st_tablaDePaginas* paginaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
-		if(paginaEncontrada){
-			char* value = malloc(tamanioValue);
-			memcpy(value, paginaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), tamanioValue);
-			return value;
+		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
+		if(paginaDeTablaEncontrada){
+			log_info(file_log, "Pagina encontrada por comando Select");
+
+			st_marco* marco = list_get(listaDeMarcos, paginaDeTablaEncontrada->nroDePagina);
+			marco->timestamp = obtenerMilisegundosDeHoy();
+
+			memcpy(&registro->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
+			memcpy(&registro->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
+			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), tamanioValue);
+			return registro;
 		}
 		return "No se encontro la pagina";
 	}
 	return "No se encontro el segmento";
 }
+
 
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 	bool mismoNombreTabla(st_segmento* segmento){
@@ -101,7 +148,7 @@ st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 	return (st_segmento*)list_find(listaDeSegmentos, mismoNombreTabla);
 }
 
-//double time, uint16_t key, char* value
+
 st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 	bool paginaConEsaKey(void* pagina){
 		pagina += sizeof(double);
@@ -113,13 +160,15 @@ st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 }
 
 int buscarMarcoLibre(){
-	for(int i = 0; i < cantPaginas; i++){
-		if(marco[i] == LIBRE){
-			return i;
+	st_marco* marco;
+	for(int i = 0; i < listaDeMarcos->elements_count; i++){
+		marco = list_get(listaDeMarcos, i);
+		if(marco->condicion == LIBRE){
+		return i;
 		}
 	}
-	int marcoLibre = algoritmoLRU(); //encuentro el marco de la pagina que puedo reemplazar porque se uso hace mas tiempo
-	return marcoLibre;
+	int posMarcoLibre = algoritmoLRU(); //encuentro el marco de la pagina que puedo reemplazar porque se uso hace mas tiempo
+	return posMarcoLibre;
 }
 
 int algoritmoLRU(){
@@ -129,7 +178,7 @@ int algoritmoLRU(){
 //	for(int i = 0, )
 
 
-
+	return 0; //arreglar
 }
 
 //void* list_get(t_list *self, int index)
@@ -148,13 +197,4 @@ st_tablaDePaginas* paginaConTiempoMenorPorSegmento(t_list* listaPaginas){
 //		}
 //	}
 }
-
-
-double obtenerTimeDePag(st_tablaDePaginas* pagina){
-	double timestamp;
-	memcpy(&timestamp, pagina->pagina, sizeof(double));
-	return timestamp;
-}
-
-
 

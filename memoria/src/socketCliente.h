@@ -16,6 +16,7 @@
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
 #include <funcionesCompartidas/API.h>
+#include "configuracionMemoria.h"
 
 void messageAction(header *req, void *buffer, int socketClient);
 

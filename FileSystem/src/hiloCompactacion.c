@@ -26,6 +26,8 @@ extern int loop;
 
 void hilocompactacion(){
 
+//	signal(SIGKILL,senial);
+
 	FILE* archivo;
 	int i = 1, valor;
 	printf("Hilo compactacion\n");

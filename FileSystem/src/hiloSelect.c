@@ -27,6 +27,7 @@ void * hiloselect(){
 
 	controlador=0;
 
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
 	log_info(alog, "Se creo el hilo servidor");
 
@@ -73,6 +74,8 @@ void * hiloselect(){
 
 		}
 	}
+
+	close(socketfs);
 
 	pthread_exit(NULL);
 }

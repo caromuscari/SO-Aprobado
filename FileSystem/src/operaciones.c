@@ -17,12 +17,13 @@
 #include <funcionesCompartidas/listaMetadata.h>
 #include "hiloCompactacion.h"
 #include "buscar.h"
+#include <commons/collections/queue.h>
 
 extern structConfig * config;
 extern t_bitarray* bitmap;
 extern int cantBloques;
 extern int tBloques;
-extern char * nombre;
+extern t_queue * nombre;
 
 extern char* posicion;
 extern struct stat mystat;
@@ -283,10 +284,10 @@ t_dictionary * listarDirectorio(){
 
         		sem_init(&tabla->compactacion,0,1);
         		sem_init(&tabla->opcional,0,0);
-        		tabla->sem = list_create();
+        		//tabla->sem = list_create();
 
-        		free(nombre);
-        		nombre = strdup(name);
+        		char * table = strdup(name);
+        		queue_push(nombre, table);
         		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
         		pthread_detach(tabla->hilo);
 

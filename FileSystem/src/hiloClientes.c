@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/API.h>
+#include <funcionesCompartidas/registroTabla.h>
 #include <semaphore.h>
 #include <commons/collections/dictionary.h>
 #include "Funciones.h"
@@ -32,6 +33,7 @@ void tratarCliente(int socketC){
 	int status=0;
 	bool flag = true;
 
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
 	while(loop && flag){
 		mensaje * recibido = malloc(sizeof(mensaje));
@@ -66,12 +68,18 @@ void tratarCliente(int socketC){
 			case 2:
 				log_info(alog, "Recibi un Select");
 				st_select * select;
+				char * registro;
+				st_registro * reg;
 				select = deserealizarSelect(recibido->buffer);
 
-				respuesta = realizarSelect(select, &buffer);
-				enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
+				respuesta = realizarSelect(select, &registro);
+				reg = cargarRegistro(registro);
+				buffer = serealizarRegistro(reg,&size);
+				enviarRespuesta(respuesta, &buffer, socketC, &status, size);
 
 				destoySelect(select);
+				destroyRegistro(reg);
+				free(registro);
 				free(buffer);
 				break;
 

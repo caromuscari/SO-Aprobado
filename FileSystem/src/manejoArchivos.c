@@ -20,10 +20,11 @@
 #include <dirent.h>
 #include "hiloConsola.h"
 #include "hiloCompactacion.h"
+#include <commons/collections/queue.h>
 
 extern t_dictionary * memtable, *tablas;
 extern t_list * listaTabla;
-//extern t_log* alog;
+extern t_queue * nombre;
 
 
 int realizarInsert(st_insert * insert){
@@ -152,6 +153,8 @@ int realizarCreate(st_create * create){
 
 			st_tablaCompac * tabla = malloc(sizeof(st_tablaCompac));
 			tabla->meta = leerMetadata(create->nameTable);
+			char * name = strdup(create->nameTable);
+			queue_push(nombre, name);
 			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
 			pthread_detach(tabla->hilo);
 			dictionary_put(tablas, create->nameTable, tabla);
@@ -202,7 +205,10 @@ int realizarDrop(st_drop * drop){
 
 		eliminarDirectorio(path);
 
-		pthread_kill(tabla->hilo,SIGKILL);
+		pthread_cancel(tabla->hilo);
+
+		sem_destroy(&tabla->compactacion);
+		sem_destroy(&tabla->opcional);
 
 		respuesta = 9;
 

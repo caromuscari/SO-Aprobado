@@ -26,7 +26,7 @@ void archivoDeConfiguracion(char* argv);
 int leer_metadata();
 int abrir_bitmap();
 void finalizar();
-void finalizarFile();
+void liberarTablas(st_tablaCompac * tabla);
 
 
 #endif /* FILE_SYSTEM_SRC_FUNCIONES_H_ */

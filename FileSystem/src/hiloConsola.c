@@ -20,11 +20,15 @@
 #include <commons/collections/dictionary.h>
 #include <signal.h>
 #include "Funciones.h"
+#include "hiloClientes.h"
 
 extern t_log* alog;
 extern structConfig * config;
 extern t_list * listaTabla;
 extern int loop;
+
+extern pthread_t hiloSelect,hiloDump, hiloInotify;
+extern t_dictionary * clientes, *tablas;
 
 void* hiloconsola(){
 
@@ -38,7 +42,7 @@ void* hiloconsola(){
 
 	while(loop){
 
-		printf("Ingrese una Request:\n");
+		printf("\nIngrese una Request:\n");
 		ingreso = malloc(sizeof(char) * tamBuffer);
 
 		getline(&ingreso, &tamBuffer, stdin);
@@ -152,6 +156,11 @@ void* hiloconsola(){
 
 			case 6:
 				loop = 0;
+				dictionary_iterator(clientes,(void*)cerrarClientes);
+				dictionary_iterator(tablas,(void*)cerrarTablas);
+				pthread_cancel(hiloSelect);
+				pthread_cancel(hiloDump);
+				pthread_cancel(hiloInotify);
 				break;
 			default:
 				mostrarRespuesta(2);
@@ -233,11 +242,19 @@ void mostrarRespuesta(int respuesta){
 }
 
 void mostrarTabla(st_metadata * meta){
-		printf("Table: %s\nConsistency: %s\nPartitions: %d\nCompaction Time: %d\n",meta->nameTable, meta->consistency, meta->partitions, meta->compaction_time);
+		printf("\nTable: %s\nConsistency: %s\nPartitions: %d\nCompaction Time: %d\n",meta->nameTable, meta->consistency, meta->partitions, meta->compaction_time);
 }
 
 void liberarMetadata(st_metadata * meta){
 	free(meta->nameTable);
 	free(meta->consistency);
 	free(meta);
+}
+
+void cerrarClientes(char * key, cliente_t * cliente){
+	pthread_cancel(cliente->hilo);
+}
+
+void cerrarTablas(char * key, st_tablaCompac * tabla){
+	pthread_cancel(tabla->hilo);
 }

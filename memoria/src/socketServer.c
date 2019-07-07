@@ -2,6 +2,7 @@
 
 extern t_log *file_log;
 extern t_configuracionMemoria * configMemoria;
+#include <funcionesCompartidas/API.h>
 
 t_list * listClient;
 
@@ -10,7 +11,6 @@ void atenderMensaje(st_client * client){
     header request;
     void * paqueteDeRespuesta = getMessage(client->client,&request,&control);
     printf("client = %d\n",client->client);
-
     switch (request.codigo) {
     	case INSERT: {
     		st_insert *insert = desserealizarInsert(paqueteDeRespuesta);
@@ -33,51 +33,54 @@ void atenderMensaje(st_client * client){
     		destroyInsert(insert);
     		break;
     	}
-    	case SELECT:
-    		st_select * select = deserealizarSelect(paqueteDeRespuesta);
-    		printf("[+] We got a SELECT\n");
-    		printf("[+] Table [%s]\n", select->nameTable);
-    		printf("[+] Key [%d]\n", select->key);
+        case SELECT: {
+            st_select * select = deserealizarSelect(paqueteDeRespuesta);
+            printf("[+] We got a SELECT\n");
+            printf("[+] Table [%s]\n", select->nameTable);
+            printf("[+] Key [%d]\n", select->key);
 
-    		// IDEM INSERT
+            // IDEM INSERT
 
-    		//request.letra = 'M';
-    		//request.codigo = 1;
-    		//request.sizeData = 0;
-    		//bufferMensaje = createMessage(&request, "");
-    		//enviar_message(socketClient, bufferMensaje, file_log, &control);
+            //request.letra = 'M';
+            //request.codigo = 1;
+            //request.sizeData = 0;
+            //bufferMensaje = createMessage(&request, "");
+            //enviar_message(socketClient, bufferMensaje, file_log, &control);
 
-    		destroyInsert(select);
-    		break;
-    	case CREATE:
-    		st_create * create = deserealizarCreate(paqueteDeRespuesta);
-    		printf("We got a CREATE\n");
+            destoySelect(select);
+            break;
+        }
+    	case CREATE:{
+            st_create * create = deserealizarCreate(paqueteDeRespuesta);
+            printf("We got a CREATE\n");
 
-    		//Hacer create
+            //Hacer create
 
-    		destroyCreate(create);
-    		break;
-    	case DROP:
-    		st_drop * drop = deserealizarDrop(paqueteDeRespuesta);
-    		printf("We got a DROP");
+            destroyCreate(create);
+            break;
+    	}
+    	case DROP:{
+            st_drop * drop = deserealizarDrop(paqueteDeRespuesta);
+            printf("We got a DROP");
 
-    		//Hacer drop
+            //Hacer drop
 
-    		destroyDrop(drop);
-    		break;
-    	case DESCRIBE:
-    		st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
-    		printf("We got a DESCRIBE");
+            destroyDrop(drop);
+            break;
+    	}
+    	case DESCRIBE:{
+            st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
+            printf("We got a DESCRIBE");
 
-    		//Hacer describe
+            //Hacer describe
 
-    		destroyDescribe(describe);
-    		break;
+            destroyDescribe(describe);
+            break;
+    	}
     	case JOURNAL:
     		break;
     }
 
-    free(request);
     free(paqueteDeRespuesta);
     free(client);
 

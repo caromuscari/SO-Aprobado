@@ -10,7 +10,6 @@
 extern t_log *file_log;
 extern int tamanioMemoria;
 extern int tamanioValue;
-extern int cantPaginas;
 extern t_list* listaDeMarcos;
 
 void* memoriaPrincipal;

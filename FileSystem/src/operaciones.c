@@ -361,7 +361,9 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 						}
 				}
 			}else *exep = strdup(linea);
-		}else *exep = strdup(linea);
+		}else if(!string_is_empty(linea)){
+            *exep = strdup(linea);
+		}
 
 
 		string_iterate_lines(split, (void*)free);

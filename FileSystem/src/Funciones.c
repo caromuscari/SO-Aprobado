@@ -50,7 +50,7 @@ void inicializar(){
 	loop = 1;
 	clientes = dictionary_create();
 	memtable = dictionary_create();
-	alog = crear_archivo_log("File System", true, "/home/utnso/Escritorio/log.txt");
+	alog = crear_archivo_log("File System", true, "~/FS/log.txt");
 }
 
 void archivoDeConfiguracion(char* argv)

@@ -9,7 +9,6 @@
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
-#include <funcionesCompartidas/API.h>
 #include <readline/readline.h>
 #include <commons/log.h>
 #include <stdlib.h>

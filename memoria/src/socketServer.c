@@ -2,61 +2,89 @@
 
 extern t_log *file_log;
 extern t_configuracionMemoria * configMemoria;
+#include <funcionesCompartidas/API.h>
 
 t_list * listClient;
 
-void messageAction(header *req, void *buffer, int socketClient) {
-    header request;
-    message *bufferMensaje = NULL;
-    size_t sizebuffer = 0;
-    int control = 0;
-
-}
-
-void * atenderMensaje(st_client * client){
+void atenderMensaje(st_client * client){
     int control = 0;
     header request;
     void * paqueteDeRespuesta = getMessage(client->client,&request,&control);
     printf("client = %d\n",client->client);
     switch (request.codigo) {
-            case INSERT: {
-                st_insert *insert = desserealizarInsert(paqueteDeRespuesta);
-                printf("[+] We got an INSERT\n");
-                printf("[+] Table [%s]\n", insert->nameTable);
-                printf("[+] Key [%d]\n", insert->key);
-                printf("[+] Value [%s]\n", insert->value);
-                printf("[+] TimeStamp [%f]\n", insert->timestamp);
+    	case INSERT: {
+    		st_insert *insert = desserealizarInsert(paqueteDeRespuesta);
+    		printf("[+] We got an INSERT\n");
+    		printf("[+] Table [%s]\n", insert->nameTable);
+    		printf("[+] Key [%d]\n", insert->key);
+    		printf("[+] Value [%s]\n", insert->value);
+    		printf("[+] TimeStamp [%f]\n", insert->timestamp);
 
-                // HACE LA FUNCION INSERT
+    		// HACE LA FUNCION INSERT
 
-                //request.letra = 'M';
-                //request.codigo = 1;
-                //request.sizeData = 0;
-                //buffer = createMessage(&request, "");
-                //enviar_message(socketClient, bufferMensaje, file_log, &control);
+    		//request.letra = 'M';
+    		//request.codigo = 1;
+    		//request.sizeData = 0;
+    		//buffer = createMessage(&request, "");
+    		//enviar_message(socketClient, bufferMensaje, file_log, &control);
 
-                // DEVOLVER REGISTRO
+    		// DEVOLVER REGISTRO
 
-                break;
-            }
-            case SELECT:{
-              st_select * select = deserealizarSelect(paqueteDeRespuesta);
-              printf("[+] We got a SELECT\n");
-              printf("[+] Table [%s]\n", select->nameTable);
-              printf("[+] Key [%d]\n", select->key);
+    		destroyInsert(insert);
+    		break;
+    	}
+        case SELECT: {
+            st_select * select = deserealizarSelect(paqueteDeRespuesta);
+            printf("[+] We got a SELECT\n");
+            printf("[+] Table [%s]\n", select->nameTable);
+            printf("[+] Key [%d]\n", select->key);
 
-              // IDEM INSERT
+            // IDEM INSERT
 
-              //request.letra = 'M';
-              //request.codigo = 1;
-              //request.sizeData = 0;
-              //bufferMensaje = createMessage(&request, "");
-              //enviar_message(socketClient, bufferMensaje, file_log, &control);
+            //request.letra = 'M';
+            //request.codigo = 1;
+            //request.sizeData = 0;
+            //bufferMensaje = createMessage(&request, "");
+            //enviar_message(socketClient, bufferMensaje, file_log, &control);
 
-              break;
-            }
+            destoySelect(select);
+            break;
         }
+    	case CREATE:{
+            st_create * create = deserealizarCreate(paqueteDeRespuesta);
+            printf("We got a CREATE\n");
 
+            //Hacer create
+
+            destroyCreate(create);
+            break;
+    	}
+    	case DROP:{
+            st_drop * drop = deserealizarDrop(paqueteDeRespuesta);
+            printf("We got a DROP");
+
+            //Hacer drop
+
+            destroyDrop(drop);
+            break;
+    	}
+    	case DESCRIBE:{
+            st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
+            printf("We got a DESCRIBE");
+
+            //Hacer describe
+
+            destroyDescribe(describe);
+            break;
+    	}
+    	case JOURNAL:
+    		break;
+    }
+
+    free(paqueteDeRespuesta);
+    free(client);
+
+    pthread_exit(NULL);
 }
 
 void *start_server() {

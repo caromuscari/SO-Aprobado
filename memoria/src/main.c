@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
     inicializarMemoria();
     log_info(file_log, "la memoria se inicio correctamente");
     pthread_create(&server, NULL, &start_server, NULL);
+    //Falta el join
     console();
     return 0;
 }

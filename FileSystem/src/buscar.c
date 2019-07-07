@@ -112,21 +112,23 @@ structRegistro * buscarEnParticion(char * path, uint16_t key){
 
 	part = leerParticion(path);
 
-	while(part->bloques[i] != NULL && flag == 0){
-		prueba = leerBloque(part->bloques[i], key, &exep);
-		if(prueba != NULL){
-			reg = malloc(sizeof(structRegistro));
-			reg->time = prueba->time;
-			reg->key = prueba->key;
-			reg->value = string_new();
-			string_append(&reg->value, prueba->value);
+	if(part->Size != 0){
+		while(part->bloques[i] != NULL && flag == 0){
+			prueba = leerBloque(part->bloques[i], key, &exep);
+			if(prueba != NULL){
+				reg = malloc(sizeof(structRegistro));
+				reg->time = prueba->time;
+				reg->key = prueba->key;
+				reg->value = string_new();
+				string_append(&reg->value, prueba->value);
 
-			flag = 1;
+				flag = 1;
 
-			free(prueba->value);
-			free(prueba);
+				free(prueba->value);
+				free(prueba);
+			}
+			i++;
 		}
-		i++;
 	}
 
 	string_iterate_lines(part->bloques, (void*)free);

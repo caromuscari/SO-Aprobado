@@ -22,13 +22,14 @@
 #include "Funciones.h"
 #include <signal.h>
 #include <pthread.h>
+#include <commons/collections/queue.h>
+#include "hiloConsola.h"
 
 extern struct stat mystat;
 
 extern char* magic_number;
 extern int tBloques;
 extern int cantBloques;
-extern char * nombre;
 
 extern structConfig * config;
 extern t_dictionary * clientes, *memtable, *tablas;
@@ -37,6 +38,7 @@ extern t_bitarray* bitmap;
 extern char* posicion;
 extern int bitm;
 extern int loop;
+extern t_queue * nombre;
 
 
 void inicializar(){
@@ -44,7 +46,7 @@ void inicializar(){
 	config->montaje = strdup("");
 	magic_number = strdup("");
 	config->puerto = strdup("");
-	nombre = strdup("");
+	nombre = queue_create();
 	loop = 1;
 	clientes = dictionary_create();
 	memtable = dictionary_create();
@@ -99,16 +101,50 @@ int leer_metadata()
 int abrir_bitmap()
 {
 	char *ruta = strdup("");
+	FILE * archivo;
+	char * bytes;
+	int tamBitmap;
 
 	string_append(&ruta,config->montaje);
 	string_append(&ruta,"/Metadata/Bitmap.bin");
 
 	int fdbitmap = open(ruta,O_RDWR);
-	free(ruta);
-	if(fdbitmap==0){
-		log_info(alog,"no abrio el bitmap\n");
+
+	if(fdbitmap == -1){
+		log_info(alog,"Creacion del archivo bitmap\n");
+		fdbitmap = open(ruta, O_CREAT|O_RDWR|O_TRUNC, S_IRUSR|S_IWUSR|S_IROTH|S_IWOTH|S_IRGRP|S_IWGRP);
+		char * bloques = string_from_format("%s/Bloques", config->montaje);
+
+		tamBitmap = cantBloques/8;
+
+		for(int i=0; i< cantBloques; i++){
+			char * file = string_from_format("%s/%d.bin", bloques, i);
+			archivo = fopen(file,"a+");
+			fclose(archivo);
+			free(file);
+		}
+
+		write(fdbitmap,"  ",tamBitmap);
+
+		bytes = (char *)mmap(0,tamBitmap,PROT_READ|PROT_WRITE,MAP_SHARED,fdbitmap,0);
+		if(bytes == MAP_FAILED){
+			log_info(alog,"error en mmap\n");
+			fprintf(stderr, "mmap failed: %s\n", strerror(errno));
+			close(fdbitmap);
+			return -1;
+		}
+
+		memset(bytes,0,tamBitmap);
+		msync(bytes,tamBitmap,MS_SYNC);
+		munmap(bytes,tamBitmap);
+
 		close(fdbitmap);
-		return -1;
+
+		free(bloques);
+
+		fdbitmap = open(ruta, O_RDWR);
+		if(fdbitmap == -1) return -1;
+
 	}
 
 	fstat(fdbitmap,&mystat);
@@ -120,17 +156,16 @@ int abrir_bitmap()
 		close(fdbitmap);
 		return -1;
 	}
-	bitmap = bitarray_create_with_mode(posicion,mystat.st_size, LSB_FIRST);
 
-	/*for(int i = 0; i< bitarray_get_max_bit(bitmap); i++){
-		bitarray_clean_bit(bitmap,i);
-	}*/
+	bitmap = bitarray_create_with_mode(posicion,mystat.st_size, LSB_FIRST);
 
 	close(fdbitmap);
 
 	posicion = malloc(cantBloques);
 
 	log_info(alog, "Abre el bitmap");
+
+	free(ruta);
 
 	return 0;
 
@@ -144,26 +179,36 @@ void finalizar(){
 	free(magic_number);
 	free(config->puerto);
 	free(config);
-	free(nombre);
 	if(bitm != -1){
 		memcpy(posicion,bitmap,mystat.st_size);
 		msync(posicion,mystat.st_size,MS_SYNC);
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
-	}
-	dictionary_clean(tablas);
-	dictionary_destroy(tablas);
+		free(posicion);
 
-	dictionary_clean(clientes);
+		queue_clean_and_destroy_elements(nombre, free);
+
+		dictionary_clean_and_destroy_elements(tablas,(void*)liberarTablas);
+		dictionary_destroy(tablas);
+
+		dictionary_clean(clientes);
+
+		dictionary_clean(memtable);
+	}
+
+	queue_destroy(nombre);
+
 	dictionary_destroy(clientes);
 
-	dictionary_clean(memtable);
 	dictionary_destroy(memtable);
 	liberar_log(alog);
 }
 
-void finalizarFile(){
-	loop = 0;
+void liberarTablas(st_tablaCompac * tabla){
+	liberarMetadata(tabla->meta);
+	sem_destroy(&tabla->compactacion);
+	sem_destroy(&tabla->opcional);
+	//list_destroy(tabla->sem);
+	free(tabla);
 }
-
 

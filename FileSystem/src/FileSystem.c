@@ -19,6 +19,7 @@
 #include "hiloDump.h"
 #include "hiloInotify.h"
 #include <commons/collections/dictionary.h>
+#include <commons/collections/queue.h>
 #include <commons/bitarray.h>
 #include <sys/stat.h>
 #include <signal.h>
@@ -35,7 +36,7 @@ int socketfs;
 int controlador;
 char* posicion;
 int bitm;
-char * nombre;
+t_queue * nombre;
 int loop;
 
 structConfig * config;
@@ -58,7 +59,6 @@ int main(int argc, char *argv[]) {
 
 
 	if(!(metadata ==-1 || bitm ==-1)){
-		signal(SIGINT,finalizarFile);
 
 		tablas = listarDirectorio();
 

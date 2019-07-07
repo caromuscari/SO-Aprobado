@@ -13,30 +13,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-t_log* file_log;
-t_config * archivoConfiguracionMemoria;
+#include <commons/collections/list.h>
+#include <commons/string.h>
 
 typedef struct{
-	char* puerto;
-	char* ipFS;
-	char* puertoFS;
-	t_list* ipSeeds;
-	t_list* puertoSeeds;
-	int retardoAccesoMP;
-	int retardoAccesoFS;
-	int tamanioMemoria;
-	int tiempoJournal;
-	int tiempoGossiping;
-	int nroMemoria;
-	int sleep;
+	char* PUERTO;
+	char* IP_FS;
+	char* PUERTO_FS;
+	t_list* IP_SEEDS;
+	t_list* PUERTO_SEEDS;
+	int RETARDO_MEM;
+	int RETARDO_FS;
+	int TAM_MEM;
+	int TIEMPO_JOURNAL;
+	int TIEMPO_GOSSIPING;
+	int NRO_MEMORIA;
+	int SLEEP;
 
 }t_configuracionMemoria;
 
-t_configuracionMemoria leerConfiguracion(char* path);
-
-int tamanioArray(void** array);
-
-void hacerFreeArray(void** array);
+t_configuracionMemoria * leerConfiguracion(char* path);
 
 #endif /* CONFIGURACIONMEMORIA_H_ */

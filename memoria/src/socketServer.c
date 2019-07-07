@@ -1,8 +1,7 @@
 #include "socketServer.h"
 
 extern t_log *file_log;
-
-extern t_configuracionMemoria configMemoria;
+extern t_configuracionMemoria * configMemoria;
 
 t_list * listClient;
 
@@ -26,7 +25,7 @@ void * atenderMensaje(st_client * client){
                 printf("[+] Table [%s]\n", insert->nameTable);
                 printf("[+] Key [%d]\n", insert->key);
                 printf("[+] Value [%s]\n", insert->value);
-                printf("[+] TimeStamp [%d]\n", insert->timestamp);
+                printf("[+] TimeStamp [%f]\n", insert->timestamp);
 
                 // HACE LA FUNCION INSERT
 
@@ -63,7 +62,7 @@ void * atenderMensaje(st_client * client){
 void *start_server() {
 	printf("[+] Starting server.. \n");
 	int control = 0;
-	int socketServer = makeListenSock(configMemoria.puerto, file_log, &control);
+	int socketServer = makeListenSock(configMemoria->PUERTO, file_log, &control);
 	int client;
 	st_client * newClient;
 	while (true){

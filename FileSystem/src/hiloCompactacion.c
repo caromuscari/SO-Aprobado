@@ -12,6 +12,7 @@
 #include "Funciones.h"
 #include <unistd.h>
 #include <commons/collections/dictionary.h>
+#include <commons/collections/queue.h>
 #include "operaciones.h"
 #include "hiloCompactacion.h"
 #include "manejoArchivos.h"
@@ -21,27 +22,30 @@ extern t_dictionary * tablas;
 extern int tBloques;
 extern t_bitarray* bitmap;
 extern t_log* alog;
-extern char * nombre;
+extern t_queue * nombre;
 extern int loop;
 
 void hilocompactacion(){
 
-//	signal(SIGKILL,senial);
-
 	FILE* archivo;
 	int i = 1, valor;
+	char * nomTabla = queue_pop(nombre);
 	printf("Hilo compactacion\n");
-	printf("Nombre de tabla: %s\n", nombre);
-	char * name = strdup(nombre);
-	char * pathTabla = armar_path(name);
+	printf("Nombre de tabla: %s\n", nomTabla);
+	char * pathTabla;
 	char * path, *new;
 	t_dictionary * lista;
-	st_tablaCompac * tabla = dictionary_get(tablas, name);
+	st_tablaCompac * tabla = dictionary_get(tablas, nomTabla);
 
+	free(nomTabla);
+
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
 	while(loop){
 
 		sleep(tabla->meta->compaction_time);
+
+		pathTabla = armar_path(nomTabla);
 
 		path = string_from_format("%s/%d.tmp", pathTabla, i);
 		archivo = fopen(path,"r");

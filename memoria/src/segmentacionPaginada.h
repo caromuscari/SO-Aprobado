@@ -50,4 +50,8 @@ int buscarMarcoLibre();
 
 int algoritmoLRU();
 
+st_tablaDePaginas* paginaConMenorTiempoPorSegmento(t_list* listaPaginas);
+
+st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tablaDePaginas* paginaAComparar);
+
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

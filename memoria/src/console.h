@@ -13,6 +13,7 @@
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
+#include "segmentacionPaginada.h"
 
 #include "socketCliente.h"
 

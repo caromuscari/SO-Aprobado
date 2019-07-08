@@ -12,6 +12,8 @@ extern int tamanioValue;
 extern t_list* listaDeMarcos;
 extern void *memoriaPrincipal;
 t_list* listaDeSegmentos;
+extern int cantPaginas;
+extern int tamanioTotalDePagina;
 
 
 void inicializarMemoria(){
@@ -20,6 +22,23 @@ void inicializarMemoria(){
 }
 
 //COMANDO INSERT
+
+void mostrarPaginasCargadas(){
+    int i,offset = 0;
+    uint16_t key;
+    double timeStamp;
+    char * value = malloc(tamanioValue);
+    for (i = 0; i < cantPaginas; ++i) {
+        offset = tamanioTotalDePagina * i;
+        memcpy(&timeStamp, (memoriaPrincipal + offset), sizeof(double));
+        memcpy(&key,(memoriaPrincipal + offset + sizeof(double)), sizeof(uint16_t));
+        memcpy(value,(memoriaPrincipal + offset + sizeof(double) + sizeof(uint16_t)), tamanioValue);
+        printf("pagina [%d]-------\n",i);
+        printf("%f\n",timeStamp);
+        printf("%d\n",key);
+        printf("%s\n",value);
+    }
+}
 
 int comandoInsert(st_insert* comandoInsert){
 	if(strlen(comandoInsert->value) > tamanioValue){
@@ -57,7 +76,7 @@ int comandoInsert(st_insert* comandoInsert){
 
 		st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 		marco->condicion = OCUPADO;
-
+        mostrarPaginasCargadas();
 		return 0;
 	}
 	log_info(file_log, "No se encontro el segmento de esa tabla");
@@ -86,7 +105,7 @@ int comandoInsert(st_insert* comandoInsert){
 
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
-
+    mostrarPaginasCargadas();
 	return 0;
 }
 
@@ -129,10 +148,9 @@ st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 
 
 st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
-	bool paginaConEsaKey(void* pagina){
-		pagina += sizeof(double);
+	bool paginaConEsaKey(st_tablaDePaginas * tablaPagina){
 		uint16_t keyAComparar;
-		memcpy(&keyAComparar, pagina, sizeof(uint16_t));
+		memcpy(&keyAComparar, tablaPagina->pagina + sizeof(double), sizeof(uint16_t));
 		return key == keyAComparar;
 	}
 	return (st_tablaDePaginas*) list_find(tablaDePaginas, paginaConEsaKey);

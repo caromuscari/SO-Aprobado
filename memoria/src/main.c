@@ -12,7 +12,7 @@ t_log *file_log;
 t_list *listaDeMarcos;
 t_configuracionMemoria *configMemoria;
 int cantPaginas;
-int tamanioValue = 4; //esto me lo va a pasa fs
+int tamanioValue = 10; //esto me lo va a pasa fs
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
 

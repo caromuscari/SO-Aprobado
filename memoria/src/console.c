@@ -8,26 +8,30 @@ void makeCommand(char *command){
 
   switch(typeCommand){
   	  case INSERT:
-  		  printf("[+] I got INSERT.");
+  		  log_info(file_log, "Ejecutando un insert");
   		  st_insert * insert;
   		  if((insert = cargarInsert(command))){
-  			  //comandoInsert(insert);
-  			  printf("[+] Executing INSERT");
-  			  sleep(1);
+              if(comandoInsert(insert) < 0){
+                  log_error(file_log, "no se puedo hacer el insert");
+              }
   		  }
-
   		  destroyInsert(insert);
   		  break;
       case SELECT:
     	  log_info(file_log, "[+] El comando es un SELECT\n");
     	  st_select * select;
+    	  st_registro * registro;
     	  if((select = cargarSelect(command))){
     		  log_info(file_log, "[+] Ejecutando SELECT.\n");
-    		  //comandoSelect(select);
-    		  sleep(1);
+              registro = comandoSelect(select);
+              if(registro){
+                  printf("value [%s]\n", registro->value);
+              }else{
+                log_info(file_log, "No se encontro el select");
+              }
+    	  }else{
+              log_error(file_log, "[+] Error en datos de SELECT. \n");
     	  }
-
-    	  log_info(file_log, "[+] Error en datos de SELECT. \n");
     	  destoySelect(select);
     	  break;
       case CREATE:
@@ -76,6 +80,9 @@ void makeCommand(char *command){
         break;
       case EXIT:
     	  break;
+      default: {
+          log_info(file_log, "No se reconoce el comando");
+      }
   }
 
 }

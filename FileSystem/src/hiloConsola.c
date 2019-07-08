@@ -51,7 +51,7 @@ void* hiloconsola(){
 
 		switch(getEnumFromString(request))
 		{
-			case 1:
+			case INSERT:
 				log_info(alog, "Request de tipo INSERT");
 				st_insert * insert;
 				insert = cargarInsert(request);
@@ -66,21 +66,21 @@ void* hiloconsola(){
 					}else{
 						mostrarRespuesta(3);
 					}
+
+					destroyInsert(insert);
 				}else{
 					mostrarRespuesta(1);
 				}
-
-				destroyInsert(insert);
 				break;
 
-			case 2:
+			case SELECT:
 				log_info(alog, "Request de tipo SELECT");
-				st_select * select;
+				st_select * selectt;
 				char * value;
-				select = cargarSelect(request);
+				selectt = cargarSelect(request);
 
-				if(select != NULL){
-					respuesta = realizarSelect(select, &value);
+				if(selectt != NULL){
+					respuesta = realizarSelect(selectt, &value);
 
 					if(respuesta != 14){
 						mostrarRespuesta(respuesta);
@@ -88,14 +88,15 @@ void* hiloconsola(){
 						log_info(alog, value);
 						printf("Value: %s\n",value);
 					}
+
+					destoySelect(selectt);
 				}else{
 					mostrarRespuesta(1);
 				}
 
-				destoySelect(select);
 				break;
 
-			case 3:
+			case CREATE:
 				log_info(alog, "Request de tipo CREATE");
 				st_create * create;
 				create = cargarCreate(request);
@@ -105,14 +106,14 @@ void* hiloconsola(){
 					actualizar_bitmap();
 					mostrarRespuesta(respuesta);
 
+					destroyCreate(create);
 				}else{
 					mostrarRespuesta(1);
 				}
 
-				destroyCreate(create);
 				break;
 
-			case 4:
+			case DROP:
 				log_info(alog, "Request de tipo DROP");
 				st_drop * drop;
 				drop = cargarDrop(request);
@@ -122,14 +123,14 @@ void* hiloconsola(){
 					actualizar_bitmap();
 					mostrarRespuesta(respuesta);
 
+					destroyDrop(drop);
 				}else{
 					mostrarRespuesta(1);
 				}
 
-				destroyDrop(drop);
 				break;
 
-			case 5:
+			case DESCRIBE:
 				log_info(alog, "Request de tipo DESCRIBE");
 				st_describe * describe;
 				st_metadata * meta;
@@ -154,7 +155,7 @@ void* hiloconsola(){
 
 				break;
 
-			case 6:
+			case EXIT:
 				loop = 0;
 				dictionary_iterator(clientes,(void*)cerrarClientes);
 				dictionary_iterator(tablas,(void*)cerrarTablas);
@@ -168,7 +169,7 @@ void* hiloconsola(){
 			}
 		free(ingreso);
 
-		//sleep(config->retardo);
+		sleep(config->retardo);
 	}
 
 	log_info(alog, "Sale del hilo consola");

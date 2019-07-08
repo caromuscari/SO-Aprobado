@@ -26,7 +26,7 @@ void crearTemporal(char * key, st_tabla* data){
         //ITERAR POR EL TAMANIO Y PONER DATA
         int* numeroBloque = list_get(bloques, 0);
         int caracteresPorString = tBloques * 1024/ sizeof(char);
-        while(tamanioRestante > 0 && *numeroBloque != NULL){
+        while(tamanioRestante > 0 && numeroBloque != NULL){
 
             char* path = armar_PathBloque(string_itoa(*numeroBloque));
             FILE *write_ptr;
@@ -65,7 +65,7 @@ char* buscarNombreProximoTemporal(char* nombreTabla){
     FILE *file;
     int i = 1;
     char* filename = string_from_format("%s/%d.tmp", pathTabla, i);
-    while (file = fopen(filename, "r")){
+    while ((file = fopen(filename, "r"))){
         fclose(file);
         i++;
         free(filename);

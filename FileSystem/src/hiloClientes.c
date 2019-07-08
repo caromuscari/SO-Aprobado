@@ -47,7 +47,7 @@ void tratarCliente(int socketC){
 
 		switch(recibido->head.codigo)
 		{
-			case 1:
+			case INSERT:
 				log_info(alog, "Recibi un Insert");
 				st_insert * insert;
 				insert = desserealizarInsert(recibido->buffer);
@@ -65,25 +65,25 @@ void tratarCliente(int socketC){
 				//free(buffer);
 				break;
 
-			case 2:
+			case SELECT:
 				log_info(alog, "Recibi un Select");
-				st_select * select;
+				st_select * selectt;
 				char * registro;
 				st_registro * reg;
-				select = deserealizarSelect(recibido->buffer);
+				selectt = deserealizarSelect(recibido->buffer);
 
-				respuesta = realizarSelect(select, &registro);
+				respuesta = realizarSelect(selectt, &registro);
 				reg = cargarRegistro(registro);
 				buffer = serealizarRegistro(reg,&size);
 				enviarRespuesta(respuesta, &buffer, socketC, &status, size);
 
-				destoySelect(select);
+				destoySelect(selectt);
 				destroyRegistro(reg);
 				free(registro);
 				free(buffer);
 				break;
 
-			case 3:
+			case CREATE:
 				log_info(alog, "Recibi un Create");
 				st_create * create;
 				create = deserealizarCreate(recibido->buffer);
@@ -96,7 +96,7 @@ void tratarCliente(int socketC){
 				//free(buffer);
 				break;
 
-			case 4:
+			case DROP:
 				log_info(alog, "Recibi un Drop");
 				st_drop * drop;
 				drop = deserealizarDrop(recibido->buffer);
@@ -109,7 +109,7 @@ void tratarCliente(int socketC){
 				//free(buffer);
 				break;
 
-			case 5: //describe
+			case DESCRIBE:
 				log_info(alog, "Recibi un Describe");
 				st_describe * describe;
 				st_metadata * meta;
@@ -117,30 +117,27 @@ void tratarCliente(int socketC){
 
 				respuesta = realizarDescribe(describe, &meta);
 
-				buffer = serealizarMetaData(meta, &size);//Probar
+				buffer = serealizarMetaData(meta, &size);
 
 				enviarRespuesta(respuesta, &buffer, socketC, &status, size);
 
-				//liberarMetadata(meta);
 				destroyDescribe(describe);
 				free(buffer);
 				break;
 
-			case 6:
+			case DESCRIBEGLOBAL:
 				log_info(alog, "Recibi un Describe Global");
 
 				respuesta = realizarDescribeGlobal();
 
 				buffer = serealizarListaMetaData(listaTabla,&size);
-				enviarRespuesta(respuesta, &buffer, socketC, &status,size);//Enviar el size_t
+				enviarRespuesta(respuesta, &buffer, socketC, &status,size);
 
 				free(buffer);
 				break;
 			default:
 				flag = false;
 				enviarRespuesta(16, &buffer, socketC, &status, sizeof(buffer)); //Modificar numero
-
-				//free(buffer);
 
 		}
 

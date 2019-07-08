@@ -328,7 +328,7 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 			reg = malloc(sizeof(structRegistro));
 			reg->time = atol(split[0]);
 			reg->key = atoi(split[1]);
-			reg->value = strtok(split[2], "\n");
+			reg->value = strdup(strtok(split[2], "\n"));
 
 			flag = 1;
 		}
@@ -351,17 +351,19 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 						reg = malloc(sizeof(structRegistro));
 						reg->time = atol(split[0]);
 						reg->key = atoi(split[1]);
-						reg->value = strtok(split[2], "\n");
+						reg->value = strdup(strtok(split[2], "\n"));
 
 						flag = 1;
 					}else if(reg->time < atol(split[0])){
 							reg->time = atol(split[0]);
 							reg->key = atoi(split[1]);
-							reg->value = strtok(split[2], "\n");
+							reg->value = strdup(strtok(split[2], "\n"));
 						}
 				}
 			}else *exep = strdup(linea);
-		}else *exep = strdup(linea);
+		}else if(!string_is_empty(linea)){
+            *exep = strdup(linea);
+		}
 
 
 		string_iterate_lines(split, (void*)free);

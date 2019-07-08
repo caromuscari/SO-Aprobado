@@ -1,4 +1,5 @@
 #include "socketServer.h"
+#include "request.h"
 
 extern t_log *file_log;
 extern t_configuracionMemoria * configMemoria;
@@ -52,27 +53,37 @@ void atenderMensaje(st_client * client){
         }
     	case CREATE:{
             st_create * create = deserealizarCreate(paqueteDeRespuesta);
+            int respuesta;
             printf("We got a CREATE\n");
 
-            //Hacer create
+            respuesta = mandarCreate(create);
+
+            //Mandar respuesta
 
             destroyCreate(create);
             break;
     	}
     	case DROP:{
             st_drop * drop = deserealizarDrop(paqueteDeRespuesta);
+            int respuesta;
             printf("We got a DROP");
 
-            //Hacer drop
+            respuesta = mandarDrop(drop);
+
+            //Mandar respuesta
 
             destroyDrop(drop);
             break;
     	}
     	case DESCRIBE:{
+    		char * respuesta;
             st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
             printf("We got a DESCRIBE");
 
-            //Hacer describe
+            //Revisar
+            respuesta = mandarDescribe(describe,5);
+
+            //Hacer algo con la metadata
 
             destroyDescribe(describe);
             break;

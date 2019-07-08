@@ -1,5 +1,6 @@
 // console
 #include "console.h"
+#include "request.h"
 
 extern t_log *file_log;
 
@@ -37,10 +38,15 @@ void makeCommand(char *command){
       case CREATE:
     	  log_info(file_log, "[+] El comando es un CREATE\n");
     	  st_create * create;
+    	  int codigo;
+
 		  if((create = cargarCreate(command))){
 			  log_info(file_log, "[+] Ejecutando CREATE\n");
-			  //Hacer create
+			  codigo = mandarCreate(create);
+
+			  //Mostrar respuesta
 		  }
+
 		  log_info(file_log, "[+] Error en datos de CREATE\n");
 
     	  destroyCreate(create);
@@ -48,9 +54,13 @@ void makeCommand(char *command){
       case DROP:
     	  log_info(file_log, "[+] El comando es un DROP\n");
     	  st_drop * drop;
+    	  int cod;
+
 		  if((drop = cargarDrop(command))){
 			  log_info(file_log, "[+] Ejecutando DROP\n");
-			  //Hacer drop
+			  cod = mandarDrop(drop);
+
+			  //Mostrar respuesta
 		  }
 		  log_info(file_log, "[+] Error en datos de DROP\n");
 
@@ -59,13 +69,21 @@ void makeCommand(char *command){
       case DESCRIBE:
     	  log_info(file_log, "[+] El comando es un DESCRIBE\n");
     	  st_describe * describe;
+    	  char * respuesta;
     	  if((describe = cargarDescribe(command))){
     		  log_info(file_log, "[+] Ejecutando DESCRIBE\n");
-    		  //Hacer describe
+    		  respuesta = mandarDescribe(describe,DESCRIBE);
+
+    		  //Hacer algo con describe
+    	  }else{
+    		  respuesta = mandarDescribe(describe, 8);
+
+    		  //Hacer algo con describe
     	  }
     	  log_info(file_log, "[+] Error en datos de DESCRIBE\n");
 
-    	  destroyDrop(drop);
+    	  free(respuesta);
+    	  destroyDescribe(describe);
   	 	break;
       case JOURNAL:
     	  log_info(file_log, "[+] El comando es un JOURNAL\n");

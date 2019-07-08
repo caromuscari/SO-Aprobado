@@ -17,8 +17,9 @@ enum OPERACION {
     CREATE = 3,
     DROP = 4,
     DESCRIBE = 5,
-    EXIT = 6,
-    JOURNAL = 7
+	DESCRIBEGLOBAL = 6,
+	EXIT = 7,
+	JOURNAL = 8
 };
 
 typedef struct {

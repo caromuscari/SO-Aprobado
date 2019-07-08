@@ -163,8 +163,8 @@ structRegistro * buscarEnTemporales(char * name, uint16_t key){
         				final = reg;
         			}
         			flag = 1;
-        			free(reg->value);
-        			free(reg);
+        			/*free(reg->value);
+        			free(reg);*/
         		}
         		free(path);
         	}
@@ -183,7 +183,7 @@ structRegistro * buscarEnArchivo(char * path, uint16_t key){
 	structRegistro * reg, * prueba;
 	structParticion * part;
 	int i = 0, flag = 0;
-	char * exep;
+	char * exep = NULL;
 
 	part = leerParticion(path);
 

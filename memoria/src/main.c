@@ -11,15 +11,16 @@
 t_log *file_log;
 t_list *listaDeMarcos;
 t_configuracionMemoria *configMemoria;
+int fdFileSystem;
 int cantPaginas;
 int tamanioValue = 10; //esto me lo va a pasa fs
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
 
-bool buscarValueMaximo() {
+bool buscarValueMaximo(){
     int control = 0;
     log_info(file_log,"Conectando con FileSysten");
-    int fdClient = establecerConexion(configMemoria->IP_FS, configMemoria->PUERTO_FS, file_log, &control);
+    fdFileSystem = establecerConexion(configMemoria->IP_FS, configMemoria->PUERTO_FS, file_log, &control);
     if(control != 0){
         log_error(file_log,"no se puedo establecer conexion con el FILESYSTEM");
         return false;
@@ -31,7 +32,7 @@ bool buscarValueMaximo() {
     request.codigo = 1;
     request.sizeData = 1;
     void * paqueteDeMensaje = createMessage(&request," ");
-    if(enviar_message(fdClient,paqueteDeMensaje,file_log,&control) < 0){
+    if(enviar_message(fdFileSystem,paqueteDeMensaje,file_log,&control) < 0){
         log_error(file_log,"no se puedo enviar el mensaje");
         return false;
     }
@@ -39,17 +40,19 @@ bool buscarValueMaximo() {
 
     log_info(file_log,"esperando respuesta del valor maximo");
     header response;
-    void * paqueteDeRespuesta = getMessage(fdClient,&response,&control);
+    void * paqueteDeRespuesta = getMessage(fdFileSystem,&response,&control);
     if(paqueteDeMensaje == NULL){
         log_error(file_log,"erro al recibir el la respuesta");
         return  false;
     }
     //verificar como enviar el mensaje
-    tamanioValue = 4;
+    tamanioValue = atoi(paqueteDeRespuesta);
 
+    free(paqueteDeRespuesta);
+    return true;
 }
 
-int inicializar(char *pathConfig) {
+int inicializar(char *pathConfig){
     int i;
     file_log = crear_archivo_log("Memoria", true, "./logMemoria");
     log_info(file_log, "cargando el archivo de configuracion");
@@ -73,7 +76,7 @@ int inicializar(char *pathConfig) {
     return 0;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
     if (inicializar(argv[1]) < 0) {
         return -1;
     }

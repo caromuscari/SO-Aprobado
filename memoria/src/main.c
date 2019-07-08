@@ -49,6 +49,7 @@ bool buscarValueMaximo(){
     tamanioValue = atoi(paqueteDeRespuesta);
 
     free(paqueteDeRespuesta);
+    printf("Tamanio del value: %d",tamanioValue);
     return true;
 }
 
@@ -81,13 +82,14 @@ int main(int argc, char *argv[]){
         return -1;
     }
     //descomentar cando el File entienda este mensaje
-    //if(!buscarValueMaximo()){
-    //    return -1;
-    //}
+    if(!buscarValueMaximo()){
+        return -1;
+    }
     pthread_t server;
     inicializarMemoria();
     log_info(file_log, "la memoria se inicio correctamente");
     pthread_create(&server, NULL, &start_server, NULL);
+    pthread_detach(server);
     //Falta el join
     console();
     return 0;

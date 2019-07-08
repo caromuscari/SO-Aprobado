@@ -155,8 +155,8 @@ int realizarCreate(st_create * create){
 			tabla->meta = leerMetadata(create->nameTable);
 			char * name = strdup(create->nameTable);
 			queue_push(nombre, name);
-			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
-			pthread_detach(tabla->hilo);
+			//pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
+			//pthread_detach(tabla->hilo);
 			dictionary_put(tablas, create->nameTable, tabla);
 
 			free(path);

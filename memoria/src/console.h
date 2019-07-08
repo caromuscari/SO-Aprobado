@@ -5,6 +5,7 @@
 #include <commons/log.h>
 #include <stdlib.h>
 #include <funcionesCompartidas/API.h>
+#include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/list.h>
 #include <commons/config.h>
 #include <stdio.h>
@@ -21,5 +22,8 @@
 void console();
 
 void makeCommand(char *command);
+void mostrarRespuesta(int respuesta);
+void mostrarTabla(st_metadata * meta);
+void mostrarTabla(st_metadata * meta);
 
 #endif //MEM_CONSOLE_H

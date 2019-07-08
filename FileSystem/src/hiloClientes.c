@@ -28,7 +28,7 @@ extern structConfig * config;
 extern t_list * listaTabla;
 extern int loop;
 
-void tratarCliente(int socketC){
+void tratarCliente(cliente_t * cliente){
 
 	int status=0;
 	bool flag = true;
@@ -41,7 +41,7 @@ void tratarCliente(int socketC){
 		char * buffer;
 		size_t size;
 
-		recibido->buffer = getMessage(socketC, &(recibido->head), &status);
+		recibido->buffer = getMessage(cliente->socket, &(recibido->head), &status);
 
 		if(recibido->buffer == NULL) flag=false;
 
@@ -52,17 +52,19 @@ void tratarCliente(int socketC){
 				st_insert * insert;
 				insert = desserealizarInsert(recibido->buffer);
 
+				buffer = strdup("");
+
 				if(string_length(insert->value) <= config->tam_value)
 				{
 					respuesta = realizarInsert(insert);
-					enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status, sizeof(buffer));
 
 				}else{
-					enviarRespuesta(3, &buffer, socketC, &status, sizeof(buffer));
+					enviarRespuesta(3, buffer, cliente->socket, &status, sizeof(buffer));
 				}
 
 				destroyInsert(insert);
-				//free(buffer);
+				free(buffer);
 				break;
 
 			case SELECT:
@@ -75,7 +77,7 @@ void tratarCliente(int socketC){
 				respuesta = realizarSelect(selectt, &registro);
 				reg = cargarRegistro(registro);
 				buffer = serealizarRegistro(reg,&size);
-				enviarRespuesta(respuesta, &buffer, socketC, &status, size);
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
 				destoySelect(selectt);
 				destroyRegistro(reg);
@@ -90,10 +92,12 @@ void tratarCliente(int socketC){
 
 				respuesta = realizarCreate(create);
 				actualizar_bitmap();
-				enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
+
+				buffer = strdup("");
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, sizeof(buffer));
 
 				destroyCreate(create);
-				//free(buffer);
+				free(buffer);
 				break;
 
 			case DROP:
@@ -103,10 +107,12 @@ void tratarCliente(int socketC){
 
 				respuesta = realizarDrop(drop);
 				actualizar_bitmap();
-				enviarRespuesta(respuesta, &buffer, socketC, &status, sizeof(buffer));
+
+				buffer = strdup("");
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, sizeof(buffer));
 
 				destroyDrop(drop);
-				//free(buffer);
+				free(buffer);
 				break;
 
 			case DESCRIBE:
@@ -119,7 +125,7 @@ void tratarCliente(int socketC){
 
 				buffer = serealizarMetaData(meta, &size);
 
-				enviarRespuesta(respuesta, &buffer, socketC, &status, size);
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
 				destroyDescribe(describe);
 				free(buffer);
@@ -130,14 +136,20 @@ void tratarCliente(int socketC){
 
 				respuesta = realizarDescribeGlobal();
 
-				buffer = serealizarListaMetaData(listaTabla,&size);
-				enviarRespuesta(respuesta, &buffer, socketC, &status,size);
+				if(respuesta == 13){
+					buffer = serealizarListaMetaData(listaTabla,&size);
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
+					list_destroy(listaTabla);
+				}else{
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status,sizeof(buffer));
+				}
+
 
 				free(buffer);
 				break;
 			default:
 				flag = false;
-				enviarRespuesta(16, &buffer, socketC, &status, sizeof(buffer)); //Modificar numero
+				enviarRespuesta(16, buffer, cliente->socket, &status, sizeof(buffer)); //Modificar numero
 
 		}
 
@@ -147,14 +159,14 @@ void tratarCliente(int socketC){
 		sleep(config->retardo);
 	}
 
-	log_info(alog, "se desconecto el socket client %d",socketC);
-	close(socketC);
-	free(dictionary_remove(clientes, string_itoa(socketC)));
+	log_info(alog, "se desconecto el socket client %d",cliente->socket);
+	close(cliente->socket);
+	free(dictionary_remove(clientes, string_itoa(cliente->socket)));
 
 	pthread_exit(NULL);
 }
 
-void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status, size_t tam){
+void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam){
 
 	header * head = malloc(sizeof(header));
 

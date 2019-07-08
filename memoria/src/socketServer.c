@@ -4,12 +4,15 @@
 extern t_log *file_log;
 extern t_configuracionMemoria * configMemoria;
 #include <funcionesCompartidas/API.h>
+#include <funcionesCompartidas/listaMetadata.h>
+#include <commons/collections/list.h>
 
 t_list * listClient;
 
 void atenderMensaje(st_client * client){
     int control = 0;
     header request;
+    char * buffer;
     void * paqueteDeRespuesta = getMessage(client->client,&request,&control);
     printf("client = %d\n",client->client);
     switch (request.codigo) {
@@ -58,9 +61,13 @@ void atenderMensaje(st_client * client){
 
             respuesta = mandarCreate(create);
 
-            //Mandar respuesta
+            buffer = strdup("");
+
+            if(respuesta == 8) enviarRespuesta(7, buffer, client->client, &control, sizeof(buffer));
+            else enviarRespuesta(8, buffer, client->client, &control, sizeof(buffer));
 
             destroyCreate(create);
+            free(buffer);
             break;
     	}
     	case DROP:{
@@ -70,23 +77,59 @@ void atenderMensaje(st_client * client){
 
             respuesta = mandarDrop(drop);
 
-            //Mandar respuesta
+            buffer = strdup("");
+
+            if(respuesta == 9) enviarRespuesta(7, buffer, client->client, &control, sizeof(buffer));
+            else enviarRespuesta(8, buffer, client->client, &control, sizeof(buffer));
 
             destroyDrop(drop);
+            free(buffer);
             break;
     	}
     	case DESCRIBE:{
-    		char * respuesta;
+    		int respuesta;
+    		st_metadata * meta;
+    		size_t size;
             st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
             printf("We got a DESCRIBE");
 
-            //Revisar
-            respuesta = mandarDescribe(describe,5);
+            respuesta = mandarDescribe(describe,&meta);
 
-            //Hacer algo con la metadata
+            //Cambiar Numeros
+            if(respuesta == 15){
+            	buffer = serealizarMetaData(meta,&size);
+            	enviarRespuesta(15,buffer,client->client,&control,size);
+            	destroyMetaData(meta);
+            }else{
+            	buffer = strdup("");
+            	enviarRespuesta(15,buffer,client->client,&control,sizeof(buffer));
+            }
 
             destroyDescribe(describe);
+            free(buffer);
             break;
+    	}
+    	case DESCRIBEGLOBAL:{
+    		int respuesta;
+    		t_list * metas;
+    		size_t size;
+    		char * buffer;
+    		printf("We got a DESCRIBE Global");
+
+    		respuesta = mandarDescribeGlobal(&metas);
+
+    		//Cambiar Numeros
+    		if(respuesta == 13){
+    			buffer = serealizarListaMetaData(metas,&size);
+    			enviarRespuesta(13, buffer, client->client, &control,size);
+    			destroyListaMetaData(metas);
+    		}else{
+    			buffer = strdup("");
+    			enviarRespuesta(13, buffer, client->client, &control,sizeof(buffer));
+    		}
+
+    		free(buffer);
+    		break;
     	}
     	case JOURNAL:
     		break;
@@ -111,4 +154,17 @@ void *start_server() {
         pthread_create(&newClient->hilo,NULL,(void *)atenderMensaje,newClient);
         pthread_detach(newClient->hilo);
 	}
+}
+
+void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam){
+
+	header * head = malloc(sizeof(header));
+
+	head->letra = 'M';
+	head->codigo = codigo;
+	head->sizeData = tam;
+
+	message * mensaje = createMessage(head, buffer);
+
+	enviar_message(socketC, mensaje, file_log, status);
 }

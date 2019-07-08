@@ -1,6 +1,7 @@
 // console
 #include "console.h"
 #include "request.h"
+#include <funcionesCompartidas/listaMetadata.h>
 
 extern t_log *file_log;
 
@@ -44,10 +45,8 @@ void makeCommand(char *command){
 			  log_info(file_log, "[+] Ejecutando CREATE\n");
 			  codigo = mandarCreate(create);
 
-			  //Mostrar respuesta
-		  }
-
-		  log_info(file_log, "[+] Error en datos de CREATE\n");
+			  mostrarRespuesta(codigo);
+		  }else log_info(file_log, "[+] Error en datos de CREATE\n");
 
     	  destroyCreate(create);
     	  break;
@@ -60,30 +59,35 @@ void makeCommand(char *command){
 			  log_info(file_log, "[+] Ejecutando DROP\n");
 			  cod = mandarDrop(drop);
 
-			  //Mostrar respuesta
-		  }
-		  log_info(file_log, "[+] Error en datos de DROP\n");
+			  mostrarRespuesta(cod);
+		  }else log_info(file_log, "[+] Error en datos de DROP\n");
 
     	  destroyDrop(drop);
     	  break;
       case DESCRIBE:
     	  log_info(file_log, "[+] El comando es un DESCRIBE\n");
     	  st_describe * describe;
-    	  char * respuesta;
+    	  st_metadata * meta;
+    	  t_list * lista;
+    	  int respuesta;
     	  if((describe = cargarDescribe(command))){
     		  log_info(file_log, "[+] Ejecutando DESCRIBE\n");
-    		  respuesta = mandarDescribe(describe,DESCRIBE);
+    		  respuesta = mandarDescribe(describe,&meta);
 
-    		  //Hacer algo con describe
+    		  mostrarRespuesta(respuesta);
+    		  if(respuesta == 15){
+    			  mostrarTabla(meta);
+    		  }
+    		  destroyDescribe(describe);
     	  }else{
-    		  respuesta = mandarDescribe(describe, 8);
+    		  respuesta = mandarDescribeGlobal(&lista);
 
-    		  //Hacer algo con describe
+    		  mostrarRespuesta(respuesta);
+    		  if(respuesta == 13){
+    			  list_iterate(lista,(void*)mostrarTabla);
+    			  destroyListaMetaData(lista);
+    		  }
     	  }
-    	  log_info(file_log, "[+] Error en datos de DESCRIBE\n");
-
-    	  free(respuesta);
-    	  destroyDescribe(describe);
   	 	break;
       case JOURNAL:
     	  log_info(file_log, "[+] El comando es un JOURNAL\n");
@@ -106,15 +110,67 @@ void makeCommand(char *command){
 }
 
 void console(){
-  char *command ;
+  char *command, *ingreso ;
+  size_t tamBuffer = 100;
   printf("[+] Write a LQL command: \n");
-  command = readline("[>] ");
+
+  ingreso = malloc(sizeof(char) * tamBuffer);
+  getline(&ingreso, &tamBuffer, stdin);
+  command = strtok(ingreso, "\n");
+
   while(strcmp(command,"exit") != 0){
     makeCommand(command);
     free(command);
     printf("------------------------------\n");
-    command = readline("[>] ");
+
+    free(ingreso);
+    ingreso = malloc(sizeof(char) * tamBuffer);
+    getline(&ingreso, &tamBuffer, stdin);
+    command = strtok(ingreso, "\n");
   }
-  free(command);
+  free(ingreso);
   printf("[-] Exiting console\n" );
+}
+
+void mostrarRespuesta(int respuesta){
+
+	switch(respuesta)
+	{
+		case 4:
+			log_error(file_log,"La tabla ingresada no existe");
+			printf("El tabla ingresada no existe\n");
+			break;
+		case 7:
+			log_error(file_log,"La tabla ingresada ya existe");
+			printf("La tabla ingresada ya existe\n");
+			break;
+		case 8:
+			log_info(file_log, "La tabla se creo correctamente");
+			printf("La tabla se creo correctamente\n");
+			break;
+		case 9:
+			log_error(file_log, "La tabla se elimino correctamente");
+			printf("La tabla se elimino correctamente\n");
+			break;
+		case 10:
+			log_error(file_log, "No se pudo crear la tabla");
+			printf("No se pudo crear la tabla\n");
+			break;
+		case 12:
+			log_error(file_log, "No se pudo realizar la request");
+			printf("No se pudo realizar la request\n");
+			break;
+		case 13:
+			log_info(file_log, "Describe de tablas encontradas");
+			printf("Describe de tablas encontradas\n");
+			break;
+		case 15:
+			log_info(file_log, "Describe de tabla");
+			printf("Describe de tabla\n");
+			break;
+	}
+}
+
+void mostrarTabla(st_metadata * meta){
+		printf("\nTable: %s\nConsistency: %s\nPartitions: %d\nCompaction Time: %d\n",meta->nameTable, meta->consistency, meta->partitions, meta->compaction_time);
 }

@@ -140,8 +140,11 @@ void* hiloconsola(){
 					respuesta = realizarDescribeGlobal();
 
 					mostrarRespuesta(respuesta);
-					list_iterate(listaTabla,(void*)mostrarTabla);
-					list_destroy(listaTabla);
+					if(respuesta == 13){
+						list_iterate(listaTabla,(void*)mostrarTabla);
+						list_destroy(listaTabla);
+					}else list_destroy(listaTabla);
+
 				}else{
 					respuesta = realizarDescribe(describe,&meta);
 

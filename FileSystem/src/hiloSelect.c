@@ -49,20 +49,21 @@ void * hiloselect(){
 				pthread_t hilo;
 				cliente_t * cliente = malloc(sizeof(cliente_t));
 
+				cliente->socket = nuevo_socket;
+
 				log_info(alog, "Se conecto un nuevo cliente");
-				pthread_create(&hilo, NULL, (void*)tratarCliente,&cliente);
+				pthread_create(&hilo, NULL, (void*)tratarCliente,cliente);
 				pthread_detach(hilo);
 
-				log_info(alog, "Se creo el hilo del cliente");
-
-				cliente->socket = nuevo_socket;
 				cliente->hilo = hilo;
+
+				log_info(alog, "Se creo el hilo del cliente");
 
 				dictionary_put(clientes, string_itoa(nuevo_socket), cliente);
 
 				char * value = string_itoa(config->tam_value);
 
-				enviarRespuesta(0,&value, nuevo_socket, &controlador, sizeof(value));
+				enviarRespuesta(0,value, nuevo_socket, &controlador, sizeof(value));
 
 			}else{
 				log_info(alog, "Se conecto un cliente incorrecto");

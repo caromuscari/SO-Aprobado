@@ -22,8 +22,8 @@ typedef struct {
 	pthread_t hilo;
 }cliente_t;
 
-void tratarCliente(int socketC);
-void enviarRespuesta(int codigo, char ** buffer, int socketC, int * status, size_t tam);
+void tratarCliente(cliente_t * cliente);
+void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam);
 void senial();
 
 

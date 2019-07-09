@@ -23,7 +23,7 @@ typedef struct {
 } st_client;
 
 
-void *start_server();
+void start_server();
 void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam);
 
 

@@ -141,7 +141,7 @@ void atenderMensaje(st_client * client){
     pthread_exit(NULL);
 }
 
-void *start_server() {
+void start_server() {
 	printf("[+] Starting server.. \n");
 	int control = 0;
 	int socketServer = makeListenSock(configMemoria->PUERTO, file_log, &control);
@@ -167,4 +167,8 @@ void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_
 	message * mensaje = createMessage(head, buffer);
 
 	enviar_message(socketC, mensaje, file_log, status);
+
+	free(head);
+	free(mensaje->buffer);
+	free(mensaje);
 }

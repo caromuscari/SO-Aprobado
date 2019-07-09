@@ -10,6 +10,7 @@
 #include <funcionesCompartidas/listaMetadata.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 extern int fdFileSystem;
 extern t_log * file_log;

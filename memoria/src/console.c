@@ -120,7 +120,6 @@ void console(){
 
   while(strcmp(command,"exit") != 0){
     makeCommand(command);
-    free(command);
     printf("------------------------------\n");
 
     free(ingreso);

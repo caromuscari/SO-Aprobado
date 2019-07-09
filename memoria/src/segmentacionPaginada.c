@@ -11,7 +11,7 @@ extern t_log *file_log;
 extern int tamanioValue;
 extern t_list* listaDeMarcos;
 extern void *memoriaPrincipal;
-t_list* listaDeSegmentos;
+extern t_list* listaDeSegmentos;
 extern int cantPaginas;
 extern int tamanioTotalDePagina;
 

@@ -10,7 +10,9 @@
 
 t_log *file_log;
 t_list *listaDeMarcos;
+t_list* listaDeSegmentos;
 t_configuracionMemoria *configMemoria;
+pthread_t server;
 int fdFileSystem;
 int cantPaginas;
 int tamanioValue = 10; //esto me lo va a pasa fs
@@ -53,6 +55,16 @@ bool buscarValueMaximo(){
     return true;
 }
 
+void liberarConfig(t_configuracionMemoria * config){
+	free(config->IP_FS);
+	free(config->PUERTO);
+	list_clean_and_destroy_elements(config->IP_SEEDS, free);
+	list_destroy(config->IP_SEEDS);
+	free(config->PUERTO_FS);
+	list_clean_and_destroy_elements(config->PUERTO_SEEDS,free);
+	free(config);
+}
+
 int inicializar(char *pathConfig){
     int i;
     file_log = crear_archivo_log("Memoria", true, "./logMemoria");
@@ -77,6 +89,24 @@ int inicializar(char *pathConfig){
     return 0;
 }
 
+void liberarSegmentos(st_segmento* segmento){
+	free(segmento->nombreTabla);
+	list_clean_and_destroy_elements(segmento->tablaDePaginas, (void*)free);
+	list_destroy(segmento->tablaDePaginas);
+	free(segmento);
+}
+
+void finalizar(){
+	pthread_cancel(server);
+	liberar_log(file_log);
+	liberarConfig(configMemoria);
+	free(memoriaPrincipal);//Revisar
+	list_clean_and_destroy_elements(listaDeMarcos, (void*)free);
+	list_destroy(listaDeMarcos);
+	list_clean_and_destroy_elements(listaDeSegmentos, (void*)liberarSegmentos);
+	list_destroy(listaDeSegmentos);
+}
+
 int main(int argc, char *argv[]){
     if (inicializar(argv[1]) < 0) {
         return -1;
@@ -85,17 +115,15 @@ int main(int argc, char *argv[]){
     if(!buscarValueMaximo()){
         return -1;
     }
-    pthread_t server;
     inicializarMemoria();
     log_info(file_log, "la memoria se inicio correctamente");
-    pthread_create(&server, NULL, &start_server, NULL);
+    pthread_create(&server, NULL, (void*)start_server, NULL);
     pthread_detach(server);
     //Falta el join
     console();
+    finalizar();
     return 0;
 }
-
-
 
 
 

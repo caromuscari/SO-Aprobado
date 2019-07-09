@@ -139,11 +139,11 @@ void tratarCliente(cliente_t * cliente){
 				if(respuesta == 13){
 					buffer = serealizarListaMetaData(listaTabla,&size);
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
+					//list_clean(listaTabla);
 					list_destroy(listaTabla);
 				}else{
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,sizeof(buffer));
 				}
-
 
 				free(buffer);
 				break;
@@ -161,7 +161,9 @@ void tratarCliente(cliente_t * cliente){
 
 	log_info(alog, "se desconecto el socket client %d",cliente->socket);
 	close(cliente->socket);
-	free(dictionary_remove(clientes, string_itoa(cliente->socket)));
+	char * socketS = string_itoa(cliente->socket);
+	free(dictionary_remove(clientes, socketS));
+	free(socketS);
 
 	pthread_exit(NULL);
 }
@@ -177,5 +179,9 @@ void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_
 	message * mensaje = createMessage(head, buffer);
 
 	enviar_message(socketC, mensaje, alog, status);
+
+	free(head);
+	free(mensaje->buffer);
+	free(mensaje);
 }
 

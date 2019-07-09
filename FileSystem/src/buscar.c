@@ -43,7 +43,7 @@ char * buscarKey(char * name, int key, int particion){
 	reg = buscarEnParticion(completo,key);
 
 	if(reg != NULL){
-		if(time < reg->time){
+		if(time == 0 || time < reg->time){
 			time = reg->time;
 			value = strdup(reg->value);
 		}
@@ -56,7 +56,7 @@ char * buscarKey(char * name, int key, int particion){
 	reg = buscarEnTemporales(name,key);
 
 	if(reg != NULL){
-		if(time < reg->time){
+		if(time == 0 || time < reg->time){
 			time = reg->time;
 			value = strdup(reg->value);
 		}
@@ -158,7 +158,7 @@ structRegistro * buscarEnTemporales(char * name, uint16_t key){
         		reg = buscarEnArchivo(path,key);
 
         		if(reg != NULL){
-        			if(time < reg->time){
+        			if(time == 0 || time < reg->time){
         				time = reg->time;
         				final = reg;
         			}

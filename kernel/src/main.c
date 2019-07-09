@@ -27,32 +27,6 @@ int inicializar(char * pathConfig){
     }
     return 0;
 }
-t_list *cargarListMemoria()
-{
-    t_list *listaMemoria = list_create();
-    st_data_memoria *memoria = malloc(sizeof(st_data_memoria));
-    memoria->ip = strdup("127.0.0.1");
-    memoria->puerto = strdup("3001");
-    memoria->numero = 1;
-    list_add(listaMemoria, memoria);
-    st_data_memoria *memoria2 = malloc(sizeof(st_data_memoria));
-    memoria2->ip = strdup("127.0.0.1.5.6");
-    memoria2->puerto = strdup("3002");
-    memoria2->numero = 2;
-    list_add(listaMemoria, memoria2);
-    return listaMemoria;
-}
-
-t_list *cargarListMemoria2()
-{
-    t_list *listaMemoria = list_create();
-    st_data_memoria *memoria = malloc(sizeof(st_data_memoria));
-    memoria->ip = strdup("127.0.0.1");
-    memoria->puerto = strdup("3001");
-    memoria->numero = 1;
-    list_add(listaMemoria, memoria);
-    return listaMemoria;
-}
 
 int main(int argc, char **argv){
     if(inicializar(argv[1]) < 0){
@@ -62,13 +36,14 @@ int main(int argc, char **argv){
 //    updateListaMemorias(lista);
 //    lista = cargarListMemoria2();
 //    updateListaMemorias(lista);
-    pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
-    pthread_create(&pthreadMemoria,NULL,loadPoolMemori,NULL);
-    pthread_create(&pthreadMetadata,NULL,schedulerMetadata, NULL);
-    consola();
-    pthread_cancel(plafinifcador);
-    pthread_cancel(pthreadMemoria);
-    pthread_cancel(pthreadMetadata);
+//    pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
+//    pthread_create(&pthreadMemoria,NULL,loadPoolMemori,NULL);
+//    pthread_create(&pthreadMetadata,NULL,schedulerMetadata, NULL);
+//    consola();
+//    pthread_cancel(plafinifcador);
+//    pthread_cancel(pthreadMemoria);
+//    pthread_cancel(pthreadMetadata);
+    loadPoolMemori();
     log_destroy(file_log);
     return 0;
 }

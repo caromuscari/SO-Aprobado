@@ -19,14 +19,14 @@ enum TypeCriterio {
     EventualConsistency = 3
 };
 typedef struct {
-    st_data_memoria * memoria;
+    st_memoria * memoria;
     bool activo;
     t_list * tags;
     t_list * tipos;
     int count;
 } st_kernel_memoria;
 void *loadPoolMemori();
-void updateListaMemorias(t_list * nuevaLista);
+void updateListaMemorias(st_data_memoria * nuevaLista);
 bool setTipoConsistencia(int number, enum TypeCriterio tipo);
 
 #endif //KERNEL_THREADPOOLMEMORIA_H

@@ -124,6 +124,7 @@ void console(){
 
     free(ingreso);
     ingreso = malloc(sizeof(char) * tamBuffer);
+    printf("[+] Write a LQL command: \n");
     getline(&ingreso, &tamBuffer, stdin);
     command = strtok(ingreso, "\n");
   }

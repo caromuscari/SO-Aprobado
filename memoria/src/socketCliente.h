@@ -17,8 +17,10 @@
 #include <pthread.h>
 #include <funcionesCompartidas/API.h>
 #include "configuracionMemoria.h"
+#include <funcionesCompartidas/registroTabla.h>
 
-void messageAction(header *req, void *buffer, int socketClient);
+
+st_registro* obtenerSelect(st_select * comandoSelect);
 
 #endif //MEMORIA_CONNECTIONS_H
 

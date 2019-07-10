@@ -37,11 +37,9 @@ typedef struct{
 	double timestamp;
 }st_marco;
 
-void inicializarMemoria();
+void mostrarPaginasCargadas();
 
-st_registro* comandoSelect(st_select* comandoSelect);
 void insertarDatosEnPagina(void* paginaLibre, st_insert * comandoInsert);
-int comandoInsert(st_insert* comandoInsert);
 
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla);
 

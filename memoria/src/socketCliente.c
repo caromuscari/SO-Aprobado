@@ -7,8 +7,7 @@ extern t_configuracionMemoria * configMemoria;
 // CLIENTE
 
 
-//cambiar esto a void* , ahora lo saco para que compile
-void obtenerSelect(st_select * comandoSelect){
+st_registro* obtenerSelect(st_select * comandoSelect){
 	int control = 0;
 	header request;
 	void* paqueteDeRespuesta;
@@ -29,8 +28,17 @@ void obtenerSelect(st_select * comandoSelect){
 		if(control == 0){
 			paqueteDeRespuesta = getMessage(socketCliente, &respuesta, &control);
 
-			// deserealizar ---> time key value
+			st_registro* registro = deserealizarRegistro(paqueteDeRespuesta);
+
+			return registro;
+
+		} else {
+			log_error(file_log, "Fallo el envio del Select");
+			return NULL;
 		}
+	} else {
+		log_error(file_log, "Fallo la conexion con el File System");
+		return NULL;
 	}
 }
 

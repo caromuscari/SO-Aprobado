@@ -208,6 +208,7 @@ int comandoDrop(st_drop* comandoDrop){
 
 //COMANDO JOURNAL
 void* enviarSegmentoAFS(st_segmento* segmento){
+    bool huboError = false;
     void* enviarPaginasAFS(st_tablaDePaginas * pagina){
         if(pagina->flagModificado) {
             st_marco *marco = list_get(listaDeMarcos, pagina->nroDePagina);
@@ -220,14 +221,29 @@ void* enviarSegmentoAFS(st_segmento* segmento){
             insert->operacion = INSERT;
             insert->nameTable = strdup(segmento->nombreTabla);
 
-            int result = mandarInsert(insert);
+            if(mandarInsert(insert) == 5){
+                //BORRO DE MEMORIA
+                marco->condicion = LIBRE;
+                free(pagina);
+            }else{
+             log_error(file_log, string_from_format("El Filesystem rechazó el registro \nTabla:%s | Key:%d | Value:%s", insert->nameTable, insert->key, insert->value));
+             huboError = true;
+            }
         }
     }
     list_iterate(segmento->tablaDePaginas, enviarPaginasAFS);
+    if(!huboError){
+        //ELIMINA EL SEGMENTO DE MEMORIA
+        list_destroy(segmento->tablaDePaginas);
+        free(segmento->nombreTabla);
+        free(segmento);
+        //SACAR DE LA LISTA!
+    }
 }
 int comandoJournal(){
     //RECORRO TODA LA MEMORIA Y HAGO LOS INSERT CORRESPONDIENTES COMO REQUEST AL FILE
     list_iterate(listaDeSegmentos, (void*)enviarSegmentoAFS);
+    log_info(file_log, "Terminó el JOURNAL");
     return 1;
 }
 

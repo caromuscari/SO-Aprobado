@@ -42,6 +42,28 @@ st_registro* obtenerSelect(st_select * comandoSelect){
 	}
 }
 
+void* informarDrop(st_drop* comandoDrop){
+	int control = 0;
+	header request, respuesta;
+	void* paqueteDeRespuesta;
+
+	int socketCliente = establecerConexion(configMemoria->IP_FS, configMemoria->PUERTO_FS, file_log, &control);
+	if(socketCliente != -1){
+		request.letra = 'M';
+		request.codigo = DROP;
+
+		size_t size;
+		void* paqueteDatos = serealizarDrop(comandoDrop, &size);
+
+		request.sizeData = size;
+
+		void* mensaje = createMessage(&request, paqueteDatos);
+		enviar_message(socketCliente, mensaje, file_log, &control);
+
+
+	}
+	return NULL;
+}
 
 
 

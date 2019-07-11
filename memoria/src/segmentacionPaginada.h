@@ -17,6 +17,7 @@
 #include <funcionesCompartidas/registroTabla.h>
 
 typedef struct{
+	int nroSegmento;
 	char* nombreTabla;
 	t_list* tablaDePaginas;
 }st_segmento;

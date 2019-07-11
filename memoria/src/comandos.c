@@ -65,19 +65,20 @@ int comandoInsert(st_insert* comandoInsert){
 	int posMarcoLibre = buscarMarcoLibre();
 	//creo la pagina
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
-
+	//cargo datos a la memoria princ
 	memcpy(paginaLibre, &comandoInsert->timestamp, sizeof(double));
 	memcpy(paginaLibre + sizeof(double), &comandoInsert->key, sizeof(uint16_t));
 	memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
-
+	//creo la pag de la tabla y le cargo los datos
 	st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
 	paginaDeTabla->nroDePagina = posMarcoLibre;
 	paginaDeTabla->pagina = paginaLibre;
 	paginaDeTabla->flagModificado = 1;
-
+	//agrego la pag a la lista
 	list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
-
-	list_add(listaDeSegmentos, segmentoNuevo);
+	//agrego el segmento a la lista de segmentos en el ultimo lugar
+	segmentoNuevo->nroSegmento = list_size(listaDeSegmentos);
+	list_add_in_index(listaDeSegmentos, segmentoNuevo->nroSegmento, segmentoNuevo);
 
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
@@ -112,6 +113,10 @@ st_registro* comandoSelect(st_select* comandoSelect){
 
 		registro = obtenerSelect(comandoSelect);
 
+		if(registro == NULL){
+			return NULL;
+		}
+
 		int posMarcoLibre = buscarMarcoLibre();
 
 		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
@@ -136,6 +141,10 @@ st_registro* comandoSelect(st_select* comandoSelect){
 	log_info(file_log, "No se encontro el segmento de esa tabla");
 	registro = obtenerSelect(comandoSelect);
 
+	if(registro == NULL){
+		return NULL;
+	}
+
 	st_segmento* segmentoNuevo= malloc(sizeof(st_segmento));
 
 	segmentoNuevo->nombreTabla = strdup(comandoSelect->nameTable);
@@ -156,7 +165,9 @@ st_registro* comandoSelect(st_select* comandoSelect){
 
 	list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
 
-	list_add(listaDeSegmentos, segmentoNuevo);
+	//agrego el segmento a la lista de segmentos en el ultimo lugar
+	segmentoNuevo->nroSegmento = list_size(listaDeSegmentos);
+	list_add_in_index(listaDeSegmentos, segmentoNuevo->nroSegmento, segmentoNuevo);
 
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
@@ -166,7 +177,33 @@ st_registro* comandoSelect(st_select* comandoSelect){
 	return registro;
 }
 
+int comandoDrop(st_drop* comandoDrop){
+	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoDrop->nameTable);
+	if(segmentoEncontrado){
+		log_info(file_log, "Se encontro el segmento por Drop");
 
+		for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
+			st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
+			free(paginaDeTabla->pagina);
+			st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
+			marco->condicion = LIBRE;
+		}
 
+		list_destroy(segmentoEncontrado->tablaDePaginas);
+		free(segmentoEncontrado->tablaDePaginas);
+		free(segmentoEncontrado->nombreTabla);
+		list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
+		for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
+			st_segmento* segmento = list_get(listaDeSegmentos, i);
+			int nro = segmento->nroSegmento;
+			segmento->nroSegmento = nro - 1;
+		}
+		return 0;
+	} else {
+		//se informa al file system
+		informarDrop(comandoDrop);
+		return 0;
+	}
+}
 
 

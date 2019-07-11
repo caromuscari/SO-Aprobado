@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "request.h"
 
 extern int fdFileSystem;
 extern t_log * file_log;
@@ -116,5 +117,35 @@ int mandarDescribeGlobal(t_list ** lista){
 	free(buffer);
 	return head2.codigo;
 }
+
+int mandarInsert(st_insert * insert){
+    size_t size;
+    header head, head2;
+    message * mensaje;
+    int controlador;
+    char * buffer;
+
+    //Eliminar de memtable
+
+    buffer = serealizarInsert(insert,&size);
+
+    head.letra = 'M';
+    head.codigo = INSERT;
+    head.sizeData = size;
+
+    mensaje = createMessage(&head, buffer);
+
+    enviar_message(fdFileSystem, mensaje,file_log,&controlador);
+
+    free(buffer);
+
+    buffer = getMessage(fdFileSystem,&head2,&controlador);
+
+    free(buffer);
+
+    return head2.codigo;
+}
+
+
 
 

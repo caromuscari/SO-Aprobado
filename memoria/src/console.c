@@ -1,6 +1,7 @@
 // console
 #include "console.h"
 #include "request.h"
+#include "comandos.h"
 #include <funcionesCompartidas/listaMetadata.h>
 
 extern t_log *file_log;
@@ -91,14 +92,7 @@ void makeCommand(char *command){
   	 	break;
       case JOURNAL:
     	  log_info(file_log, "[+] El comando es un JOURNAL\n");
-    	  //st_drop * drop;
-    	  /*if((drop = cargarDrop(command))){
-    		  log_info(file_log, "[+] Ejecutando JOURNAL\n");
-    		  //Hacer drop
-    	  }*/
-    	  //log_info(file_log, "[+] Error en datos de JOURNAL\n");
-
-    	  //destroyDrop(drop);
+    	  comandoJournal();
         break;
       case EXIT:
     	  break;

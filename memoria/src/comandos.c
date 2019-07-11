@@ -206,4 +206,28 @@ int comandoDrop(st_drop* comandoDrop){
 	}
 }
 
+//COMANDO JOURNAL
+void* enviarSegmentoAFS(st_segmento* segmento){
+    void* enviarPaginasAFS(st_tablaDePaginas * pagina){
+        if(pagina->flagModificado) {
+            st_marco *marco = list_get(listaDeMarcos, pagina->nroDePagina);
+            st_insert *insert = malloc(sizeof(st_insert));
+            insert->value = malloc(tamanioValue);
+
+            memcpy(&insert->timestamp, pagina->pagina, sizeof(double));
+            memcpy(&insert->key, pagina->pagina + sizeof(double), sizeof(uint16_t));
+            memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), tamanioValue);
+            insert->operacion = INSERT;
+            insert->nameTable = strdup(segmento->nombreTabla);
+
+            int result = mandarInsert(insert);
+        }
+    }
+    list_iterate(segmento->tablaDePaginas, enviarPaginasAFS);
+}
+int comandoJournal(){
+    //RECORRO TODA LA MEMORIA Y HAGO LOS INSERT CORRESPONDIENTES COMO REQUEST AL FILE
+    list_iterate(listaDeSegmentos, (void*)enviarSegmentoAFS);
+    return 1;
+}
 

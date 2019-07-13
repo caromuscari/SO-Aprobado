@@ -7,14 +7,18 @@ extern t_configuracionMemoria * configMemoria;
 #include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/list.h>
 
-t_list * listClient;
-
-void atenderMensaje(st_client * client){
+void * atenderMensaje(int * fdClient){
     int control = 0;
     header request;
+    header response;
+    size_t sizePaqueteRes = 0;
     char * buffer;
-    void * paqueteDeRespuesta = getMessage(client->client,&request,&control);
-    printf("client = %d\n",client->client);
+    void * paqueteDeRespuesta = getMessage(*fdClient,&request,&control);
+    if (control != 0) {
+        log_error(file_log, "error al obtener el mensaje");
+        close(*fdClient);
+        pthread_exit(NULL);
+    }
     switch (request.codigo) {
     	case INSERT: {
     		st_insert *insert = desserealizarInsert(paqueteDeRespuesta);
@@ -63,8 +67,8 @@ void atenderMensaje(st_client * client){
 
             buffer = strdup("");
 
-            if(respuesta == 8) enviarRespuesta(7, buffer, client->client, &control, sizeof(buffer));
-            else enviarRespuesta(8, buffer, client->client, &control, sizeof(buffer));
+            if(respuesta == 8) enviarRespuesta(7, buffer, *fdClient, &control, sizeof(buffer));
+            else enviarRespuesta(8, buffer, *fdClient, &control, sizeof(buffer));
 
             destroyCreate(create);
             free(buffer);
@@ -79,8 +83,8 @@ void atenderMensaje(st_client * client){
 
             buffer = strdup("");
 
-            if(respuesta == 9) enviarRespuesta(7, buffer, client->client, &control, sizeof(buffer));
-            else enviarRespuesta(8, buffer, client->client, &control, sizeof(buffer));
+            if(respuesta == 9) enviarRespuesta(7, buffer, *fdClient, &control, sizeof(buffer));
+            else enviarRespuesta(8, buffer, *fdClient, &control, sizeof(buffer));
 
             destroyDrop(drop);
             free(buffer);
@@ -98,11 +102,11 @@ void atenderMensaje(st_client * client){
             //Cambiar Numeros
             if(respuesta == 15){
             	buffer = serealizarMetaData(meta,&size);
-            	enviarRespuesta(15,buffer,client->client,&control,size);
+            	enviarRespuesta(15,buffer,*fdClient,&control,size);
             	destroyMetaData(meta);
             }else{
             	buffer = strdup("");
-            	enviarRespuesta(15,buffer,client->client,&control,sizeof(buffer));
+            	enviarRespuesta(15,buffer,*fdClient,&control,sizeof(buffer));
             }
 
             destroyDescribe(describe);
@@ -121,38 +125,50 @@ void atenderMensaje(st_client * client){
     		//Cambiar Numeros
     		if(respuesta == 13){
     			buffer = serealizarListaMetaData(metas,&size);
-    			enviarRespuesta(13, buffer, client->client, &control,size);
+    			enviarRespuesta(13, buffer, *fdClient, &control,size);
     			destroyListaMetaData(metas);
     		}else{
     			buffer = strdup("");
-    			enviarRespuesta(13, buffer, client->client, &control,sizeof(buffer));
+    			enviarRespuesta(13, buffer, *fdClient, &control,sizeof(buffer));
     		}
 
     		free(buffer);
     		break;
     	}
+        case BUSCARTABLAGOSSIPING: {
+            void *paqueteLista = devolverListaMemoria(&sizePaqueteRes);
+            response.codigo = DEVOLVERTABLAGOSSIPING;
+            response.letra = 'M';
+            response.sizeData = sizePaqueteRes;
+            void *paqueteRespuesta = createMessage(&response, paqueteLista);
+            if (enviar_message(*fdClient, paqueteRespuesta, file_log, &control) < 0) {
+                log_error(file_log, "no se pudo enviar la respuesta solicitada");
+            }
+            break;
+        }
     	case JOURNAL:
     		break;
     }
 
     free(paqueteDeRespuesta);
-    free(client);
-
+    close(*fdClient);
     pthread_exit(NULL);
 }
 
-void start_server() {
-	printf("[+] Starting server.. \n");
+void * start_server() {
 	int control = 0;
 	int socketServer = makeListenSock(configMemoria->PUERTO, file_log, &control);
-	int client;
-	st_client * newClient;
+	int  * fdClient;
+    pthread_t nuevoCliente;
 	while (true){
-        client = aceptar_conexion(socketServer, file_log, &control);
-        newClient = malloc(sizeof(newClient));
-        newClient->client = client;
-        pthread_create(&newClient->hilo,NULL,(void *)atenderMensaje,newClient);
-        pthread_detach(newClient->hilo);
+        fdClient = malloc(sizeof(int));
+        *fdClient = aceptar_conexion(socketServer, file_log, &control);
+        if (control != 0) {
+            log_error(file_log, "no se puede aceptar la conexion");
+            continue;
+        }
+        pthread_create(&nuevoCliente,NULL,(void *)atenderMensaje,fdClient);
+        pthread_detach(nuevoCliente);
 	}
 }
 

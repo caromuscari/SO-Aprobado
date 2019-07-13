@@ -21,25 +21,23 @@ t_configuracionMemoria * leerConfiguracion(char* path){
     configuracion->SLEEP = atoi(config_get_string_value(bufferConfig, "SLEEP"));
     configuracion->TAM_MEM = atoi(config_get_string_value(bufferConfig, "TAM_MEM"));
 
-    char **split = string_split(config_get_string_value(bufferConfig, "IP_SEEDS"), "\"");
+    char **split = config_get_array_value(bufferConfig, "IP_SEEDS");
+    int i = 0;
     configuracion->IP_SEEDS = list_create();
-    list_add(configuracion->IP_SEEDS, strdup(split[1]));
-    list_add(configuracion->IP_SEEDS, strdup(split[3]));
+    while (split[i]) {
+        list_add(configuracion->IP_SEEDS, strdup(split[i]));
+        ++i;
+    }
     string_iterate_lines(split, (void *) free);
     free(split);
 
-    split = string_split(config_get_string_value(bufferConfig, "PUERTO_SEEDS"), ",");
-    char *subString;
+    split = config_get_array_value(bufferConfig, "PUERTO_SEEDS");
+    i = 0;
     configuracion->PUERTO_SEEDS = list_create();
-
-    subString = string_substring(split[0], 1, strlen(split[0]) - 1);
-    list_add(configuracion->PUERTO_SEEDS, strdup(subString));
-    free(subString);
-
-    subString = string_substring(split[1], 0, strlen(split[0]) - 1);
-    list_add(configuracion->PUERTO_SEEDS, strdup(subString));
-    free(subString);
-
+    while (split[i]) {
+        list_add(configuracion->PUERTO_SEEDS, strdup(split[i]));
+        ++i;
+    }
     string_iterate_lines(split, (void *) free);
     free(split);
 

@@ -13,6 +13,7 @@ t_list *listaDeMarcos;
 t_list* listaDeSegmentos;
 t_configuracionMemoria *configMemoria;
 pthread_t server;
+pthread_t gossiping;
 int fdFileSystem;
 int cantPaginas;
 int tamanioValue = 10; //esto me lo va a pasa fs
@@ -112,13 +113,15 @@ int main(int argc, char *argv[]){
         return -1;
     }
     //descomentar cando el File entienda este mensaje
-    if(!buscarValueMaximo()){
-        return -1;
-    }
-    inicializarMemoria();
+//    if(!buscarValueMaximo()){
+//        return -1;
+//    }
+//    inicializarMemoria();
     log_info(file_log, "la memoria se inicio correctamente");
-    pthread_create(&server, NULL, (void*)start_server, NULL);
+    pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);
+    pthread_create(&gossiping, NULL,pthreadGossping, NULL);
+    pthread_detach(gossiping);
     //Falta el join
     console();
     finalizar();

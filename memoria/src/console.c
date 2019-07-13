@@ -166,5 +166,5 @@ void mostrarRespuesta(int respuesta){
 }
 
 void mostrarTabla(st_metadata * meta){
-		printf("\nTable: %s\nConsistency: %s\nPartitions: %d\nCompaction Time: %d\n",meta->nameTable, meta->consistency, meta->partitions, meta->compaction_time);
+    printf("\nTable: %s\nConsistency: %s\nPartitions: %d\nCompaction Time: %d\n",meta->nameTable, meta->consistency, meta->partitions, meta->compaction_time);
 }

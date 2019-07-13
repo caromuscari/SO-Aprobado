@@ -7,6 +7,7 @@
 #include "configuracionMemoria.h"
 #include "socketServer.h"
 #include <funcionesCompartidas/funcionesNET.h>
+#include "comandos.h"
 
 t_log *file_log;
 t_list *listaDeMarcos;
@@ -68,7 +69,7 @@ void liberarConfig(t_configuracionMemoria * config){
 
 int inicializar(char *pathConfig){
     int i;
-    file_log = crear_archivo_log("Memoria", true, "./logMemoria");
+    file_log = crear_archivo_log("Memoria", false, "./logMemoria");
     log_info(file_log, "cargando el archivo de configuracion");
     configMemoria = leerConfiguracion(pathConfig);
     if (!configMemoria) {
@@ -113,10 +114,10 @@ int main(int argc, char *argv[]){
         return -1;
     }
     //descomentar cando el File entienda este mensaje
-//    if(!buscarValueMaximo()){
-//        return -1;
-//    }
-//    inicializarMemoria();
+   if(!buscarValueMaximo()){
+        return -1;
+   }
+    inicializarMemoria();
     log_info(file_log, "la memoria se inicio correctamente");
     pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);

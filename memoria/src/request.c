@@ -15,6 +15,8 @@
 
 extern int fdFileSystem;
 extern t_log * file_log;
+extern t_list *listaDeMarcos;
+extern t_list* listaDeSegmentos;
 
 int mandarCreate(st_create * create){
 	size_t size;
@@ -47,7 +49,27 @@ int mandarDrop(st_drop * drop){
 	int controlador;
 	char * buffer;
 
-	//Eliminar de memtable
+    st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(drop->nameTable);
+    if(segmentoEncontrado){
+        log_info(file_log, "Se encontro el segmento por Drop");
+
+        for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
+            st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
+            free(paginaDeTabla->pagina);
+            st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
+            marco->condicion = LIBRE;
+        }
+
+        list_destroy(segmentoEncontrado->tablaDePaginas);
+        free(segmentoEncontrado->tablaDePaginas);
+        free(segmentoEncontrado->nombreTabla);
+        list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
+        for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
+            st_segmento* segmento = list_get(listaDeSegmentos, i);
+            int nro = segmento->nroSegmento;
+            segmento->nroSegmento = nro - 1;
+        }
+    }
 
 	buffer = serealizarDrop(drop,&size);
 
@@ -124,8 +146,6 @@ int mandarInsert(st_insert * insert){
     message * mensaje;
     int controlador;
     char * buffer;
-
-    //Eliminar de memtable
 
     buffer = serealizarInsert(insert,&size);
 

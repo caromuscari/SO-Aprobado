@@ -93,18 +93,6 @@ void show(){
 //    return list_find(listaMemorias, (void *) search_Memoria);
 //}
 //
-//bool setTipoConsistencia(int number, enum TypeCriterio tipo){
-//    bool flagSolucion = false;
-//    enum TypeCriterio * auxTipo;
-//    st_kernel_memoria * memoria = getMemoriaKernelByNumber(number);
-//    if(memoria){
-//        flagSolucion = true;
-//        auxTipo = malloc(sizeof(enum TypeCriterio));
-//        *auxTipo = tipo;
-//        list_add(memoria->tipos,auxTipo);
-//    }
-//    return  flagSolucion;
-//}
 
 st_kernel_memoria * cargarNuevaKernelMemoria(st_memoria * data){
     st_kernel_memoria * k_memoria = malloc(sizeof(st_kernel_memoria));
@@ -135,12 +123,31 @@ st_kernel_memoria * existeMemoria(int numeroMemoria){
     return NULL;
 }
 
+bool setTipoConsistencia(int number, enum TypeCriterio tipo){
+    bool flagSolucion = false;
+    enum TypeCriterio * auxTipo;
+    st_kernel_memoria * memoria = existeMemoria(number);
+    if(memoria){
+        flagSolucion = true;
+        auxTipo = malloc(sizeof(enum TypeCriterio));
+        *auxTipo = tipo;
+        list_add(memoria->tipos,auxTipo);
+    }
+    return  flagSolucion;
+}
+
 void agregarMemoria(st_kernel_memoria * kernelMemoria){
     list_add(poolMemoria,kernelMemoria);
 }
+
 void updateMemoria(st_kernel_memoria * kernelMemoria, st_memoria * stMemoria){
     destroyMemoria(kernelMemoria->memoria);
-    kernelMemoria->memoria = stMemoria;
+    st_memoria * memoria = malloc(sizeof(st_data_memoria));
+    memoria->numero = stMemoria->numero;
+    memoria->puerto = strdup(stMemoria->puerto);
+    memoria->ip = strdup(stMemoria->ip);
+    kernelMemoria->memoria = memoria;
+    kernelMemoria->activo = true;
 }
 
 void updateListaMemorias(st_data_memoria * dataMemoria){
@@ -150,12 +157,11 @@ void updateListaMemorias(st_data_memoria * dataMemoria){
     newKernelMemoria = existeMemoria(dataMemoria->numero);
     if(newKernelMemoria == NULL){
         //agregar
-        newKernelMemoria = malloc(sizeof(st_kernel_memoria));
         stMemoria = malloc(sizeof(st_memoria));
         stMemoria->numero = dataMemoria->numero;
-        stMemoria->puerto = configuracion->PUERTO_MEMORIA;
-        stMemoria->ip = configuracion->IP_MEMORIA;
-        cargarNuevaKernelMemoria(stMemoria);
+        stMemoria->puerto = strdup(configuracion->PUERTO_MEMORIA);
+        stMemoria->ip = strdup(configuracion->IP_MEMORIA);
+        newKernelMemoria = cargarNuevaKernelMemoria(stMemoria);
         agregarMemoria(newKernelMemoria);
         destroyMemoria(stMemoria);
     }else{
@@ -166,11 +172,10 @@ void updateListaMemorias(st_data_memoria * dataMemoria){
     int i;
     for (i = 0; i < dataMemoria->listaMemorias->elements_count ; ++i) {
         stMemoria = list_get(dataMemoria->listaMemorias, i);
-        newKernelMemoria = existeMemoria(dataMemoria->numero);
+        newKernelMemoria = existeMemoria(stMemoria->numero);
         if(newKernelMemoria == NULL){
             //adding
-            newKernelMemoria = malloc(sizeof(st_kernel_memoria));
-            cargarNuevaKernelMemoria(stMemoria);
+            newKernelMemoria = cargarNuevaKernelMemoria(stMemoria);
             agregarMemoria(newKernelMemoria);
         }else{
             //update
@@ -179,7 +184,6 @@ void updateListaMemorias(st_data_memoria * dataMemoria){
         destroyMemoria(stMemoria);
 
     }
-    show();
 }
 
 void destoyPoolMemoria(){
@@ -212,7 +216,6 @@ void *loadPoolMemori() {
     header request;
     header response;
     void *buffer = NULL;
-    poolMemoria = NULL;
     if (pthread_mutex_init(&mutex, NULL) != 0)
     {
         printf("\n mutex init failed\n");
@@ -224,7 +227,7 @@ void *loadPoolMemori() {
         socketClient = establecerConexion(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA, file_log, &control);
         if (socketClient != -1) {
             request.letra = 'K';
-            request.codigo = 5;
+            request.codigo = 8;
             request.sizeData = 1;
             bufferMensaje = createMessage(&request, " ");
             enviar_message(socketClient, bufferMensaje, file_log, &control);
@@ -238,6 +241,8 @@ void *loadPoolMemori() {
                 }
             }
         }
+        printf("********************************************************************************************\n");
+        show();
         sleep(30);
     }
 }

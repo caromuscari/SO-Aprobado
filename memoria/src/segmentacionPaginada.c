@@ -39,7 +39,7 @@ st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 		memcpy(&keyAComparar, tablaPagina->pagina + sizeof(double), sizeof(uint16_t));
 		return key == keyAComparar;
 	}
-	return (st_tablaDePaginas*) list_find(tablaDePaginas, paginaConEsaKey);
+	return (st_tablaDePaginas*) list_find(tablaDePaginas, (void *)paginaConEsaKey);
 }
 
 int buscarMarcoLibre(){

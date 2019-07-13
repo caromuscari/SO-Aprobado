@@ -9,6 +9,7 @@
 #define SRC_REQUEST_H_
 
 #include <funcionesCompartidas/listaMetadata.h>
+#include "segmentacionPaginada.h"
 
 
 int mandarCreate(st_create * create);

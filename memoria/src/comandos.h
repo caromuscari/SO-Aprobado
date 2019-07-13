@@ -11,6 +11,7 @@
 #include "segmentacionPaginada.h"
 #include "socketCliente.h"
 #include <funcionesCompartidas/API.h>
+#include "request.h"
 
 void inicializarMemoria();
 

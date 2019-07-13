@@ -177,6 +177,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 	return registro;
 }
 
+/*
 int comandoDrop(st_drop* comandoDrop){
 	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoDrop->nameTable);
 	if(segmentoEncontrado){
@@ -204,7 +205,7 @@ int comandoDrop(st_drop* comandoDrop){
 		informarDrop(comandoDrop);
 		return 0;
 	}
-}
+}*/
 
 //COMANDO JOURNAL
 void* enviarSegmentoAFS(st_segmento* segmento){
@@ -221,7 +222,7 @@ void* enviarSegmentoAFS(st_segmento* segmento){
             insert->operacion = INSERT;
             insert->nameTable = strdup(segmento->nombreTabla);
 
-            if(mandarInsert(insert) == 5){
+            if(mandarInsert(insert) != 5){
                 //BORRO DE MEMORIA
                 marco->condicion = LIBRE;
                 free(pagina);
@@ -231,7 +232,7 @@ void* enviarSegmentoAFS(st_segmento* segmento){
             }
         }
     }
-    list_iterate(segmento->tablaDePaginas, enviarPaginasAFS);
+    list_iterate(segmento->tablaDePaginas, (void *)enviarPaginasAFS);
     if(!huboError){
         //ELIMINA EL SEGMENTO DE MEMORIA
         list_destroy(segmento->tablaDePaginas);
@@ -240,6 +241,7 @@ void* enviarSegmentoAFS(st_segmento* segmento){
         //SACAR DE LA LISTA!
     }
 }
+
 int comandoJournal(){
     //RECORRO TODA LA MEMORIA Y HAGO LOS INSERT CORRESPONDIENTES COMO REQUEST AL FILE
     list_iterate(listaDeSegmentos, (void*)enviarSegmentoAFS);

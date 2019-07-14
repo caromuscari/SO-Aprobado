@@ -18,12 +18,13 @@
 #include "hiloCompactacion.h"
 #include "buscar.h"
 #include <commons/collections/queue.h>
+#include "Semaforos.h"
 
-extern structConfig * config;
 extern t_bitarray* bitmap;
 extern int cantBloques;
 extern int tBloques;
 extern t_queue * nombre;
+extern sem_t sBitmap, sNombre;
 
 extern char* posicion;
 extern struct stat mystat;
@@ -56,6 +57,7 @@ int verificar_bloque()
 {
 	int bit = -1;
 	bool comprobar = true;
+	sem_wait(&sBitmap);
 	while(bit < cantBloques && comprobar == true)
 	{
 		bit++;
@@ -63,24 +65,26 @@ int verificar_bloque()
 
 	}
 	if(bit == cantBloques && comprobar == false){
-		return -1;
+		bit = -1;
 	}
 	else {
-		return bit;
+		bitarray_set_bit(bitmap,bit);
 	}
+	sem_post(&sBitmap);
 
+	return bit;
 }
 
 void actualizar_bitmap(){
-
+	sem_wait(&sBitmap);
 	memcpy(posicion,bitmap,mystat.st_size);
 	msync(posicion,mystat.st_size,MS_SYNC);
-
+	sem_post(&sBitmap);
 }
 
 char * armar_path(char * archivo){
 	char * path = string_new();
-	string_append(&path,config->montaje);
+	string_append(&path,getMontaje());
 	string_append(&path,"/Tables/");
 	string_to_upper(archivo);
 	string_append(&path,archivo);
@@ -90,7 +94,7 @@ char * armar_path(char * archivo){
 
 char * armar_PathBloque(char * bloque){
 	char * path = string_new();
-	string_append(&path,config->montaje);
+	string_append(&path,getMontaje());
 	string_append(&path,"/Bloques/");
 	string_append(&path,bloque);
 	string_append(&path,".bin");
@@ -138,7 +142,6 @@ int crearParticiones(st_create * c, char * path){
 				flag = i;
 
 			}else{
-				bitarray_set_bit(bitmap,bit);
 				contenido = string_from_format("SIZE=0\nBLOQUES=[%d]", bit);
 
 				completo = string_from_format("%s/%d.bin", path, i);
@@ -170,7 +173,9 @@ void eliminarTemporales(char * path){
 		contenido = leerParticion(temp);
 		while(contenido->bloques[i] != NULL)
 		{
+			sem_wait(&sBitmap);
 			bitarray_clean_bit(bitmap,atoi(contenido->bloques[i]));
+			sem_post(&sBitmap);
 			i++;
 		}
 		remove(temp);
@@ -205,7 +210,9 @@ void eliminarParticion(char *path, int particion){
 
 	while(contenido->bloques[i] != NULL)
 	{
+		sem_wait(&sBitmap);
 		bitarray_clean_bit(bitmap,atoi(contenido->bloques[i]));
+		sem_post(&sBitmap);
 		i++;
 	}
 
@@ -219,12 +226,12 @@ void eliminarParticion(char *path, int particion){
 
 structParticion * leerParticion(char * path){
 	structParticion * contenido = malloc(sizeof(structParticion));
-	t_config *config=config_create(path);
+	t_config *configu=config_create(path);
 
-	contenido->Size = config_get_int_value(config,"SIZE");
-	contenido->bloques = config_get_array_value(config,"BLOQUES");
+	contenido->Size = config_get_int_value(configu,"SIZE");
+	contenido->bloques = config_get_array_value(configu,"BLOQUES");
 
-	config_destroy(config);
+	config_destroy(configu);
 
 	return contenido;
 }
@@ -269,7 +276,7 @@ t_dictionary * listarDirectorio(){
 	DIR *d;
 	struct dirent *dir;
 	t_dictionary * tablas;
-	char * nombreTabla = string_from_format("%s/Tables", config->montaje);
+	char * nombreTabla = string_from_format("%s/Tables", getMontaje());
     d = opendir(nombreTabla);
     if (d)
     {
@@ -287,7 +294,9 @@ t_dictionary * listarDirectorio(){
         		//tabla->sem = list_create();
 
         		char * table = strdup(name);
+        		sem_wait(&sNombre);
         		queue_push(nombre, table);
+        		sem_post(&sNombre);
         		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
         		pthread_detach(tabla->hilo);
 
@@ -386,7 +395,9 @@ bool chequearBitValido(int* bit){
 }
 
 void seteoBit(int* bit){
+	sem_wait(&sBitmap);
     bitarray_set_bit(bitmap,*bit);
+    sem_post(&sBitmap);
 }
 
 char* armarStrBloques(char * strBloques, int *bit){

@@ -14,4 +14,6 @@
 #define FILESYSTEM_HILOINOTIFY_H
 void hiloinotify(char* rutaConfig);
 void cambioConfiguracion(char* rutaConfig);
+int getRetardo();
+int getDump();
 #endif //FILESYSTEM_HILOINOTIFY_H

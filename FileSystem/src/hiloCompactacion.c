@@ -17,25 +17,28 @@
 #include "hiloCompactacion.h"
 #include "manejoArchivos.h"
 #include <commons/bitarray.h>
+#include <semaphore.h>
+#include "Semaforos.h"
 
-extern t_dictionary * tablas;
 extern int tBloques;
-extern t_bitarray* bitmap;
 extern t_log* alog;
 extern t_queue * nombre;
+extern sem_t sNombre;
 extern int loop;
 
 void hilocompactacion(){
 
 	FILE* archivo;
 	int i = 1, valor;
+	sem_wait(&sNombre);
 	char * nomTabla = queue_pop(nombre);
+	sem_post(&sNombre);
 	printf("Hilo compactacion\n");
 	printf("Nombre de tabla: %s\n", nomTabla);
 	char * pathTabla;
 	char * path, *new;
 	t_dictionary * lista;
-	st_tablaCompac * tabla = dictionary_get(tablas, nomTabla);
+	st_tablaCompac * tabla = leerDeTablas(nomTabla);
 
 	free(nomTabla);
 
@@ -137,7 +140,7 @@ t_list * llenarTabla(char * path){
 				reg = malloc(sizeof(structRegistro));
 				reg->time = atol(split[0]);
 				reg->key = atoi(split[1]);
-				reg->value = strtok(split[2], "\n");
+				reg->value = strdup(strtok(split[2], "\n"));
 
 				list_add(lista, reg);
 
@@ -150,7 +153,7 @@ t_list * llenarTabla(char * path){
 						reg = malloc(sizeof(structRegistro));
 						reg->time = atol(split[0]);
 						reg->key = atoi(split[1]);
-						reg->value = strtok(split[2], "\n");
+						reg->value = strdup(strtok(split[2], "\n"));
 
 						list_add(lista, reg);
 					}else flag = strdup(linea);
@@ -202,7 +205,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 						if(atol(split[0]) > reg->time){
 							reg->time = atol(split[0]);
 							free(reg->value);
-							reg->value = strtok(split[2], "\n");
+							reg->value = strdup(strtok(split[2], "\n"));
 						}
 						flag2 = 1;
 					}
@@ -212,7 +215,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 					structRegistro * reg2 = malloc(sizeof(structRegistro));
 					reg2->time = atol(split[0]);
 					reg2->key = atoi(split[1]);
-					reg2->value = strtok(split[2], "\n");
+					reg2->value = strdup(strtok(split[2], "\n"));
 
 					list_add(listPart,reg2);
 				}
@@ -232,7 +235,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 								if(atol(split[0]) > reg->time){
 									reg->time = atol(split[0]);
 									free(reg->value);
-									reg->value = strtok(split[2], "\n");
+									reg->value = strdup(strtok(split[2], "\n"));
 								}
 								flag2 = 1;
 							}
@@ -242,7 +245,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 							structRegistro * reg2 = malloc(sizeof(structRegistro));
 							reg2->time = atol(split[0]);
 							reg2->key = atoi(split[1]);
-							reg2->value = strtok(split[2], "\n");
+							reg2->value = strdup(strtok(split[2], "\n"));
 
 							list_add(listPart,reg2);
 						}
@@ -282,7 +285,6 @@ void generarParticion(char * path, int part, t_dictionary * lista){
 
 	bit = verificar_bloque();
 	if(bit != -1){
-		bitarray_set_bit(bitmap,bit);
 		contenido = string_from_format("SIZE=0\nBLOQUES=[%d]", bit);
 
 		archivo = fopen(pathPart, "a+");
@@ -310,7 +312,6 @@ void generarParticion(char * path, int part, t_dictionary * lista){
 
 			bit = verificar_bloque();
 			if(bit != -1){
-				bitarray_set_bit(bitmap,bit);
 				actualizar_bloques(pathPart,bit);
 				actualizar_size(pathPart,(tBloques-offset));
 			}

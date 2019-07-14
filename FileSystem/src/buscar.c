@@ -14,7 +14,7 @@
 #include "Funciones.h"
 
 extern t_dictionary * memtable;
-extern t_list * listaTabla;
+extern sem_t sMemtable;
 
 char * buscarKey(char * name, int key, int particion){
 	char * value;
@@ -26,6 +26,7 @@ char * buscarKey(char * name, int key, int particion){
 	char * path = armar_path(name);
 	char * completo;
 
+	sem_wait(&sMemtable);
 	if(dictionary_has_key(memtable,name)){
 		data = dictionary_get(memtable, name);
 
@@ -38,6 +39,7 @@ char * buscarKey(char * name, int key, int particion){
 			free(reg);
 		}
 	}
+	sem_post(&sMemtable);
 
 	completo = string_from_format("%s/%d.bin", path, particion);
 	reg = buscarEnParticion(completo,key);
@@ -218,37 +220,4 @@ structRegistro * buscarEnArchivo(char * path, uint16_t key){
 	if(flag == 0)return NULL;
 	else return reg;
 }
-/*
-t_list * listaTablas(){
-	DIR *d;
-	struct dirent *dir;
-	t_list * lista;
-	char * nombre = string_from_format("%s/Tables", config->montaje);
-    d = opendir(nombre);
-    if (d)
-    {
-    	lista = list_create();
-	    while ((dir = readdir(d)) != NULL)
-        {
-	    	st_metadata * meta;
-	        char * name = strdup(dir->d_name);
-
-	        if(!string_equals_ignore_case(name,".") && !string_equals_ignore_case(name,"..")){
-	        	meta = leerMetadata(name);
-	        	list_add(lista,meta);
-	        }
-	        free(name);
-	    }
-	    closedir(d);
-	}
-    free(nombre);
-
-    return lista;
-}*/
-
-void obtenerMetadatas(char * key, st_tablaCompac * tabla){
-
-	list_add(listaTabla, tabla->meta);
-}
-
 

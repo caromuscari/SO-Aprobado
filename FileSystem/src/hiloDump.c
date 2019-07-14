@@ -5,9 +5,9 @@
  *      Author: utnso
  */
 #include "hiloDump.h"
+#include "hiloInotify.h"
+#include "Semaforos.h"
 
-
-extern structConfig * config;
 extern t_dictionary *memtable;
 extern int tBloques;
 extern int loop;
@@ -52,7 +52,7 @@ void crearTemporal(char * key, st_tabla* data){
 	free(nombreArchivo);
 	list_destroy(bloques);
     sem_post(&data->semaforo);
-    free(dictionary_remove(memtable,key));
+    eliminarDeMemtable(key);
 }
 
 char* armarStrLista(char * strLista, structRegistro *registro){
@@ -78,11 +78,13 @@ char* buscarNombreProximoTemporal(char* nombreTabla){
 void* hilodump(){
 
 	while(loop){
-		sleep(config->tiempo_dump);
+		sleep(getDump());
+		//Hacer copia y ver si existe la tablas
 		dictionary_iterator(memtable,(void*)crearTemporal);
 	}
 
 	pthread_exit(NULL);
 }
+
 
 

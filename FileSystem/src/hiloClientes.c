@@ -20,12 +20,12 @@
 #include <signal.h>
 #include "Funciones.h"
 #include "hiloConsola.h"
+#include "Semaforos.h"
 
 
 extern t_log* alog;
 extern t_dictionary * clientes;
-extern structConfig * config;
-extern t_list * listaTabla;
+extern sem_t sClientes;
 extern int loop;
 
 void tratarCliente(cliente_t * cliente){
@@ -38,7 +38,7 @@ void tratarCliente(cliente_t * cliente){
 	while(loop && flag){
 		mensaje * recibido = malloc(sizeof(mensaje));
 		int respuesta;
-		char * buffer;
+		char * buffer = NULL;
 		size_t size;
 
 		recibido->buffer = getMessage(cliente->socket, &(recibido->head), &status);
@@ -52,19 +52,16 @@ void tratarCliente(cliente_t * cliente){
 				st_insert * insert;
 				insert = desserealizarInsert(recibido->buffer);
 
-				buffer = strdup("");
-
-				if(string_length(insert->value) <= config->tam_value)
+				if(string_length(insert->value) <= getValue())
 				{
 					respuesta = realizarInsert(insert);
-					enviarRespuesta(respuesta, buffer, cliente->socket, &status, sizeof(buffer));
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status, 0);
 
 				}else{
-					enviarRespuesta(3, buffer, cliente->socket, &status, sizeof(buffer));
+					enviarRespuesta(3, buffer, cliente->socket, &status, 0);
 				}
 
 				destroyInsert(insert);
-				free(buffer);
 				break;
 
 			case SELECT:
@@ -75,14 +72,18 @@ void tratarCliente(cliente_t * cliente){
 				selectt = deserealizarSelect(recibido->buffer);
 
 				respuesta = realizarSelect(selectt, &registro);
-				reg = cargarRegistro(registro);
-				buffer = serealizarRegistro(reg,&size);
+				if(registro != NULL){
+					reg = cargarRegistro(registro);
+					buffer = serealizarRegistro(reg,&size);
+				}else size = 0;
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
 				destoySelect(selectt);
-				destroyRegistro(reg);
-				free(registro);
-				free(buffer);
+				if(registro != NULL){
+					destroyRegistro(reg);
+					free(registro);
+					free(buffer);
+				}
 				break;
 
 			case CREATE:
@@ -93,11 +94,9 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarCreate(create);
 				actualizar_bitmap();
 
-				buffer = strdup("");
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, sizeof(buffer));
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, 0);
 
 				destroyCreate(create);
-				free(buffer);
 				break;
 
 			case DROP:
@@ -108,11 +107,9 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarDrop(drop);
 				actualizar_bitmap();
 
-				buffer = strdup("");
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, sizeof(buffer));
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, 0);
 
 				destroyDrop(drop);
-				free(buffer);
 				break;
 
 			case DESCRIBE:
@@ -123,46 +120,49 @@ void tratarCliente(cliente_t * cliente){
 
 				respuesta = realizarDescribe(describe, &meta);
 
-				buffer = serealizarMetaData(meta, &size);
+				if(respuesta == 15)
+					buffer = serealizarMetaData(meta, &size);
+				else size = 0;
 
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
 				destroyDescribe(describe);
-				free(buffer);
+				if(buffer != NULL) free(buffer);
 				break;
 
 			case DESCRIBEGLOBAL:
 				log_info(alog, "Recibi un Describe Global");
+				t_list * lista;
 
-				respuesta = realizarDescribeGlobal();
+				respuesta = realizarDescribeGlobal(&lista);
 
 				if(respuesta == 13){
-					buffer = serealizarListaMetaData(listaTabla,&size);
+					buffer = serealizarListaMetaData(lista,&size);
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
-					//list_clean(listaTabla);
-					list_destroy(listaTabla);
+					list_destroy(lista);
 				}else{
-					enviarRespuesta(respuesta, buffer, cliente->socket, &status,sizeof(buffer));
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status,0);
 				}
 
-				free(buffer);
+				if(buffer != NULL) free(buffer);
 				break;
 			default:
 				flag = false;
-				enviarRespuesta(16, buffer, cliente->socket, &status, sizeof(buffer)); //Modificar numero
 
 		}
 
-		free(recibido->buffer);
+		if(recibido->buffer != NULL) free(recibido->buffer);
 		free(recibido);
 
-		sleep(config->retardo);
+		sleep(getRetardo());
 	}
 
 	log_info(alog, "se desconecto el socket client %d",cliente->socket);
 	close(cliente->socket);
 	char * socketS = string_itoa(cliente->socket);
+	sem_wait(&sClientes);
 	free(dictionary_remove(clientes, socketS));
+	sem_post(&sClientes);
 	free(socketS);
 
 	pthread_exit(NULL);
@@ -170,17 +170,16 @@ void tratarCliente(cliente_t * cliente){
 
 void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam){
 
-	header * head = malloc(sizeof(header));
+	header head;
 
-	head->letra = 'F';
-	head->codigo = codigo;
-	head->sizeData = tam;
+	head.letra = 'F';
+	head.codigo = codigo;
+	head.sizeData = tam;
 
-	message * mensaje = createMessage(head, buffer);
+	message * mensaje = createMessage(&head, buffer);
 
 	enviar_message(socketC, mensaje, alog, status);
 
-	free(head);
 	free(mensaje->buffer);
 	free(mensaje);
 }

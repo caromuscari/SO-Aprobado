@@ -9,7 +9,6 @@
 #define SRC_OPERACIONES_H_
 
 #include "manejoArchivos.h"
-#include "archivos.h"
 #include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/dictionary.h>
 

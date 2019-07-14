@@ -23,6 +23,7 @@ void mostrarPaginasCargadas(){
         printf("%d\n",key);
         printf("%s\n",value);
     }
+    free(value);
 }
 
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){

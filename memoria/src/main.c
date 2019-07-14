@@ -64,6 +64,7 @@ void liberarConfig(t_configuracionMemoria * config){
 	list_destroy(config->IP_SEEDS);
 	free(config->PUERTO_FS);
 	list_clean_and_destroy_elements(config->PUERTO_SEEDS,free);
+	list_destroy(config->PUERTO_SEEDS);
 	free(config);
 }
 

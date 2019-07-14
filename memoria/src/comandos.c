@@ -74,7 +74,7 @@ int comandoInsert(st_insert* comandoInsert){
 	//cargo datos a la memoria princ
 	memcpy(paginaLibre, &comandoInsert->timestamp, sizeof(double));
 	memcpy(paginaLibre + sizeof(double), &comandoInsert->key, sizeof(uint16_t));
-	memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
+	memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, strlen(comandoInsert->value));
 	//creo la pag de la tabla y le cargo los datos
 	st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
 	paginaDeTabla->nroDePagina = posMarcoLibre;
@@ -88,7 +88,6 @@ int comandoInsert(st_insert* comandoInsert){
 
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
-    mostrarPaginasCargadas();
 	return 0;
 }
 

@@ -166,8 +166,8 @@ void *pthreadGossping() {
             memoria = list_get(seedFallidas,i);
             removeMemoriaFallida(memoria);
         }
-        printf("------Memoria [%d]-------\n", configMemoria->NRO_MEMORIA);
-        showMiguel(listaTablas);
+        //printf("------Memoria [%d]-------\n", configMemoria->NRO_MEMORIA);
+        //showMiguel(listaTablas);
         sleep(60);
     }
 }

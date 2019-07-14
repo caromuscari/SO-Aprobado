@@ -36,6 +36,9 @@ int comandoInsert(st_insert* comandoInsert){
 		log_info(file_log, "No se encontro la pagina con esa Key");
 
 		int posMarcoLibre = buscarMarcoLibre();
+		if(posMarcoLibre == -1){
+            return -2;
+		}
 
 		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 
@@ -63,6 +66,9 @@ int comandoInsert(st_insert* comandoInsert){
 	segmentoNuevo->tablaDePaginas = list_create();
 
 	int posMarcoLibre = buscarMarcoLibre();
+	if(posMarcoLibre == -1){
+        return -2;
+	}
 	//creo la pagina
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 	//cargo datos a la memoria princ
@@ -222,7 +228,7 @@ void* enviarSegmentoAFS(st_segmento* segmento){
             insert->operacion = INSERT;
             insert->nameTable = strdup(segmento->nombreTabla);
 
-            if(mandarInsert(insert) != 5){
+            if(mandarInsert(insert) == 5){
                 //BORRO DE MEMORIA
                 marco->condicion = LIBRE;
                 free(pagina);
@@ -238,7 +244,6 @@ void* enviarSegmentoAFS(st_segmento* segmento){
         list_destroy(segmento->tablaDePaginas);
         free(segmento->nombreTabla);
         free(segmento);
-        //SACAR DE LA LISTA!
     }
 }
 
@@ -246,6 +251,7 @@ int comandoJournal(){
     //RECORRO TODA LA MEMORIA Y HAGO LOS INSERT CORRESPONDIENTES COMO REQUEST AL FILE
     list_iterate(listaDeSegmentos, (void*)enviarSegmentoAFS);
     log_info(file_log, "Terminó el JOURNAL");
+    list_clean(listaDeSegmentos);
     return 1;
 }
 

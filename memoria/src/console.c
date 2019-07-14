@@ -6,6 +6,72 @@
 
 extern t_log *file_log;
 
+st_insert *cargarInsert2(char *comando) {
+    char *hayString;
+    st_insert *insert = malloc(sizeof(st_insert));
+    insert->operacion = INSERT;
+    char **listSplit = string_split(comando, "\"");
+    char **listSplit2;
+    if (listSplit[1] == NULL) {
+        string_iterate_lines(listSplit, (void *) free);
+        free(listSplit);
+
+        free(insert);
+        return NULL;
+    }
+    insert->value = strdup(listSplit[1]);
+    if (listSplit[2]) {
+        insert->timestamp = strtol(listSplit[2], &hayString, 10);
+        if (!string_is_empty(hayString)) {
+            string_iterate_lines(listSplit, (void *) free);
+            free(listSplit);
+
+            free(insert);
+            return NULL;
+        }
+    } else {
+        insert->timestamp = obtenerMilisegundosDeHoy();
+    }
+
+    listSplit2 = string_split(listSplit[0], " ");
+    if (listSplit2[1] == NULL) {
+        string_iterate_lines(listSplit, (void *) free);
+        free(listSplit);
+
+        free(insert);
+        return NULL;
+    }
+
+    insert->nameTable = strdup(listSplit2[1]);
+    if (listSplit2[2] == NULL) {
+        string_iterate_lines(listSplit, (void *) free);
+        free(listSplit);
+
+        string_iterate_lines(listSplit2, (void *) free);
+        free(listSplit2);
+
+        free(insert);
+        return NULL;
+    }
+    insert->key = strtol(listSplit2[2], &hayString, 10);
+    if (!string_is_empty(hayString)) {
+        string_iterate_lines(listSplit, (void *) free);
+        free(listSplit);
+
+        string_iterate_lines(listSplit2, (void *) free);
+        free(listSplit2);
+        free(insert);
+        return NULL;
+    }
+
+    string_iterate_lines(listSplit, (void *) free);
+    free(listSplit);
+
+    string_iterate_lines(listSplit2, (void *) free);
+    free(listSplit2);
+    return insert;
+}
+
 void makeCommand(char *command){
   int typeCommand = getEnumFromString(command);
 
@@ -13,12 +79,20 @@ void makeCommand(char *command){
   	  case INSERT:
   		  log_info(file_log, "Ejecutando un insert");
   		  st_insert * insert;
-  		  if((insert = cargarInsert(command))){
-              if(comandoInsert(insert) < 0){
-                  log_error(file_log, "no se puedo hacer el insert");
+  		  int codigoInsert = 0;
+  		  if((insert = cargarInsert2(command))){
+              if((codigoInsert = comandoInsert(insert)) == -1){
+                  printf("no se pudo hacer el insert\n");
+                  log_error(file_log, "no se pudo hacer el insert");
+              }
+              if(codigoInsert == -2){
+                  printf("no hay espacio en las paginas\n");
+                  log_error(file_log, "no hay espacio en las paginas");
               }
   		  }
-  		  destroyInsert(insert);
+  		  if(insert){
+              destroyInsert(insert);
+  		  }
   		  break;
       case SELECT:
     	  log_info(file_log, "[+] El comando es un SELECT\n");
@@ -29,8 +103,10 @@ void makeCommand(char *command){
               registro = comandoSelect(select);
               if(registro){
                   printf("value [%s]\n", registro->value);
+                  destroyRegistro(registro);
               }else{
-                log_info(file_log, "No se encontro el select");
+                printf("No hay resultados para este select\n");
+                log_info(file_log, "No hay resultados para este select");
               }
     	  }else{
               log_error(file_log, "[+] Error en datos de SELECT. \n");

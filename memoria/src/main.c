@@ -17,7 +17,7 @@ pthread_t server;
 pthread_t gossiping;
 int fdFileSystem;
 int cantPaginas;
-int tamanioValue = 10; //esto me lo va a pasa fs
+int tamanioValue = 255; //esto me lo va a pasa fs
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
 
@@ -77,6 +77,9 @@ int inicializar(char *pathConfig){
         log_destroy(file_log);
         return -1;
     }
+    if(!buscarValueMaximo()){
+        return -1;
+    }
     log_info(file_log, "Inicializar Memoria");
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;
@@ -114,9 +117,6 @@ int main(int argc, char *argv[]){
         return -1;
     }
     //descomentar cando el File entienda este mensaje
-   if(!buscarValueMaximo()){
-        return -1;
-   }
     inicializarMemoria();
     log_info(file_log, "la memoria se inicio correctamente");
     pthread_create(&server, NULL,start_server, NULL);

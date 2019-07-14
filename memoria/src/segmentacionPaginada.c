@@ -56,18 +56,25 @@ int buscarMarcoLibre(){
 
 int algoritmoLRU(){
 
-	st_tablaDePaginas* paginaAReemplazar = list_fold(listaDeSegmentos, listaDeSegmentos->head, (void*)paginaConMenorTiempoPorSegmento);
+	st_tablaDePaginas* paginaAReemplazar = list_fold(listaDeSegmentos, listaDeSegmentos->head->data, (void*)paginaConMenorTiempoPorSegmento);
 
-	return paginaAReemplazar->nroDePagina;
+	if(paginaAReemplazar){
+        return paginaAReemplazar->nroDePagina;
+	}else{
+        return -1;
+	}
 }
 
-st_tablaDePaginas* paginaConMenorTiempoPorSegmento(t_list* listaPaginas){
+st_tablaDePaginas* paginaConMenorTiempoPorSegmento(st_segmento * stSegmento){
 	bool tieneFlagEnCero(st_tablaDePaginas* pagina){
 		return 0 == pagina->flagModificado;
 	}
-	t_list* listaPaginasConFlagEnCero = list_filter(listaPaginas, (void*)tieneFlagEnCero);
+	t_list* listaPaginasConFlagEnCero = list_filter(stSegmento->tablaDePaginas, (void*)tieneFlagEnCero);
 
-	return list_fold(listaPaginasConFlagEnCero, listaPaginasConFlagEnCero->head, (void*)paginaConMenorTiempo);
+	if(!list_is_empty(listaPaginasConFlagEnCero)){
+        return list_fold(listaPaginasConFlagEnCero, listaPaginasConFlagEnCero->head->data, (void*)paginaConMenorTiempo);
+	}
+    return NULL;
 }
 
 st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tablaDePaginas* paginaAComparar){

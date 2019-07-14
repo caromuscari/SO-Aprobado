@@ -55,13 +55,12 @@ int mandarDrop(st_drop * drop){
 
         for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
             st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
-            free(paginaDeTabla->pagina);
             st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
+            free(paginaDeTabla);
             marco->condicion = LIBRE;
         }
 
         list_destroy(segmentoEncontrado->tablaDePaginas);
-        free(segmentoEncontrado->tablaDePaginas);
         free(segmentoEncontrado->nombreTabla);
         list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
         for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
@@ -80,10 +79,18 @@ int mandarDrop(st_drop * drop){
 	mensaje = createMessage(&head, buffer);
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
+    if(controlador != 0){
+        log_error(file_log, "no se pudo enviar el mensaje al FS");
+        return -1;
+    }
 
 	free(buffer);
 
 	buffer = getMessage(fdFileSystem,&head2,&controlador);
+    if(controlador != 0){
+        log_error(file_log, "no se pudo recibir un mensaje");
+        return -1;
+    }
 
 	free(buffer);
 
@@ -139,8 +146,6 @@ int mandarDescribeGlobal(t_list ** lista){
 	free(buffer);
 	return head2.codigo;
 }
-<<<<<<< HEAD
-=======
 
 int mandarInsert(st_insert * insert){
     size_t size;
@@ -158,10 +163,17 @@ int mandarInsert(st_insert * insert){
     mensaje = createMessage(&head, buffer);
 
     enviar_message(fdFileSystem, mensaje,file_log,&controlador);
-
+    if(controlador != 0){
+        log_error(file_log, "no se pudo enviar el mensaje al FS");
+        return -1;
+    }
     free(buffer);
 
     buffer = getMessage(fdFileSystem,&head2,&controlador);
+    if(controlador < 0){
+        log_error(file_log, "no se pudo recibir un mensaje");
+        return -1;
+    }
 
     free(buffer);
 
@@ -171,4 +183,3 @@ int mandarInsert(st_insert * insert){
 
 
 
->>>>>>> 177905218542ca9b9d0558e628fb42c85691ea57

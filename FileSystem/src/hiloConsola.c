@@ -21,14 +21,14 @@
 #include <signal.h>
 #include "Funciones.h"
 #include "hiloClientes.h"
+#include <semaphore.h>
+#include "Semaforos.h"
 
 extern t_log* alog;
-extern structConfig * config;
-extern t_list * listaTabla;
 extern int loop;
-
 extern pthread_t hiloSelect,hiloDump, hiloInotify;
 extern t_dictionary * clientes, *tablas;
+extern sem_t sClientes, sTablas;
 
 void* hiloconsola(){
 
@@ -57,7 +57,7 @@ void* hiloconsola(){
 				insert = cargarInsert(request);
 
 				if(insert != NULL){
-					if(string_length(insert->value) <= config->tam_value)
+					if(string_length(insert->value) <= getValue())
 					{
 						respuesta = realizarInsert(insert);
 
@@ -137,13 +137,14 @@ void* hiloconsola(){
 				describe = cargarDescribe(request);
 
 				if(describe == NULL){
-					respuesta = realizarDescribeGlobal();
+					t_list * lista;
+					respuesta = realizarDescribeGlobal(&lista);
 
 					mostrarRespuesta(respuesta);
 					if(respuesta == 13){
-						list_iterate(listaTabla,(void*)mostrarTabla);
-						list_destroy(listaTabla);
-					}else list_destroy(listaTabla);
+						list_iterate(lista,(void*)mostrarTabla);
+						list_destroy(lista);
+					}else list_destroy(lista);
 
 				}else{
 					respuesta = realizarDescribe(describe,&meta);
@@ -160,8 +161,12 @@ void* hiloconsola(){
 
 			case EXIT:
 				loop = 0;
+				sem_wait(&sClientes);
 				dictionary_iterator(clientes,(void*)cerrarClientes);
+				sem_post(&sClientes);
+				sem_wait(&sTablas);
 				dictionary_iterator(tablas,(void*)cerrarTablas);
+				sem_post(&sTablas);
 				pthread_cancel(hiloSelect);
 				pthread_cancel(hiloDump);
 				pthread_cancel(hiloInotify);
@@ -172,7 +177,7 @@ void* hiloconsola(){
 			}
 		free(ingreso);
 
-		sleep(config->retardo);
+		sleep(getRetardo());
 	}
 
 	log_info(alog, "Sale del hilo consola");

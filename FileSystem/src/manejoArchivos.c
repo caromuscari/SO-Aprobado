@@ -21,18 +21,19 @@
 #include "hiloConsola.h"
 #include "hiloCompactacion.h"
 #include <commons/collections/queue.h>
+#include "Semaforos.h"
 
-extern t_dictionary * memtable, *tablas;
-extern t_list * listaTabla;
+extern t_dictionary * tablas;
 extern t_queue * nombre;
+extern sem_t sNombre, sTablas;
 
 
 int realizarInsert(st_insert * insert){
 
 	int respuesta;
 	st_tabla * data;
-
 	structRegistro * registro;
+
 
 	if(string_contains(insert->value,";")){
 		respuesta = 1;
@@ -48,8 +49,8 @@ int realizarInsert(st_insert * insert){
 		string_append(&registro->value, insert->value);
 
 
-		if(dictionary_has_key(memtable, insert->nameTable)){
-			data = dictionary_get(memtable, insert->nameTable);
+		if(existeEnMemtable(insert->nameTable)){
+			data = leerDeMemtable(insert->nameTable);
 
 			sem_wait(&data->semaforo);
 			list_add(data->lista, registro);
@@ -57,7 +58,8 @@ int realizarInsert(st_insert * insert){
 
 		}else{
 			data = malloc(sizeof(st_tabla));
-			dictionary_put(memtable,insert->nameTable, data);
+
+			agregarAMemtable(data, insert->nameTable);
 
 			sem_init(&data->semaforo,0,1);
 			data->lista = list_create();
@@ -83,7 +85,7 @@ int realizarSelect(st_select * select, char ** value){
 
 	if(validarArchivos(select->nameTable, &respuesta)){
 
-		tabla = dictionary_get(tablas, select->nameTable);
+		tabla = leerDeTablas(select->nameTable);
 
 		/*sem_getvalue(&tabla->compactacion, &valor);
 		if(valor != 1){
@@ -154,10 +156,14 @@ int realizarCreate(st_create * create){
 			st_tablaCompac * tabla = malloc(sizeof(st_tablaCompac));
 			tabla->meta = leerMetadata(create->nameTable);
 			char * name = strdup(create->nameTable);
+
+			sem_wait(&sNombre);
 			queue_push(nombre, name);
-			//pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
-			//pthread_detach(tabla->hilo);
-			dictionary_put(tablas, create->nameTable, tabla);
+			sem_post(&sNombre);
+
+			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
+			pthread_detach(tabla->hilo);
+			agregarATablas(tabla,create->nameTable);
 
 			free(path);
 
@@ -179,12 +185,12 @@ int realizarDrop(st_drop * drop){
 
 	if(validarArchivos(drop->nameTable, &respuesta)){
 
-		tabla = dictionary_remove(tablas, drop->nameTable);
+		tabla = eliminarDeTablas(drop->nameTable);
 
 		path = armar_path(drop->nameTable);
 
-		if(dictionary_has_key(memtable, drop->nameTable)){
-			data = dictionary_get(memtable, drop->nameTable);
+		if(existeEnMemtable(drop->nameTable)){
+			data = leerDeMemtable(drop->nameTable);
 
 			sem_wait(&data->semaforo);
 
@@ -194,7 +200,7 @@ int realizarDrop(st_drop * drop){
 			sem_post(&data->semaforo);
 			sem_destroy(&data->semaforo);
 
-			free(dictionary_remove(memtable,drop->nameTable));
+			eliminarDeMemtable(drop->nameTable);
 		}
 
 		for (int i = 0; i < tabla->meta->partitions; i++) {
@@ -223,8 +229,8 @@ int realizarDrop(st_drop * drop){
 int realizarDescribe(st_describe * describe, st_metadata ** m){
 	int respuesta;
 
-	if(dictionary_has_key(tablas, describe->nameTable)){
-		st_tablaCompac * tabla = dictionary_get(tablas,describe->nameTable);
+	if(existeEnTablas(describe->nameTable)){
+		st_tablaCompac * tabla = leerDeTablas(describe->nameTable);
 		*m = tabla->meta;
 		respuesta = 15;
 	}else respuesta = 4;
@@ -232,13 +238,20 @@ int realizarDescribe(st_describe * describe, st_metadata ** m){
 	return respuesta;
 }
 
-int realizarDescribeGlobal(){
+int realizarDescribeGlobal(t_list ** lista){
 	int respuesta;
 
-	listaTabla = list_create();
-	dictionary_iterator(tablas,(void*)obtenerMetadatas);
+	*lista = list_create();
+	void obtenerMetadatas(char * key, st_tablaCompac * tabla){
 
-	if(list_size(listaTabla) != 0){
+		list_add(*lista, tabla->meta);
+	}
+
+	sem_wait(&sTablas);
+	dictionary_iterator(tablas,(void*)obtenerMetadatas);
+	sem_post(&sTablas);
+
+	if(list_size(*lista) != 0){
 		respuesta = 13;
 	}else{
 		respuesta = 12;

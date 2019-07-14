@@ -29,7 +29,5 @@ structRegistro * buscarEnParticion(char * path, uint16_t key);
 structRegistro * buscarEnTemporales(char * name, uint16_t key);
 structRegistro * buscarEnArchivo(char * path, uint16_t key);
 void leerTablas();
-//t_list * listaTablas();
-void obtenerMetadatas(char * key, st_tablaCompac * tabla);
 
 #endif /* SRC_BUSCAR_H_ */

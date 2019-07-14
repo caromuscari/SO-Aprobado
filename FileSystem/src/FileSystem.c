@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include "buscar.h"
+#include <semaphore.h>
 
 
 char* magic_number;
@@ -41,8 +42,8 @@ int loop;
 
 structConfig * config;
 pthread_t hiloConsola, hiloSelect,hiloDump, hiloInotify;
+sem_t sMemtable, sTablas, sClientes, sNombre, sBitmap, sConfig;
 t_dictionary * clientes, *memtable, *tablas;
-t_list * listaTabla;
 
 struct stat mystat;
 

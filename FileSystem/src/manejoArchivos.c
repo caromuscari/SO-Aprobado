@@ -42,11 +42,10 @@ int realizarInsert(st_insert * insert){
 
 	if(validarArchivos(insert->nameTable, &respuesta)){
 
-		registro = malloc(sizeof(structRegistro *));
+		registro = malloc(sizeof(structRegistro));
 		registro->time = insert->timestamp;
 		registro->key = insert->key;
-		registro->value = string_new();
-		string_append(&registro->value, insert->value);
+		registro->value = strdup(insert->value);
 
 
 		if(existeEnMemtable(insert->nameTable)){

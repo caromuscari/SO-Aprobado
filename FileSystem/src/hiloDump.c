@@ -12,16 +12,17 @@ extern t_dictionary *memtable;
 extern int tBloques;
 extern int loop;
 extern sem_t sMemtable;
+extern t_log* alog;
 
 void crearTemporal(char * key, st_tabla* data){
 	sem_wait(&data->semaforo);
     char* nombreArchivo = buscarNombreProximoTemporal(key);
-    char* str = list_fold(data->lista, string_new(), (void*)armarStrLista);
+    char* str = list_fold(data->lista, strdup(""), (void*)armarStrLista);
 
-    t_list* bloques = crearArchivoTemporal(nombreArchivo, sizeof(str));
+    t_list* bloques = crearArchivoTemporal(nombreArchivo, string_length(str));
 
 
-    int tamanioRestante = (int) sizeof(str), iElem = 0;
+    int tamanioRestante = (int) string_length(str), iElem = 0;
 
     if(bloques->elements_count > 0){
         //ITERAR POR EL TAMANIO Y PONER DATA
@@ -29,10 +30,12 @@ void crearTemporal(char * key, st_tabla* data){
         int caracteresPorString = tBloques * 1024/ sizeof(char);
         while(tamanioRestante > 0 && numeroBloque != NULL){
 
-            char* path = armar_PathBloque(string_itoa(*numeroBloque));
+        	char * bloque = string_itoa(*numeroBloque);
+            char* path = armar_PathBloque(bloque);
+            free(bloque);
             FILE *write_ptr;
 
-            write_ptr = fopen(path,"ab+");
+            write_ptr = fopen(path,"wb");
             char* strBloque = string_substring(str, iElem * caracteresPorString, caracteresPorString);
             fwrite(strBloque,sizeof(strBloque),string_length(strBloque),write_ptr);
             fclose(write_ptr);
@@ -81,9 +84,12 @@ void* hilodump(){
 	while(loop){
 		sleep(getDump());
 		//Hacer copia y ver si existe la tablas
+		log_info(alog,"Inicia el dump");
 		sem_wait(&sMemtable);
 		dictionary_iterator(memtable,(void*)crearTemporal);
 		sem_post(&sMemtable);
+		log_info(alog,"Termina el dump");
+
 	}
 
 	pthread_exit(NULL);

@@ -40,7 +40,6 @@ void hilocompactacion(){
 	t_dictionary * lista;
 	st_tablaCompac * tabla = leerDeTablas(nomTabla);
 
-	free(nomTabla);
 
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
@@ -56,8 +55,10 @@ void hilocompactacion(){
 		while(archivo != NULL){
 			new = string_from_format("%s/%d.tmpc", pathTabla, i);
 			rename(path, new);
+			free(new);
 
 			i++;
+			free(path);
 			path = string_from_format("%s/%d.tmp", pathTabla, i);
 			archivo = fopen(path,"r");
 		}
@@ -107,6 +108,8 @@ void hilocompactacion(){
 		}
 	}
 
+	free(nomTabla);
+
 	pthread_exit(NULL);
 }
 
@@ -130,9 +133,11 @@ t_list * llenarTabla(char * path){
 
 	while(particion->bloques[i] != NULL){
 		bloque = armar_PathBloque(particion->bloques[i]);
-		archivo = fopen(path,"r");
+		archivo = fopen(bloque,"r");
 		linea = malloc(sizeof(char) * tamBuffer);
 		while(getline(&linea, &tamBuffer, archivo) != -1){
+			//if(linea != NULL){
+
 			structRegistro * reg;
 			if(flag != NULL){
 				string_append(&flag, linea);
@@ -162,6 +167,8 @@ t_list * llenarTabla(char * path){
 
 			string_iterate_lines(split, (void*)free);
 			free(split);
+
+			//}
 			free(linea);
 
 			linea = malloc(sizeof(char) * tamBuffer);
@@ -180,7 +187,7 @@ t_list * llenarTabla(char * path){
 
 void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 	FILE * archivo;
-	char * bloque, *linea, ** split, * flag;
+	char * bloque, *linea, ** split, * flag = NULL;
 	size_t tamBuffer = 100;
 	structParticion * particion;
 	int i = 0, part, j=0, flag2=0;

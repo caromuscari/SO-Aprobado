@@ -44,7 +44,11 @@ void atenderRequest(){
         for (i = 0; i < instrucciones->elements_count; ++i) {
             instruccionScript = list_get(instrucciones,i);
             datomemoria = getMemoria(instruccionScript->criteio, instruccionScript->tag);
-            enviarRequestMemoria(instruccionScript,datomemoria);
+            if(datomemoria){
+                enviarRequestMemoria(instruccionScript,datomemoria);
+            }else{
+                printf("no hay memoria disponible\n");
+            }
         }
         sleep(6);
         //validar resultado de las 4 instruciones

@@ -39,6 +39,7 @@ extern char* posicion;
 extern int bitm;
 extern int loop;
 extern t_queue * nombre;
+extern sem_t sMemtable, sTablas, sClientes, sNombre, sBitmap, sConfig;
 
 
 void inicializar(){
@@ -51,6 +52,13 @@ void inicializar(){
 	clientes = dictionary_create();
 	memtable = dictionary_create();
 	alog = crear_archivo_log("File System", true, "/home/utnso/FS/log.txt");
+
+	sem_init(&sMemtable,0,1);
+	sem_init(&sTablas,0,1);
+	sem_init(&sClientes,0,1);
+	sem_init(&sNombre,0,1);
+	sem_init(&sBitmap,0,1);
+	sem_init(&sConfig,0,1);
 }
 
 void archivoDeConfiguracion(char* argv)
@@ -179,6 +187,14 @@ void finalizar(){
 	free(magic_number);
 	free(config->puerto);
 	free(config);
+
+	sem_destroy(&sMemtable);
+	sem_destroy(&sTablas);
+	sem_destroy(&sConfig);
+	sem_destroy(&sNombre);
+	sem_destroy(&sBitmap);
+	sem_destroy(&sClientes);
+
 	if(bitm != -1){
 		memcpy(posicion,bitmap,mystat.st_size);
 		msync(posicion,mystat.st_size,MS_SYNC);

@@ -10,6 +10,7 @@
 #define BUF_LEN     ( 1024 * EVENT_SIZE )
 extern t_log* alog;
 extern structConfig * config;
+extern sem_t sConfig;
 extern int loop;
 int file_descriptor;
 int watch_descriptor;
@@ -53,6 +54,7 @@ void hiloinotify(char* rutaConfig){
 void cambioConfiguracion(char* rutaConfig){
     t_config *configuracion;
     configuracion = config_create(rutaConfig);
+    sem_wait(&sConfig);
     if(config->retardo != config_get_int_value(configuracion, "RETARDO")){
         config->retardo = config_get_int_value(configuracion, "RETARDO");
         log_info(alog, "[CONFIG] Cambió el valor de RETARDO");
@@ -62,6 +64,7 @@ void cambioConfiguracion(char* rutaConfig){
         config->tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP");
         log_info(alog, "[CONFIG] Cambió el valor de TIEMPO_DUMP");
     }
+    sem_post(&sConfig);
 
     config_destroy(configuracion);
 }

@@ -15,12 +15,14 @@
 #include "hiloClientes.h"
 #include <signal.h>
 #include "Funciones.h"
+#include <semaphore.h>
+#include "Semaforos.h"
 
 extern int controlador;
 extern int socketfs;
 extern t_log* alog;
 extern t_dictionary * clientes;
-extern structConfig * config;
+extern sem_t sClientes;
 extern int loop;
 
 void * hiloselect(){
@@ -31,7 +33,7 @@ void * hiloselect(){
 
 	log_info(alog, "Se creo el hilo servidor");
 
-	socketfs = makeListenSock(config->puerto, alog, &controlador);
+	socketfs = makeListenSock(getPuerto(), alog, &controlador);
 	if(socketfs < 0) pthread_exit(NULL);
 
 	log_info(alog, "Se creo el socket server");
@@ -60,10 +62,12 @@ void * hiloselect(){
 				log_info(alog, "Se creo el hilo del cliente");
 
 				char* socketN = string_itoa(nuevo_socket);
+				sem_wait(&sClientes);
 				dictionary_put(clientes, socketN, cliente);
+				sem_post(&sClientes);
 				free(socketN);
 
-				char * value = string_itoa(config->tam_value);
+				char * value = string_itoa(getValue());
 
 				enviarRespuesta(0,value, nuevo_socket, &controlador, sizeof(value));
 

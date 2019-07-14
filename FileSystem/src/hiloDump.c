@@ -11,6 +11,7 @@
 extern t_dictionary *memtable;
 extern int tBloques;
 extern int loop;
+extern sem_t sMemtable;
 
 void crearTemporal(char * key, st_tabla* data){
 	sem_wait(&data->semaforo);
@@ -52,7 +53,7 @@ void crearTemporal(char * key, st_tabla* data){
 	free(nombreArchivo);
 	list_destroy(bloques);
     sem_post(&data->semaforo);
-    eliminarDeMemtable(key);
+    free(dictionary_remove(memtable,key));
 }
 
 char* armarStrLista(char * strLista, structRegistro *registro){
@@ -80,7 +81,9 @@ void* hilodump(){
 	while(loop){
 		sleep(getDump());
 		//Hacer copia y ver si existe la tablas
+		sem_wait(&sMemtable);
 		dictionary_iterator(memtable,(void*)crearTemporal);
+		sem_post(&sMemtable);
 	}
 
 	pthread_exit(NULL);

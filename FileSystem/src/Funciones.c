@@ -44,7 +44,6 @@ extern sem_t sMemtable, sTablas, sClientes, sNombre, sBitmap, sConfig;
 
 void inicializar(){
 	config = malloc(sizeof(structConfig));
-	config->montaje = strdup("");
 	magic_number = strdup("");
 	config->puerto = strdup("");
 	nombre = queue_create();
@@ -64,16 +63,29 @@ void inicializar(){
 void archivoDeConfiguracion(char* argv)
 {
 	t_config *configuracion;
+	char * montaje = strdup("");
 	configuracion = config_create(argv);
 	string_append(&config->puerto, config_get_string_value(configuracion, "PUERTO_ESCUCHA​"));
-	string_append(&config->montaje, config_get_string_value(configuracion, "PUNTO_MONTAJE"));
+	string_append(&montaje, config_get_string_value(configuracion, "PUNTO_MONTAJE"));
 	config->retardo = config_get_int_value(configuracion, "RETARDO");
 	config->tam_value = config_get_int_value(configuracion, "TAMAÑO_VALUE");
 	config->tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP");
 
 	log_info(alog, "Lee el archivo de configuracion");
 
+	config->montaje = obtenerMontaje(montaje);
+
+	free(montaje);
 	config_destroy(configuracion);
+}
+
+char * obtenerMontaje(char * mont){
+	char * respuesta;
+	char ** split = string_split(mont,"\"");
+	respuesta = string_substring_until(split[0],string_length(split[0])-1);
+	string_iterate_lines(split, (void *) free);
+	free(split);
+	return respuesta;
 }
 
 int leer_metadata()

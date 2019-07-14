@@ -70,7 +70,7 @@ void liberarConfig(t_configuracionMemoria * config){
 
 int inicializar(char *pathConfig){
     int i;
-    file_log = crear_archivo_log("Memoria", false, "./logMemoria");
+    file_log = crear_archivo_log("Memoria", true, "./logMemoria");
     log_info(file_log, "cargando el archivo de configuracion");
     configMemoria = leerConfiguracion(pathConfig);
     if (!configMemoria) {
@@ -78,9 +78,9 @@ int inicializar(char *pathConfig){
         log_destroy(file_log);
         return -1;
     }
-    if(!buscarValueMaximo()){
-        return -1;
-    }
+//    if(!buscarValueMaximo()){
+//        return -1;
+//    }
     log_info(file_log, "Inicializar Memoria");
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;

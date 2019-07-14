@@ -11,6 +11,10 @@
 #include <semaphore.h>
 #include <funcionesCompartidas/log.h>
 #include <unistd.h>
+#include "load_config.h"
+#include "threadPoolMemoria.h"
+#include "requestMemoria.h"
+
 void * inicialPlanificador();
 void cargarNuevoScript(t_list * listInstrucciones);
 

@@ -12,12 +12,10 @@
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/listaMemoria.h>
 #include <pthread.h>
+#include <funcionesCompartidas/codigoMensajes.h>
+#include "utils.h"
+#include "threadPoolMemoria.h"
 
-enum TypeCriterio {
-    StrongConsistency = 1,
-    StrongHashConsistency = 2,
-    EventualConsistency = 3
-};
 typedef struct {
     st_memoria * memoria;
     bool activo;
@@ -27,6 +25,7 @@ typedef struct {
 } st_kernel_memoria;
 void *loadPoolMemori();
 void updateListaMemorias(st_data_memoria * nuevaLista);
-bool setTipoConsistencia(int number, enum TypeCriterio tipo);
+bool setTipoConsistencia(int number,TypeCriterio tipo);
+st_memoria *getMemoria(TypeCriterio tipo, char *text);
 
 #endif //KERNEL_THREADPOOLMEMORIA_H

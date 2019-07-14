@@ -12,6 +12,13 @@
 #include "load_config.h"
 #include <commons/collections/list.h>
 #include "threadPlanificador.h"
+#include "threadMetadata.h"
+#include "threadPoolMemoria.h"
+
+typedef struct {
+    int numero;
+    TypeCriterio tipo;
+} st_add_memoria;
 
 void consola();
 

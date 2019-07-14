@@ -123,27 +123,31 @@ int mandarDescribe(st_describe * describe, st_metadata ** buff){
 	return head2.codigo;
 }
 
-int mandarDescribeGlobal(t_list ** lista){
+int mandarDescribeGlobal(void ** paquete, size_t *size){
 	header head, head2;
 	message * mensaje;
 	int controlador;
-	char * buffer = strdup("");
 
 	head.letra = 'M';
 	head.codigo = DESCRIBEGLOBAL;
-	head.sizeData = sizeof(buffer);
+	head.sizeData = 0;
 
-	mensaje = createMessage(&head, buffer);
+	mensaje = createMessage(&head, NULL);
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
+	if(controlador != 0){
+        return -1;
+	}
 
-	free(buffer);
+	void * buffer = getMessage(fdFileSystem,&head2,&controlador);
+	if(controlador < 0){
+        return -1;
+	}
 
-	buffer = getMessage(fdFileSystem,&head2,&controlador);
-
-	if(head2.codigo == 13) *lista = deserealizarListaMetaData(buffer,head2.sizeData);
-
-	free(buffer);
+	if(head2.codigo == 13) {
+	    *paquete = buffer;
+	    *size = head2.sizeData;
+	}
 	return head2.codigo;
 }
 

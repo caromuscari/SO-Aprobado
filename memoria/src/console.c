@@ -147,24 +147,24 @@ void makeCommand(char *command){
     	  st_metadata * meta;
     	  t_list * lista;
     	  int respuesta;
-    	  if((describe = cargarDescribe(command))){
-    		  log_info(file_log, "[+] Ejecutando DESCRIBE\n");
-    		  respuesta = mandarDescribe(describe,&meta);
-
-    		  mostrarRespuesta(respuesta);
-    		  if(respuesta == 15){
-    			  mostrarTabla(meta);
-    		  }
-    		  destroyDescribe(describe);
-    	  }else{
-    		  respuesta = mandarDescribeGlobal(&lista);
-
-    		  mostrarRespuesta(respuesta);
-    		  if(respuesta == 13){
-    			  list_iterate(lista,(void*)mostrarTabla);
-    			  destroyListaMetaData(lista);
-    		  }
-    	  }
+//    	  if((describe = cargarDescribe(command))){
+//    		  log_info(file_log, "[+] Ejecutando DESCRIBE\n");
+//    		  respuesta = mandarDescribe(describe,&meta);
+//
+//    		  mostrarRespuesta(respuesta);
+//    		  if(respuesta == 15){
+//    			  mostrarTabla(meta);
+//    		  }
+//    		  destroyDescribe(describe);
+//    	  }else{
+//    		  respuesta = mandarDescribeGlobal(&lista);
+//
+//    		  mostrarRespuesta(respuesta);
+//    		  if(respuesta == 13){
+//    			  list_iterate(lista,(void*)mostrarTabla);
+//    			  destroyListaMetaData(lista);
+//    		  }
+//    	  }
   	 	break;
       case JOURNAL:
     	  log_info(file_log, "[+] El comando es un JOURNAL\n");

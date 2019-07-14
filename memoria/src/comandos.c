@@ -95,16 +95,16 @@ int comandoInsert(st_insert* comandoInsert){
 // COMANDO SELECT
 
 st_registro* comandoSelect(st_select* comandoSelect){
-	st_registro* registro = malloc(sizeof(st_registro));
-	registro->value = malloc(tamanioValue);
 	st_segmento* segmentoEncontrado;
+	st_registro* registro;
 	segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoSelect->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
 		log_info(file_log, "Segmento encontrado por comando Select");
 		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
 		if(paginaDeTablaEncontrada){
 			log_info(file_log, "Pagina encontrada por comando Select");
-
+			registro = malloc(sizeof(st_registro));
+			registro->value = malloc(tamanioValue);
 			st_marco* marco = list_get(listaDeMarcos, paginaDeTablaEncontrada->nroDePagina);
 			marco->timestamp = obtenerMilisegundosDeHoy();
 
@@ -213,9 +213,9 @@ int comandoDrop(st_drop* comandoDrop){
 }*/
 
 //COMANDO JOURNAL
-void* enviarSegmentoAFS(st_segmento* segmento){
+void enviarSegmentoAFS(st_segmento* segmento){
     bool huboError = false;
-    void* enviarPaginasAFS(st_tablaDePaginas * pagina){
+    void enviarPaginasAFS(st_tablaDePaginas * pagina){
         if(pagina->flagModificado) {
             st_marco *marco = list_get(listaDeMarcos, pagina->nroDePagina);
             st_insert *insert = malloc(sizeof(st_insert));

@@ -16,6 +16,7 @@
 #include <funcionesCompartidas/codigoMensajes.h>
 #include "gossiping.h"
 #include "socketCliente.h"
+#include "comandos.h"
 
 void * start_server();
 void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam);

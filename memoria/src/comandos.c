@@ -11,29 +11,30 @@ extern t_list* listaDeSegmentos;
 
 void inicializarMemoria(){
 	listaDeSegmentos = list_create();
-	log_info(file_log, "se creo la lista de segmentos");
+	log_info(file_log, "La lista de segmentos se creo correctamente\n");
 }
 
 //COMANDO INSERT
 
 int comandoInsert(st_insert* comandoInsert){
 	if(strlen(comandoInsert->value) > tamanioValue){
-		log_info(file_log, "El value es mayor al tamaño máximo.");
+		log_info(file_log, "El value es mayor al tamaño máximo\n");
 		return -1;
 	}
 	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoInsert->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
-		log_info(file_log, "Segmento encontrado por comando Insert");
+		log_info(file_log, "Segmento encontrado por comando Insert\n");
 		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoInsert->key);
 		if(paginaDeTablaEncontrada){
-			log_info(file_log, "Pagina encontrada");
+			log_info(file_log, "Pagina encontrada\n");
 			memcpy(paginaDeTablaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
 			memcpy(paginaDeTablaEncontrada->pagina, &comandoInsert->timestamp, sizeof(double));
 			paginaDeTablaEncontrada->flagModificado = 1;
 
+			log_info(file_log, "El Insert se realizo correctamente\n");
 			return 0;
 		}
-		log_info(file_log, "No se encontro la pagina con esa Key");
+		log_info(file_log, "No se encontro la pagina con esa Key\n");
 
 		int posMarcoLibre = buscarMarcoLibre();
 		if(posMarcoLibre == -1){
@@ -56,9 +57,10 @@ int comandoInsert(st_insert* comandoInsert){
 		st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 		marco->condicion = OCUPADO;
         mostrarPaginasCargadas();
+        log_info(file_log, "El Insert se realizo correctamente\n");
 		return 0;
 	}
-	log_info(file_log, "No se encontro el segmento de esa tabla");
+	log_info(file_log, "No se encontro el segmento de esa tabla\n");
 	//creo el segmento
 	st_segmento* segmentoNuevo= malloc(sizeof(st_segmento));
 
@@ -88,6 +90,7 @@ int comandoInsert(st_insert* comandoInsert){
 
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
+	log_info(file_log, "El Insert se realizo correctamente\n");
 	return 0;
 }
 
@@ -99,10 +102,10 @@ st_registro* comandoSelect(st_select* comandoSelect){
 	st_registro* registro;
 	segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoSelect->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
-		log_info(file_log, "Segmento encontrado por comando Select");
+		log_info(file_log, "Segmento encontrado por comando Select\n");
 		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
 		if(paginaDeTablaEncontrada){
-			log_info(file_log, "Pagina encontrada por comando Select");
+			log_info(file_log, "Pagina encontrada por comando Select\n");
 			registro = malloc(sizeof(st_registro));
 			registro->value = malloc(tamanioValue);
 			st_marco* marco = list_get(listaDeMarcos, paginaDeTablaEncontrada->nroDePagina);
@@ -114,7 +117,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 
 			return registro;
 		}
-		log_info(file_log, "No se encontro la pagina con esa Key");
+		log_info(file_log, "No se encontro la pagina con esa Key\n");
 
 		registro = obtenerSelect(comandoSelect);
 
@@ -143,7 +146,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
         mostrarPaginasCargadas();
 		return registro;
 	}
-	log_info(file_log, "No se encontro el segmento de esa tabla");
+	log_info(file_log, "No se encontro el segmento de la tabla pedida por Select\n");
 	registro = obtenerSelect(comandoSelect);
 
 	if(registro == NULL){
@@ -213,7 +216,7 @@ int comandoDrop(st_drop* comandoDrop){
 }*/
 
 //COMANDO JOURNAL
-void enviarSegmentoAFS(st_segmento* segmento){
+bool enviarSegmentoAFS(st_segmento* segmento){
     bool huboError = false;
     void enviarPaginasAFS(st_tablaDePaginas * pagina){
         if(pagina->flagModificado) {
@@ -232,7 +235,7 @@ void enviarSegmentoAFS(st_segmento* segmento){
                 marco->condicion = LIBRE;
                 free(pagina);
             }else{
-             log_error(file_log, string_from_format("El Filesystem rechazó el registro \nTabla:%s | Key:%d | Value:%s", insert->nameTable, insert->key, insert->value));
+             log_error(file_log, string_from_format("El Filesystem rechazó el registro \nTabla:%s | Key:%d | Value:%s\n", insert->nameTable, insert->key, insert->value));
              huboError = true;
             }
         }
@@ -243,14 +246,30 @@ void enviarSegmentoAFS(st_segmento* segmento){
         list_destroy(segmento->tablaDePaginas);
         free(segmento->nombreTabla);
         free(segmento);
+        return true;
+    } else {
+    	log_info(file_log, "No se pudieron borrar todas las paginas\n");
+    	return false;
     }
 }
 
 int comandoJournal(){
     //RECORRO TODA LA MEMORIA Y HAGO LOS INSERT CORRESPONDIENTES COMO REQUEST AL FILE
-    list_iterate(listaDeSegmentos, (void*)enviarSegmentoAFS);
-    log_info(file_log, "Terminó el JOURNAL");
-    list_clean(listaDeSegmentos);
-    return 1;
+	log_info(file_log, "Ejecutando Journal\n");
+	bool resultado = true;
+	st_segmento * segmento;
+	for (int i = 0; i < list_size(listaDeSegmentos); i++){
+    	segmento = list_get(listaDeSegmentos, i);
+    	if(!enviarSegmentoAFS(segmento)){
+    		resultado = false;
+    	} else {
+    		list_remove(listaDeSegmentos, i);
+    	}
+    }
+    log_info(file_log, "Termino el Journal\n");
+    if(resultado){
+    	return 0;
+    }
+    return -1;
 }
 

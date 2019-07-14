@@ -14,4 +14,5 @@
 
 void * schedulerMetadata();
 TypeCriterio getCriterioByNameTabla(char *nameTable);
+void removeTablaByName(char * nameTable);
 #endif //KERNEL_THREADMETADATA_H

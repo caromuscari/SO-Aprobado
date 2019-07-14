@@ -51,60 +51,57 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
 }
 
 int atenderResultadoSelect(st_messageResponse *mensaje) {
-    if(mensaje == NULL){
+    if (mensaje == NULL) {
         return -1;
     }
-    if(mensaje->cabezera.codigo == 2){
+    if (mensaje->cabezera.codigo == 2) {
         printf("no se pudo encontra ese select\n");
         return -1;
-    }else{
-        st_registro * registro = deserealizarRegistro(mensaje->buffer);
+    } else {
+        st_registro *registro = deserealizarRegistro(mensaje->buffer);
         printf("resultado de consulta\n------------");
-        printf("key [%d]\n",registro->key),
-        printf("value [%s]\n",registro->value);
+        printf("key [%d]\n", registro->key),
+                printf("value [%s]\n", registro->value);
     }
     destroyStMessageResponse(mensaje);
     return 0;
 }
 
-int atenderResultadoInsert(st_messageResponse *mensaje, st_memoria * datoMemoria, stinstruccion *laInstruccion) {
-    if(mensaje == NULL){
+int atenderResultadoInsert(st_messageResponse *mensaje, st_memoria *datoMemoria, stinstruccion *laInstruccion) {
+    if (mensaje == NULL) {
         return -1;
     }
-    if(mensaje->cabezera.codigo == 3){
+    if (mensaje->cabezera.codigo == 3) {
         log_info(file_log, "Memoria Full se hace journal");
         printf("Realizar journal\n");
-        st_messageResponse * journalResponse = consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, JOURNAL, NULL, 0);
-        if(journalResponse->cabezera.codigo == 1){
+        st_messageResponse *journalResponse = consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, JOURNAL, NULL, 0);
+        if (journalResponse->cabezera.codigo == 1) {
             log_info(file_log, "se relizo coreactamente el journal");
-            return enviarRequestMemoria(laInstruccion,datoMemoria);
-        }else{
+            return enviarRequestMemoria(laInstruccion, datoMemoria);
+        } else {
             log_error(file_log, "no se pudo realizar el journal");
             return -1;
         }
     }
-    if(mensaje->cabezera.codigo == 2){
+    if (mensaje->cabezera.codigo == 2) {
         printf("no se puedo relizar el insert\n");
         return -1;
-    }else{
+    } else {
         printf("se relizo el insert todo ok\n");
     }
     destroyStMessageResponse(mensaje);
     return 0;
 }
 
-int atenderResultadoSDrop (st_messageResponse *mensaje) {
-    if(mensaje == NULL){
+int atenderResultadoSDrop(st_messageResponse *mensaje, char *nameTable) {
+    if (mensaje == NULL) {
         return -1;
     }
-    if(mensaje->cabezera.codigo == 2){
+    if (mensaje->cabezera.codigo == 2) {
         printf("no se pudo encontra ese select\n");
         return -1;
-    }else{
-        st_registro * registro = deserealizarRegistro(mensaje->buffer);
-        printf("resultado de consulta\n------------");
-        printf("key [%d]\n",registro->key),
-                printf("value [%s]\n",registro->value);
+    } else {
+        removeTablaByName(nameTable);
     }
     destroyStMessageResponse(mensaje);
     return 0;
@@ -122,18 +119,20 @@ int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria) 
                             datoMemoria->ip, datoMemoria->puerto, SELECT, buffer, size_buffer));
             break;
         }
-        case INSERT:{
+        case INSERT: {
             buffer = serealizarInsert(laInstruccion->instruccion, &size_buffer);
             resultado = atenderResultadoInsert(
                     consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer),
                     datoMemoria,
                     laInstruccion
-                    );
+            );
         }
-        case DROP:{
+        case DROP: {
             buffer = serealizarDrop(laInstruccion->instruccion, &size_buffer);
             resultado = atenderResultadoSDrop(
-                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer));
+                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer),
+                    ((st_drop *) laInstruccion->instruccion)->nameTable
+            );
 
         }
         default: {

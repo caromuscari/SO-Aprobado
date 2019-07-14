@@ -19,11 +19,32 @@ TypeCriterio getCriterioByNameTabla(char *nameTable) {
     }
     result = list_find(listMetadata, (void *) search_tabla);
     pthread_mutex_unlock(&mutex);
-    if(result){
+    if (result) {
         return getTipoCriterioByString(result->consistency);
-    }else{
+    } else {
         return -1;
     }
+}
+
+int buscarNameTable(char *nameTable) {
+    int i;
+    st_metadata *metadata;
+    for (i = 0; i < listMetadata->elements_count; ++i) {
+        metadata = list_get(listMetadata, i);
+        if (strcmp(metadata->nameTable, nameTable) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void removeTablaByName(char * nameTable){
+    int pos = buscarNameTable(nameTable);
+    st_metadata * metadata;
+    pthread_mutex_lock(&mutex);
+    metadata = list_remove(listMetadata,pos);
+    pthread_mutex_unlock(&mutex);
+    destroyMetaData(metadata);
 }
 
 void updateListaMetadata(t_list *nuevaLista) {
@@ -64,7 +85,7 @@ void *schedulerMetadata() {
         if (control == 0) {
             buffer = getMessage(socketClient, &response, &control);
             if (control >= 0) {
-                if(response.codigo == 13){
+                if (response.codigo == 13) {
                     updateListaMetadata(deserealizarListaMetaData(buffer, response.sizeData));
                 }
                 free(buffer);

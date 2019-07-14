@@ -10,6 +10,7 @@
 #include "load_config.h"
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/registroTabla.h>
+#include "threadMetadata.h"
 
 int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria);
 #endif //KERNEL_REQUESTMEMORIA_H

@@ -6,72 +6,6 @@
 
 extern t_log *file_log;
 
-st_insert *cargarInsert2(char *comando) {
-    char *hayString;
-    st_insert *insert = malloc(sizeof(st_insert));
-    insert->operacion = INSERT;
-    char **listSplit = string_split(comando, "\"");
-    char **listSplit2;
-    if (listSplit[1] == NULL) {
-        string_iterate_lines(listSplit, (void *) free);
-        free(listSplit);
-
-        free(insert);
-        return NULL;
-    }
-    insert->value = strdup(listSplit[1]);
-    if (listSplit[2]) {
-        insert->timestamp = strtol(listSplit[2], &hayString, 10);
-        if (!string_is_empty(hayString)) {
-            string_iterate_lines(listSplit, (void *) free);
-            free(listSplit);
-
-            free(insert);
-            return NULL;
-        }
-    } else {
-        insert->timestamp = obtenerMilisegundosDeHoy();
-    }
-
-    listSplit2 = string_split(listSplit[0], " ");
-    if (listSplit2[1] == NULL) {
-        string_iterate_lines(listSplit, (void *) free);
-        free(listSplit);
-
-        free(insert);
-        return NULL;
-    }
-
-    insert->nameTable = strdup(listSplit2[1]);
-    if (listSplit2[2] == NULL) {
-        string_iterate_lines(listSplit, (void *) free);
-        free(listSplit);
-
-        string_iterate_lines(listSplit2, (void *) free);
-        free(listSplit2);
-
-        free(insert);
-        return NULL;
-    }
-    insert->key = strtol(listSplit2[2], &hayString, 10);
-    if (!string_is_empty(hayString)) {
-        string_iterate_lines(listSplit, (void *) free);
-        free(listSplit);
-
-        string_iterate_lines(listSplit2, (void *) free);
-        free(listSplit2);
-        free(insert);
-        return NULL;
-    }
-
-    string_iterate_lines(listSplit, (void *) free);
-    free(listSplit);
-
-    string_iterate_lines(listSplit2, (void *) free);
-    free(listSplit2);
-    return insert;
-}
-
 void makeCommand(char *command){
   int typeCommand = getEnumFromString(command);
 
@@ -80,7 +14,7 @@ void makeCommand(char *command){
   		  log_info(file_log, "Ejecutando un insert");
   		  st_insert * insert;
   		  int codigoInsert = 0;
-  		  if((insert = cargarInsert2(command))){
+  		  if((insert = cargarInsert(command))){
               if((codigoInsert = comandoInsert(insert)) == -1){
                   printf("no se pudo hacer el insert\n");
                   log_error(file_log, "no se pudo hacer el insert");
@@ -227,8 +161,8 @@ void mostrarRespuesta(int respuesta){
 			printf("No se pudo crear la tabla\n");
 			break;
 		case 12:
-			log_error(file_log, "No se pudo realizar la request");
-			printf("No se pudo realizar la request\n");
+			log_error(file_log, "No se encontro la tabla");
+			printf("No se encontro la tabla\n");
 			break;
 		case 13:
 			log_info(file_log, "Describe de tablas encontradas");

@@ -36,53 +36,48 @@ void * atenderMensaje(int * fdClient){
     void * buffer = NULL;
     void * paqueteDeRespuesta = getMessage(*fdClient,&request,&control);
     if (control < 0) {
-        log_error(file_log, "error al obtener el mensaje");
+        log_error(file_log, "Error al obtener el mensaje\n");
         close(*fdClient);
         pthread_exit(NULL);
     }
     switch (request.codigo) {
     	case INSERT: {
     		st_insert *insert = desserealizarInsert(paqueteDeRespuesta);
-    		printf("[+] We got an INSERT\n");
-    		printf("[+] Table [%s]\n", insert->nameTable);
-    		printf("[+] Key [%d]\n", insert->key);
-    		printf("[+] Value [%s]\n", insert->value);
-    		printf("[+] TimeStamp [%f]\n", insert->timestamp);
+    		printf("El comando es un Insert\n");
+    		printf("Table [%s]\n", insert->nameTable);
+    		printf("Key [%d]\n", insert->key);
+    		printf("Value [%s]\n", insert->value);
 
-    		// HACE LA FUNCION INSERT
-
-    		//request.letra = 'M';
-    		//request.codigo = 1;
-    		//request.sizeData = 0;
-    		//buffer = createMessage(&request, "");
-    		//enviar_message(socketClient, bufferMensaje, file_log, &control);
-
-    		// DEVOLVER REGISTRO
-
+    		int resultado = comandoInsert(insert);
+    		if(resultado == -1){
+    			enviarRespuesta(2, NULL, *fdClient, &control, 0);
+    		}
+    		if(resultado == -2){
+    			//memoria full
+    			enviarRespuesta(3, NULL, *fdClient, &control, 0);
+    		}else {
+    			enviarRespuesta(1, NULL, *fdClient, &control, 0);
+    		}
     		destroyInsert(insert);
     		break;
     	}
         case SELECT: {
             st_select * select = deserealizarSelect(paqueteDeRespuesta);
-            printf("[+] We got a SELECT\n");
-            printf("[+] Table [%s]\n", select->nameTable);
-            printf("[+] Key [%d]\n", select->key);
-
-            // IDEM INSERT
-
-            //request.letra = 'M';
-            //request.codigo = 1;
-            //request.sizeData = 0;
-            //bufferMensaje = createMessage(&request, "");
-            //enviar_message(socketClient, bufferMensaje, file_log, &control);
-
+            printf("El comando es un Insert\n");
+            st_registro* registro = comandoSelect(select);
+            if(registro){
+            	buffer = serealizarRegistro(registro, &sizePaqueteRes);
+            	enviarRespuesta(1, buffer, *fdClient, &control, sizePaqueteRes);
+            } else {
+            	 enviarRespuesta(2, NULL, *fdClient, &control, 0);
+            }
             destoySelect(select);
             break;
         }
     	case CREATE:{
             st_create * create = deserealizarCreate(paqueteDeRespuesta);
             int respuesta;
-            printf("We got a CREATE\n");
+            printf("El comando es un Create\n");
 
             respuesta = mandarCreate(create);
 
@@ -98,17 +93,14 @@ void * atenderMensaje(int * fdClient){
     	case DROP:{
             st_drop * drop = deserealizarDrop(paqueteDeRespuesta);
             int respuesta;
-            printf("We got a DROP");
+            printf("El comando es un Drop\n");
 
             respuesta = mandarDrop(drop);
 
-            buffer = strdup("");
-
-            if(respuesta == 9) enviarRespuesta(7, buffer, *fdClient, &control, sizeof(buffer));
-            else enviarRespuesta(8, buffer, *fdClient, &control, sizeof(buffer));
+            if(respuesta == 9) enviarRespuesta(1, NULL, *fdClient, &control, 0);
+            else enviarRespuesta(2, NULL, *fdClient, &control, 0);
 
             destroyDrop(drop);
-            free(buffer);
             break;
     	}
     	case DESCRIBE:{
@@ -116,7 +108,7 @@ void * atenderMensaje(int * fdClient){
     		st_metadata * meta;
     		size_t size;
             st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
-            printf("We got a DESCRIBE");
+            printf("El comando es un Describe \n");
 
             respuesta = mandarDescribe(describe,&meta);
 
@@ -137,20 +129,20 @@ void * atenderMensaje(int * fdClient){
     	case DESCRIBEGLOBAL:{
     		int respuesta;
     		size_t size = 0;
-    		printf("We got a DESCRIBE Global");
+    		printf("El comando es un Describe Global\n");
     		//mock
-//            t_list *listametadata = list_create();
- //           cargarLista(listametadata);
-   //         buffer = serealizarListaMetaData(listametadata, &size);
-     //       enviarRespuesta(13, buffer, *fdClient, &control,size);
-
-    		respuesta = mandarDescribeGlobal(&buffer,&size);
+            t_list *listametadata = list_create();
+            cargarLista(listametadata);
+            buffer = serealizarListaMetaData(listametadata, &size);
+            enviarRespuesta(13, buffer, *fdClient, &control,size);
+            //
+    		//respuesta = mandarDescribeGlobal(&buffer,&size);
     		//Cambiar Numeros
-    		if(respuesta == 13){
-    			enviarRespuesta(13, buffer, *fdClient, &control,size);
-    		}else{
-    			enviarRespuesta(20, NULL, *fdClient, &control,size);
-    		}
+//    		if(respuesta == 13){
+//    			enviarRespuesta(13, buffer, *fdClient, &control,size);
+//    		}else{
+//    			enviarRespuesta(20, NULL, *fdClient, &control,size);
+//    		}
     		if(buffer) free(buffer);
     		break;
     	}
@@ -159,8 +151,16 @@ void * atenderMensaje(int * fdClient){
             enviarRespuesta(DEVOLVERTABLAGOSSIPING,paqueteLista,*fdClient,&control,sizePaqueteRes);
             break;
         }
-    	case JOURNAL:
+    	case JOURNAL:{
+    		printf("Realizando Journal");
+    		int respuesta = comandoJournal();
+    		if(respuesta == -1){
+    			enviarRespuesta(2, NULL, *fdClient, &control, 0);
+    		} else {
+    			enviarRespuesta(1, NULL, *fdClient, &control, 0);
+    		}
     		break;
+    	}
     }
 
     free(paqueteDeRespuesta);
@@ -171,13 +171,16 @@ void * atenderMensaje(int * fdClient){
 void * start_server() {
 	int control = 0;
 	int socketServer = makeListenSock(configMemoria->PUERTO, file_log, &control);
+	if(control != 0){
+		pthread_exit(NULL);
+	}
 	int  * fdClient;
     pthread_t nuevoCliente;
 	while (true){
         fdClient = malloc(sizeof(int));
         *fdClient = aceptar_conexion(socketServer, file_log, &control);
         if (control != 0) {
-            log_error(file_log, "no se puede aceptar la conexion");
+            log_error(file_log, "No se puede aceptar la conexion");
             continue;
         }
         pthread_create(&nuevoCliente,NULL,(void *)atenderMensaje,fdClient);
@@ -197,7 +200,7 @@ void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_
 
 	enviar_message(socketC, mensaje, file_log, status);
 	if(*status != 0){
-	    log_error(file_log,"no se puedo enviar una respuesta al kernel");
+	    log_error(file_log,"No se pudo enviar una respuesta al kernel");
 	}
 
 	free(head);

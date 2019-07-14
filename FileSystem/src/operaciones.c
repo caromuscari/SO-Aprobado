@@ -162,8 +162,8 @@ int crearParticiones(st_create * c, char * path){
 void eliminarTemporales(char * path){
 	FILE * archivo;
 	structParticion * contenido;
-	int i = 1;
-	char * temp = string_from_format("%s/%d.tmp",path,i);
+	int i = 0, j=1;
+	char * temp = string_from_format("%s/%d.tmpc",path,j);
 
 	archivo = fopen(temp, "r");
 
@@ -186,8 +186,9 @@ void eliminarTemporales(char * path){
 		free(contenido);
 
 
-		i++;
-		temp = string_from_format("%s/%d.tmp",path,i);
+		j++;
+		i=0;
+		temp = string_from_format("%s/%d.tmpc",path,j);
 		archivo = fopen(temp, "r");
 	}
 
@@ -427,7 +428,7 @@ t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio_size){
 
     if(valido){
         list_iterate(bits, (void*) seteoBit);
-        char* strBloques = list_fold(bits, string_new(), (void*)armarStrBloques);
+        char* strBloques = list_fold(bits, strdup(""), (void*)armarStrBloques);
         contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", tamanio_size, strBloques);
 
         archivo = fopen(pathCompleto, "a+");

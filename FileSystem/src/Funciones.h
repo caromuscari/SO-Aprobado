@@ -27,6 +27,7 @@ int leer_metadata();
 int abrir_bitmap();
 void finalizar();
 void liberarTablas(st_tablaCompac * tabla);
+char * obtenerMontaje(char * mont);
 
 
 #endif /* FILE_SYSTEM_SRC_FUNCIONES_H_ */

@@ -19,12 +19,16 @@ enum OPERACION {
     DESCRIBE = 5,
 	DESCRIBEGLOBAL = 6,
 	EXIT = 7,
-	JOURNAL = 8
+	JOURNAL = 8,
+    RUN = 9,
+    ADD = 10
 };
 
 typedef struct {
     enum OPERACION operacion;
     void *instruccion;
+    int criteio;
+    char * tag;
 } stinstruccion;
 
 typedef struct {

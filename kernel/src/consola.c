@@ -6,10 +6,66 @@
 extern t_log *file_log;
 extern config *configuracion;
 
-void crearListInstrucciones(void *instruccion, enum OPERACION type) {
+st_add_memoria *cargarAddMemoria(char *text) {
+    st_add_memoria *addMemoria = malloc(sizeof(st_add_memoria));
+    bool flagErro = false;
+    char **split = string_split(text, " ");
+    if (split[2]) {
+        addMemoria->numero = atoi(split[2]);
+    } else {
+        flagErro = true;
+    }
+    if (split[4]) {
+        addMemoria->tipo = getTipoCriterioByString(split[4]);
+        if (addMemoria->tipo == NoDefinido) {
+            flagErro = true;
+        }
+    } else {
+        flagErro = true;
+    }
+    string_iterate_lines(split, (void *) free);
+    free(split);
+    if (flagErro) {
+        free(addMemoria);
+        return NULL;
+    }
+    return addMemoria;
+}
+
+char *getText(TypeCriterio tipo, void *st_intrucion, enum OPERACION type) {
+    switch (tipo) {
+        case StrongConsistency: {
+            if (type == INSERT) {
+                return strdup(((st_insert *) st_intrucion)->nameTable);
+            } else {
+                return strdup(((st_select *) st_intrucion)->nameTable);
+            }
+        }
+        case StrongHashConsistency: {
+            if (type == INSERT) {
+                char * hashM = strdup(((st_insert *) st_intrucion)->nameTable);
+                char *keyString = string_itoa(((st_insert *) st_intrucion)->key);
+                string_append(&hashM,keyString);
+                return hashM;
+            } else {
+                char * hashM = strdup(((st_select *) st_intrucion)->nameTable);
+                char *keyString = string_itoa(((st_select *) st_intrucion)->key);
+                string_append(&hashM,keyString);
+                return hashM;
+            }
+        }
+        default: {
+            return NULL;
+        }
+    }
+}
+
+void crearListInstrucciones(void *instruccion, enum OPERACION type, TypeCriterio criterio) {
     stinstruccion *newInstruccion = malloc(sizeof(stinstruccion));
     newInstruccion->operacion = type;
     newInstruccion->instruccion = instruccion;
+    newInstruccion->criteio = criterio;
+    newInstruccion->tag = getText(criterio, instruccion, type);
     t_list *listInstrucciones = list_create();
     list_add(listInstrucciones, newInstruccion);
     cargarNuevoScript(listInstrucciones);
@@ -18,14 +74,20 @@ void crearListInstrucciones(void *instruccion, enum OPERACION type) {
 void armarComando(char *comando) {
     bool flagErrorSintaxis = false;
     int typeComando = getEnumFromString(comando);
+    TypeCriterio criterio = -1;
     switch (typeComando) {
         case INSERT: {
             st_insert *insert;
             flagErrorSintaxis = true;
             if ((insert = cargarInsert(comando))) {
-                crearListInstrucciones(insert, INSERT);
-                log_info(file_log, "EJECUTANDO COMANDO INSERT");
                 flagErrorSintaxis = false;
+                if ((criterio = getCriterioByNameTabla(insert->nameTable)) != -1) {
+                    crearListInstrucciones(insert, INSERT, criterio);
+                    log_info(file_log, "EJECUTANDO COMANDO INSERT");
+                } else {
+                    log_error(file_log, "Tabla no encontrada");
+                    destroyInsert(insert);
+                }
             }
             break;
         }
@@ -33,9 +95,14 @@ void armarComando(char *comando) {
             st_select *_select;
             flagErrorSintaxis = true;
             if ((_select = cargarSelect(comando))) {
-                crearListInstrucciones(_select, SELECT);
                 flagErrorSintaxis = false;
-                log_info(file_log, "EJECUTANDO COMANDO INSERT");
+                if ((criterio = getCriterioByNameTabla(_select->nameTable)) != -1) {
+                    crearListInstrucciones(_select, SELECT, criterio);
+                    log_info(file_log, "Ejecutando comando");
+                } else {
+                    log_error(file_log, "Tabla no encontrada");
+                    destoySelect(_select);
+                }
             }
             break;
         }
@@ -43,9 +110,14 @@ void armarComando(char *comando) {
             st_drop *_drop;
             flagErrorSintaxis = true;
             if ((_drop = cargarDrop(comando))) {
-                crearListInstrucciones(_drop, DROP);
                 flagErrorSintaxis = false;
-                log_info(file_log, "EJECUTANDO COMANDO SELECT");
+                if (getCriterioByNameTabla(_drop->nameTable) != -1) {
+                    crearListInstrucciones(_drop, DROP, NoDefinido);
+                    log_info(file_log, "EJECUTANDO COMANDO SELECT");
+                } else {
+                    log_error(file_log, "Tabla no encontrada");
+                    destroyDrop(_drop);
+                }
             }
             break;
         }
@@ -53,9 +125,21 @@ void armarComando(char *comando) {
             st_create *_create;
             flagErrorSintaxis = true;
             if ((_create = cargarCreate(comando))) {
-                crearListInstrucciones(_create, CREATE);
+                crearListInstrucciones(_create, CREATE, NoDefinido);
                 flagErrorSintaxis = false;
                 log_info(file_log, "EJECUTANDO COMANDO SELECT");
+            }
+            break;
+        }
+        case ADD: {
+            st_add_memoria *memoria = cargarAddMemoria(comando);
+            if (memoria) {
+                if (setTipoConsistencia(memoria->numero, memoria->tipo)) {
+                    printf("se asigno correctamente el criterio\n");
+                }
+                free(memoria);
+            } else {
+                printf("revisar los parametros\n");
             }
             break;
         }
@@ -73,9 +157,12 @@ void consola() {
     char *comando;
     comando = readline(">");
     printf("Ingrese comando LQL\n");
+    string_trim(&comando);
     while (strcmp(comando, "exit") != 0) {
         armarComando(comando);
         free(comando);
         comando = readline(">");
+        string_trim(&comando);
     }
+    free(comando);
 }

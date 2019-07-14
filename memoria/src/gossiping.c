@@ -70,15 +70,16 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
         header request;
         request.letra = 'M';
         request.codigo = BUSCARTABLAGOSSIPING;
-        request.sizeData = 1;
-        void *paquete = createMessage(&request, " ");
-        if (enviar_message(fdClient, paquete, file_log, &control) < 0) {
+        request.sizeData = 0;
+        void *paquete = createMessage(&request,NULL);
+        enviar_message(fdClient, paquete, file_log, &control);
+        if (control != 0) {
             return;
         } else {
             control = 0;
             header response;
             paquete = getMessage(fdClient, &response, &control);
-            if (paquete == NULL) {
+            if (control < 0) {
                 return;
             } else {
                 dataMemoria = deserealizarMemoria(paquete, response.sizeData);
@@ -166,8 +167,6 @@ void *pthreadGossping() {
             memoria = list_get(seedFallidas,i);
             removeMemoriaFallida(memoria);
         }
-        //printf("------Memoria [%d]-------\n", configMemoria->NRO_MEMORIA);
-        //showMiguel(listaTablas);
         sleep(60);
     }
 }

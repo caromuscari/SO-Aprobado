@@ -7,6 +7,7 @@
 t_list * listProcesos;
 sem_t colaDeListos;
 extern t_log * file_log;
+extern config *configuracion;
 
 void showAllProceso(){
     int i,j;
@@ -20,15 +21,31 @@ void showAllProceso(){
     }
 }
 
+t_list * tomarInstrucciones(t_list * proceso){
+    if(proceso->elements_count > configuracion->QUANTUM){
+        return list_take_and_remove(proceso,configuracion->QUANTUM);
+    }else{
+        return list_take_and_remove(proceso,proceso->elements_count);
+    }
+}
+
 void atenderRequest(){
+    int i;
+    stinstruccion * instruccionScript;
+    st_memoria * datomemoria;
     while (1){
         sem_wait(&colaDeListos);
         log_info(file_log,"atendiendo nuevo proceso");
         //optener el proceso y sacarlo de la lista
         t_list * proceso = list_remove(listProcesos,0);
-        //remover las 4 primeras intrucciones
-        t_list * instrucciones = list_take_and_remove(proceso,3);
-        //ejecutar esas 4 instrucciones
+        //tomamos y removemos las instruciones del proceso
+        t_list * instrucciones = tomarInstrucciones(proceso);
+        //ejecutamos esas instruciones tomadas
+        for (i = 0; i < instrucciones->elements_count; ++i) {
+            instruccionScript = list_get(instrucciones,i);
+            datomemoria = getMemoria(instruccionScript->criteio, instruccionScript->tag);
+            enviarRequestMemoria(instruccionScript,datomemoria);
+        }
         sleep(6);
         //validar resultado de las 4 instruciones
 

@@ -7,14 +7,35 @@ extern t_configuracionMemoria * configMemoria;
 #include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/list.h>
 
+void cargarLista(t_list *listaMetaData) {
+    st_metadata *metadata = malloc(sizeof(st_metadata));
+    metadata->nameTable = strdup("TABLA_A");
+    metadata->consistency = strdup("SC");
+    metadata->partitions = 4;
+    metadata->compaction_time = 5000;
+    list_add(listaMetaData, metadata);
+    metadata = malloc(sizeof(st_metadata));
+    metadata->nameTable = strdup("TABLA_B");
+    metadata->consistency = strdup("EC");
+    metadata->partitions = 3;
+    metadata->compaction_time = 6000;
+    list_add(listaMetaData, metadata);
+    metadata = malloc(sizeof(st_metadata));
+    metadata->nameTable = strdup("TABLA_C");
+    metadata->consistency = strdup("SHC");
+    metadata->partitions = 5;
+    metadata->compaction_time = 10000;
+    list_add(listaMetaData, metadata);
+}
+
 void * atenderMensaje(int * fdClient){
     int control = 0;
     header request;
     header response;
     size_t sizePaqueteRes = 0;
-    char * buffer;
+    void * buffer = NULL;
     void * paqueteDeRespuesta = getMessage(*fdClient,&request,&control);
-    if (control != 0) {
+    if (control < 0) {
         log_error(file_log, "error al obtener el mensaje");
         close(*fdClient);
         pthread_exit(NULL);
@@ -115,35 +136,27 @@ void * atenderMensaje(int * fdClient){
     	}
     	case DESCRIBEGLOBAL:{
     		int respuesta;
-    		t_list * metas;
-    		size_t size;
-    		char * buffer;
+    		size_t size = 0;
     		printf("We got a DESCRIBE Global");
-
-    		respuesta = mandarDescribeGlobal(&metas);
-
+    		//mock
+            t_list *listametadata = list_create();
+            cargarLista(listametadata);
+            buffer = serealizarListaMetaData(listametadata, &size);
+            enviarRespuesta(13, buffer, *fdClient, &control,size);
+            //
+    		//respuesta = mandarDescribeGlobal(&buffer,&size);
     		//Cambiar Numeros
-    		if(respuesta == 13){
-    			buffer = serealizarListaMetaData(metas,&size);
-    			enviarRespuesta(13, buffer, *fdClient, &control,size);
-    			destroyListaMetaData(metas);
-    		}else{
-    			buffer = strdup("");
-    			enviarRespuesta(13, buffer, *fdClient, &control,sizeof(buffer));
-    		}
-
-    		free(buffer);
+//    		if(respuesta == 13){
+//    			enviarRespuesta(13, buffer, *fdClient, &control,size);
+//    		}else{
+//    			enviarRespuesta(20, NULL, *fdClient, &control,size);
+//    		}
+    		if(buffer) free(buffer);
     		break;
     	}
         case BUSCARTABLAGOSSIPING: {
             void *paqueteLista = devolverListaMemoria(&sizePaqueteRes);
-            response.codigo = DEVOLVERTABLAGOSSIPING;
-            response.letra = 'M';
-            response.sizeData = sizePaqueteRes;
-            void *paqueteRespuesta = createMessage(&response, paqueteLista);
-            if (enviar_message(*fdClient, paqueteRespuesta, file_log, &control) < 0) {
-                log_error(file_log, "no se pudo enviar la respuesta solicitada");
-            }
+            enviarRespuesta(DEVOLVERTABLAGOSSIPING,paqueteLista,*fdClient,&control,sizePaqueteRes);
             break;
         }
     	case JOURNAL:
@@ -183,6 +196,9 @@ void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_
 	message * mensaje = createMessage(head, buffer);
 
 	enviar_message(socketC, mensaje, file_log, status);
+	if(*status != 0){
+	    log_error(file_log,"no se puedo enviar una respuesta al kernel");
+	}
 
 	free(head);
 	free(mensaje->buffer);

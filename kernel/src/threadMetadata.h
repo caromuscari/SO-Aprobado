@@ -10,7 +10,8 @@
 #include <funcionesCompartidas/listaMetadata.h>
 #include <funcionesCompartidas/log.h>
 #include "load_config.h"
+#include "utils.h"
 
 void * schedulerMetadata();
-char *getTabla(char *nameTable);
+TypeCriterio getCriterioByNameTabla(char *nameTable);
 #endif //KERNEL_THREADMETADATA_H

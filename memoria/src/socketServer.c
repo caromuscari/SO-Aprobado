@@ -139,18 +139,18 @@ void * atenderMensaje(int * fdClient){
     		size_t size = 0;
     		printf("We got a DESCRIBE Global");
     		//mock
-            t_list *listametadata = list_create();
-            cargarLista(listametadata);
-            buffer = serealizarListaMetaData(listametadata, &size);
-            enviarRespuesta(13, buffer, *fdClient, &control,size);
-            //
-    		//respuesta = mandarDescribeGlobal(&buffer,&size);
+//            t_list *listametadata = list_create();
+ //           cargarLista(listametadata);
+   //         buffer = serealizarListaMetaData(listametadata, &size);
+     //       enviarRespuesta(13, buffer, *fdClient, &control,size);
+
+    		respuesta = mandarDescribeGlobal(&buffer,&size);
     		//Cambiar Numeros
-//    		if(respuesta == 13){
-//    			enviarRespuesta(13, buffer, *fdClient, &control,size);
-//    		}else{
-//    			enviarRespuesta(20, NULL, *fdClient, &control,size);
-//    		}
+    		if(respuesta == 13){
+    			enviarRespuesta(13, buffer, *fdClient, &control,size);
+    		}else{
+    			enviarRespuesta(20, NULL, *fdClient, &control,size);
+    		}
     		if(buffer) free(buffer);
     		break;
     	}

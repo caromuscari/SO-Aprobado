@@ -26,6 +26,7 @@ typedef struct{
 	int nroDePagina;
 	void* pagina;
 	int flagModificado;
+	int desplazamiento;
 }st_tablaDePaginas;
 
 typedef enum{

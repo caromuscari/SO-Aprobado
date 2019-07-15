@@ -126,6 +126,7 @@ int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria) 
                     datoMemoria,
                     laInstruccion
             );
+            break;
         }
         case DROP: {
             buffer = serealizarDrop(laInstruccion->instruccion, &size_buffer);
@@ -133,6 +134,7 @@ int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria) 
                     consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer),
                     ((st_drop *) laInstruccion->instruccion)->nameTable
             );
+            break;
 
         }
         default: {

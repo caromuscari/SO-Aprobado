@@ -33,7 +33,6 @@ st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 	return (st_segmento*)list_find(listaDeSegmentos, (void*)mismoNombreTabla);
 }
 
-
 st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 	bool paginaConEsaKey(st_tablaDePaginas * tablaPagina){
 		uint16_t keyAComparar;

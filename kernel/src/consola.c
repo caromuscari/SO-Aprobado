@@ -98,7 +98,7 @@ void armarComando(char *comando) {
                 flagErrorSintaxis = false;
                 if ((criterio = getCriterioByNameTabla(_select->nameTable)) != -1) {
                     crearListInstrucciones(_select, SELECT, criterio);
-                    log_info(file_log, "Ejecutando comando");
+                    log_info(file_log, "Ejecutando comando SELECT");
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destoySelect(_select);
@@ -113,7 +113,7 @@ void armarComando(char *comando) {
                 flagErrorSintaxis = false;
                 if (getCriterioByNameTabla(_drop->nameTable) != -1) {
                     crearListInstrucciones(_drop, DROP, NoDefinido);
-                    log_info(file_log, "EJECUTANDO COMANDO SELECT");
+                    log_info(file_log, "EJECUTANDO COMANDO DROP");
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destroyDrop(_drop);
@@ -127,8 +127,30 @@ void armarComando(char *comando) {
             if ((_create = cargarCreate(comando))) {
                 crearListInstrucciones(_create, CREATE, NoDefinido);
                 flagErrorSintaxis = false;
-                log_info(file_log, "EJECUTANDO COMANDO SELECT");
+                log_info(file_log, "EJECUTANDO COMANDO CREATE");
             }
+            break;
+        }
+        case DESCRIBE:{
+            st_describe * _describe = cargarDescribe(comando);
+            flagErrorSintaxis = true;
+            if(_describe){
+                log_info(file_log, "EJECUTANDO COMANDO DESCRIBE");
+                crearListInstrucciones(_describe,DESCRIBE,NoDefinido);
+            }else{
+                log_info(file_log, "EJECUTANDO COMANDO DESCRIBE GLOBAL");
+                crearListInstrucciones(NULL,DESCRIBE,NoDefinido);
+            }
+            break;
+        }
+        case JOURNAL:{
+            hacerJournal();
+            break;
+        }
+        case RUN:{
+            break;
+        }
+        case METRICS:{
             break;
         }
         case ADD: {

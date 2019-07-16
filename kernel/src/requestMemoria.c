@@ -4,12 +4,8 @@
 
 #include "requestMemoria.h"
 
-extern t_log *file_log;
 
-typedef struct {
-    header cabezera;
-    void *buffer;
-} st_messageResponse;
+extern t_log *file_log;
 
 void destroyStMessageResponse(st_messageResponse *stMR) {
     free(stMR->buffer);
@@ -38,8 +34,7 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
 
     header response;
     void *paqueteRespuesta = getMessage(socketClient, &response, &control);
-    if (control < 0) {
-        if (paqueteRespuesta) free(paqueteRespuesta);
+    if (paqueteRespuesta == NULL) {
         log_error(file_log, "no se puedo recibir el mensaje");
         return NULL;
     }
@@ -48,69 +43,117 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
     messageResponse->cabezera.sizeData = response.sizeData;
     messageResponse->cabezera.codigo = response.codigo;
     messageResponse->buffer = paqueteRespuesta;
+    close(socketClient);
+    return messageResponse;
 }
 
 int atenderResultadoSelect(st_messageResponse *mensaje) {
+    int resultado = NO_SALIO_OK;
     if (mensaje == NULL) {
-        return -1;
+        return SE_DESCONECTO_SOCKET;
     }
-    if (mensaje->cabezera.codigo == 2) {
-        printf("no se pudo encontra ese select\n");
-        return -1;
-    } else {
-        st_registro *registro = deserealizarRegistro(mensaje->buffer);
-        printf("resultado de consulta\n------------");
-        printf("key [%d]\n", registro->key),
-                printf("value [%s]\n", registro->value);
+    switch (mensaje->cabezera.codigo) {
+        case SUCCESS: {
+            st_registro *registro = deserealizarRegistro(mensaje->buffer);
+            printf("********----resultado de consulta-------******\n");
+            printf("key [%d]\n", registro->key),
+                    printf("value [%s]\n", registro->value);
+            destroyRegistro(registro);
+            resultado = SALIO_OK;
+            break;
+        }
+        case NOSUCCESS: {
+            printf("no se pudo encontra ese select\n");
+            break;
+        }
+        default: {
+            printf("no entiendo el codigo de respuesta\n");
+        }
     }
     destroyStMessageResponse(mensaje);
-    return 0;
+    return resultado;
 }
 
 int atenderResultadoInsert(st_messageResponse *mensaje, st_memoria *datoMemoria, stinstruccion *laInstruccion) {
+    int resultado = NO_SALIO_OK;
     if (mensaje == NULL) {
-        return -1;
+        return SE_DESCONECTO_SOCKET;
     }
-    if (mensaje->cabezera.codigo == 3) {
-        log_info(file_log, "Memoria Full se hace journal");
-        printf("Realizar journal\n");
-        st_messageResponse *journalResponse = consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, JOURNAL, NULL, 0);
-        if (journalResponse->cabezera.codigo == 1) {
-            log_info(file_log, "se relizo coreactamente el journal");
-            return enviarRequestMemoria(laInstruccion, datoMemoria);
-        } else {
-            log_error(file_log, "no se pudo realizar el journal");
-            return -1;
+    switch (mensaje->cabezera.codigo) {
+        case MEMORIAFULL: {
+            resultado = journalMemoria(datoMemoria);
+            if (resultado == SALIO_OK) {
+                return enviarRequestMemoria(laInstruccion, datoMemoria);
+            }
+            break;
+        }
+        case SUCCESS: {
+            printf("se relizo el insert todo ok\n");
+            resultado = SALIO_OK;
+            break;
+        }
+        case NOSUCCESS: {
+            printf("no se puedo relizar el insert\n");
+            break;
         }
     }
-    if (mensaje->cabezera.codigo == 2) {
-        printf("no se puedo relizar el insert\n");
-        return -1;
-    } else {
-        printf("se relizo el insert todo ok\n");
-    }
     destroyStMessageResponse(mensaje);
-    return 0;
+    return resultado;
 }
 
 int atenderResultadoSDrop(st_messageResponse *mensaje, char *nameTable) {
+    int resultado = NO_SALIO_OK;
     if (mensaje == NULL) {
-        return -1;
+        return SE_DESCONECTO_SOCKET;
     }
-    if (mensaje->cabezera.codigo == 2) {
-        printf("no se pudo encontra ese select\n");
-        return -1;
-    } else {
-        removeTablaByName(nameTable);
+    switch (mensaje->cabezera.codigo) {
+        case SUCCESS: {
+            printf("se puedo eliminar la tabla sin problemas\n");
+            removeTablaByName(nameTable);
+            resultado = SALIO_OK;
+            break;
+        }
+        case NOSUCCESS: {
+            printf("no se puedo eliminar la tabla\n");
+            break;
+        }
+
     }
     destroyStMessageResponse(mensaje);
-    return 0;
+    return resultado;
+}
+
+int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
+    int resultado = NO_SALIO_OK;
+    if (mensaje == NULL) {
+        return SE_DESCONECTO_SOCKET;
+    }
+    switch (mensaje->cabezera.codigo) {
+        case SUCCESS: {
+            printf("se creo la tabla sin probl+emas\n");
+            st_metadata * newMetadata = malloc(sizeof(st_metadata));
+            newMetadata->nameTable = strdup(_create->nameTable);
+            newMetadata->consistency = strdup(_create->tipoConsistencia);
+            newMetadata->compaction_time = _create->compactionTime;
+            newMetadata->partitions = _create->numeroParticiones;
+            addNuevaTabla(newMetadata);
+            resultado = SALIO_OK;
+            break;
+        }
+        case NOSUCCESS: {
+            printf("no se puedo crear la tabla\n");
+            break;
+        }
+
+    }
+    destroyStMessageResponse(mensaje);
+    return resultado;
 }
 
 int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria) {
     void *buffer = NULL;
     size_t size_buffer = 0;
-    int resultado = -1;
+    int resultado = NO_SALIO_OK;
     switch (laInstruccion->operacion) {
         case SELECT: {
             buffer = serealizarSelect(laInstruccion->instruccion, &size_buffer);
@@ -135,12 +178,23 @@ int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria) 
                     ((st_drop *) laInstruccion->instruccion)->nameTable
             );
             break;
-
+        }
+        case CREATE: {
+            buffer = serealizarCreate(laInstruccion->instruccion, &size_buffer);
+            resultado = atenderResultadoCreate(
+                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer),
+                    laInstruccion->instruccion
+            );
+            break;
         }
         default: {
             break;
         }
     }
+    if (resultado == SE_DESCONECTO_SOCKET) {
+        eliminarMemoria(datoMemoria->numero);
+    }
     free(buffer);
+    destroyMemoria(datoMemoria);
     return resultado;
 }

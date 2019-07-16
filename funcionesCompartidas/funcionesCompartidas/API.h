@@ -21,7 +21,8 @@ enum OPERACION {
 	EXIT = 7,
 	JOURNAL = 8,
     RUN = 9,
-    ADD = 10
+    ADD = 10,
+    METRICS = 11
 };
 
 typedef struct {

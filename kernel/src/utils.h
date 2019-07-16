@@ -14,6 +14,12 @@ typedef enum {
     EventualConsistency = 3
 } TypeCriterio;
 
+typedef enum {
+    SALIO_OK = 1,
+    NO_SALIO_OK = 2,
+    SE_DESCONECTO_SOCKET = 3
+} Respuestas;
+
 char * getCriterioByEnum(TypeCriterio criterio);
 TypeCriterio getTipoCriterioByString(char * criterioString);
 #endif //KERNEL_UTILS_H

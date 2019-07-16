@@ -15,6 +15,7 @@
 #include <funcionesCompartidas/codigoMensajes.h>
 #include "utils.h"
 #include "threadPoolMemoria.h"
+#include "requestMemoria.h"
 
 typedef struct {
     st_memoria * memoria;
@@ -26,6 +27,9 @@ typedef struct {
 void *loadPoolMemori();
 void updateListaMemorias(st_data_memoria * nuevaLista);
 bool setTipoConsistencia(int number,TypeCriterio tipo);
+void hacerJournal();
+void eliminarMemoria(int numberMemoria);
 st_memoria *getMemoria(TypeCriterio tipo, char *text);
+int journalMemoria(st_memoria * memoria);
 
 #endif //KERNEL_THREADPOOLMEMORIA_H

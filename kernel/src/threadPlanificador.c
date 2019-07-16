@@ -9,18 +9,6 @@ sem_t colaDeListos;
 extern t_log * file_log;
 extern config *configuracion;
 
-void showAllProceso(){
-    int i,j;
-    for (i = 0; i < listProcesos->elements_count ; ++i) {
-        t_list * procesoInstrucciones = list_get(listProcesos,i);
-        printf("proceso numero [%d]\n",i);
-        for (j = 0; j < procesoInstrucciones->elements_count; ++j) {
-            stinstruccion * instruccion = list_get(procesoInstrucciones,j);
-            printf("instrucion numero [%d]\n",instruccion->operacion);
-        }
-    }
-}
-
 t_list * tomarInstrucciones(t_list * proceso){
     if(proceso->elements_count > configuracion->QUANTUM){
         return list_take_and_remove(proceso,configuracion->QUANTUM);

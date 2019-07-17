@@ -33,3 +33,31 @@ char * getCriterioByEnum(TypeCriterio criterio){
         }
     }
 }
+
+char * generarTag(TypeCriterio tipo, void *st_intrucion, enum OPERACION type) {
+    switch (tipo) {
+        case StrongConsistency: {
+            if (type == INSERT) {
+                return strdup(((st_insert *) st_intrucion)->nameTable);
+            } else {
+                return strdup(((st_select *) st_intrucion)->nameTable);
+            }
+        }
+        case StrongHashConsistency: {
+            if (type == INSERT) {
+                char * hashM = strdup(((st_insert *) st_intrucion)->nameTable);
+                char *keyString = string_itoa(((st_insert *) st_intrucion)->key);
+                string_append(&hashM,keyString);
+                return hashM;
+            } else {
+                char * hashM = strdup(((st_select *) st_intrucion)->nameTable);
+                char *keyString = string_itoa(((st_select *) st_intrucion)->key);
+                string_append(&hashM,keyString);
+                return hashM;
+            }
+        }
+        default: {
+            return NULL;
+        }
+    }
+}

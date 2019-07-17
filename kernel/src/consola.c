@@ -32,49 +32,17 @@ st_add_memoria *cargarAddMemoria(char *text) {
     return addMemoria;
 }
 
-char *getText(TypeCriterio tipo, void *st_intrucion, enum OPERACION type) {
-    switch (tipo) {
-        case StrongConsistency: {
-            if (type == INSERT) {
-                return strdup(((st_insert *) st_intrucion)->nameTable);
-            } else {
-                return strdup(((st_select *) st_intrucion)->nameTable);
-            }
-        }
-        case StrongHashConsistency: {
-            if (type == INSERT) {
-                char * hashM = strdup(((st_insert *) st_intrucion)->nameTable);
-                char *keyString = string_itoa(((st_insert *) st_intrucion)->key);
-                string_append(&hashM,keyString);
-                return hashM;
-            } else {
-                char * hashM = strdup(((st_select *) st_intrucion)->nameTable);
-                char *keyString = string_itoa(((st_select *) st_intrucion)->key);
-                string_append(&hashM,keyString);
-                return hashM;
-            }
-        }
-        default: {
-            return NULL;
-        }
-    }
-}
-
-void crearListInstrucciones(void *instruccion, enum OPERACION type, TypeCriterio criterio) {
-    stinstruccion *newInstruccion = malloc(sizeof(stinstruccion));
-    newInstruccion->operacion = type;
-    newInstruccion->instruccion = instruccion;
-    newInstruccion->criteio = criterio;
-    newInstruccion->tag = getText(criterio, instruccion, type);
-    t_list *listInstrucciones = list_create();
-    list_add(listInstrucciones, newInstruccion);
-    cargarNuevoScript(listInstrucciones);
+void cargarScriptConUnaInstruccion(void *instruccion, enum OPERACION type, TypeCriterio criterio, char *id) {
+    t_list *listaDeInstrucciones = list_create();
+    list_add(listaDeInstrucciones, crearInstruccion(instruccion, type, criterio));
+    cargarNuevoScript(crearNuevoScript(id, listaDeInstrucciones));
 }
 
 void armarComando(char *comando) {
     bool flagErrorSintaxis = false;
     int typeComando = getEnumFromString(comando);
-    TypeCriterio criterio = -1;
+    TypeCriterio criterio;
+    char *idText;
     switch (typeComando) {
         case INSERT: {
             st_insert *insert;
@@ -82,8 +50,9 @@ void armarComando(char *comando) {
             if ((insert = cargarInsert(comando))) {
                 flagErrorSintaxis = false;
                 if ((criterio = getCriterioByNameTabla(insert->nameTable)) != -1) {
-                    crearListInstrucciones(insert, INSERT, criterio);
-                    log_info(file_log, "EJECUTANDO COMANDO INSERT");
+                    idText = strdup("Script insert ");
+                    string_append(&idText, insert->nameTable);
+                    cargarScriptConUnaInstruccion(insert, INSERT, criterio, idText);
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destroyInsert(insert);
@@ -97,8 +66,9 @@ void armarComando(char *comando) {
             if ((_select = cargarSelect(comando))) {
                 flagErrorSintaxis = false;
                 if ((criterio = getCriterioByNameTabla(_select->nameTable)) != -1) {
-                    crearListInstrucciones(_select, SELECT, criterio);
-                    log_info(file_log, "Ejecutando comando SELECT");
+                    idText = strdup("Script select ");
+                    string_append(&idText, _select->nameTable);
+                    cargarScriptConUnaInstruccion(_select, SELECT, criterio, idText);
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destoySelect(_select);
@@ -112,8 +82,9 @@ void armarComando(char *comando) {
             if ((_drop = cargarDrop(comando))) {
                 flagErrorSintaxis = false;
                 if (getCriterioByNameTabla(_drop->nameTable) != -1) {
-                    crearListInstrucciones(_drop, DROP, NoDefinido);
-                    log_info(file_log, "EJECUTANDO COMANDO DROP");
+                    idText = strdup("Script Drop ");
+                    string_append(&idText, _drop->nameTable);
+                    cargarScriptConUnaInstruccion(_drop, DROP, NoDefinido, idText););
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destroyDrop(_drop);
@@ -125,32 +96,34 @@ void armarComando(char *comando) {
             st_create *_create;
             flagErrorSintaxis = true;
             if ((_create = cargarCreate(comando))) {
-                crearListInstrucciones(_create, CREATE, NoDefinido);
+                idText = strdup("Script Create ");
+                string_append(&idText, _create->nameTable);
+                cargarScriptConUnaInstruccion(_create, CREATE, NoDefinido, idText);
                 flagErrorSintaxis = false;
-                log_info(file_log, "EJECUTANDO COMANDO CREATE");
             }
             break;
         }
-        case DESCRIBE:{
-            st_describe * _describe = cargarDescribe(comando);
+        case DESCRIBE: {
+            st_describe *_describe = cargarDescribe(comando);
             flagErrorSintaxis = true;
-            if(_describe){
-                log_info(file_log, "EJECUTANDO COMANDO DESCRIBE");
-                crearListInstrucciones(_describe,DESCRIBE,NoDefinido);
-            }else{
-                log_info(file_log, "EJECUTANDO COMANDO DESCRIBE GLOBAL");
-                crearListInstrucciones(NULL,DESCRIBE,NoDefinido);
+            if (_describe) {
+                idText = strdup("Script Describe ");
+                string_append(&idText, _describe->nameTable);
+                cargarScriptConUnaInstruccion(_describe, DESCRIBE, NoDefinido, idText);
+            } else {
+                idText = strdup("Script Describe Global");;
+                cargarScriptConUnaInstruccion(NULL, DESCRIBE, NoDefinido, idText);
             }
             break;
         }
-        case JOURNAL:{
+        case JOURNAL: {
             hacerJournal();
             break;
         }
-        case RUN:{
+        case RUN: {
             break;
         }
-        case METRICS:{
+        case METRICS: {
             break;
         }
         case ADD: {

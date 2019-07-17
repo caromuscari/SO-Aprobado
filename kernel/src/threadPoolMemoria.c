@@ -401,7 +401,7 @@ void *loadPoolMemori() {
     void *buffer = NULL;
     if (pthread_mutex_init(&mutex, NULL) != 0) {
         printf("\n mutex init failed\n");
-        return NULL;
+        pthread_exit(NULL);
     }
     while (1) {
         CleanListaMemoria();

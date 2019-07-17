@@ -15,7 +15,14 @@
 #include "requestMemoria.h"
 #include "threadPoolMemoria.h"
 
+typedef struct {
+    char * id;
+    t_list * listaDeInstrucciones;
+}st_script;
+
 void * inicialPlanificador();
-void cargarNuevoScript(t_list * listInstrucciones);
+void cargarNuevoScript(st_script * newProceso);
+st_script *crearNuevoScript(char *id, t_list *listaInstrucciones);
+stinstruccion * crearInstruccion(void *instruccion, enum OPERACION type, TypeCriterio criterio);
 
 #endif //KERNEL_PLANIFICADOR_H

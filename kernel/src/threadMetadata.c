@@ -11,7 +11,7 @@ extern config *configuracion;
 extern t_log *file_log;
 pthread_mutex_t mutex;
 
-TypeCriterio getCriterioByNameTabla(char *nameTable) {
+int getCriterioByNameTabla(char *nameTable) {
     st_metadata *result = NULL;
     pthread_mutex_lock(&mutex);
     int search_tabla(st_metadata *p) {
@@ -22,7 +22,7 @@ TypeCriterio getCriterioByNameTabla(char *nameTable) {
     if (result) {
         return getTipoCriterioByString(result->consistency);
     } else {
-        return -1;
+        return NO_SE_ENCONTRO_TABLA;
     }
 }
 

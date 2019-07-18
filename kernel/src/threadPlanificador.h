@@ -14,15 +14,12 @@
 #include "load_config.h"
 #include "requestMemoria.h"
 #include "threadPoolMemoria.h"
-
-typedef struct {
-    char * id;
-    t_list * listaDeInstrucciones;
-}st_script;
+#include "contracts.h"
 
 void * inicialPlanificador();
 void cargarNuevoScript(st_script * newProceso);
 st_script *crearNuevoScript(char *id, t_list *listaInstrucciones);
-stinstruccion * crearInstruccion(void *instruccion, enum OPERACION type, TypeCriterio criterio);
+st_instruccion *crearInstruccion(void *instruccion, enum OPERACION type);
+void destroyListaInstruciones(t_list *instrucciones);
 
 #endif //KERNEL_PLANIFICADOR_H

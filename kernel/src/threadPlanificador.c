@@ -11,12 +11,10 @@ pthread_mutex_t mutex;
 extern t_log *file_log;
 extern config *configuracion;
 
-stinstruccion *crearInstruccion(void *instruccion, enum OPERACION type, TypeCriterio criterio) {
-    stinstruccion *newInstruccion = malloc(sizeof(stinstruccion));
+st_instruccion *crearInstruccion(void *instruccion, enum OPERACION type) {
+    st_instruccion *newInstruccion = malloc(sizeof(st_instruccion));
     newInstruccion->operacion = type;
     newInstruccion->instruccion = instruccion;
-    newInstruccion->criteio = criterio;
-    newInstruccion->tag = generarTag(criterio, instruccion, type);
     return newInstruccion;
 }
 
@@ -26,10 +24,7 @@ st_script *crearNuevoScript(char *id, t_list *listaInstrucciones) {
     stScript->listaDeInstrucciones = listaInstrucciones;
 }
 
-void destroyInctruccion(stinstruccion *instruccion) {
-    if (instruccion->tag) {
-        free(instruccion->tag);
-    }
+void destroyInctruccion(st_instruccion *instruccion) {
     switch (instruccion->operacion) {
         case INSERT: {
             destroyInsert(instruccion->instruccion);
@@ -56,7 +51,7 @@ void destroyInctruccion(stinstruccion *instruccion) {
 }
 
 void destroyListaInstruciones(t_list *instrucciones) {
-    stinstruccion *instruccionScript;
+    st_instruccion *instruccionScript;
     int i;
     for (i = 0; i < instrucciones->elements_count; ++i) {
         instruccionScript = list_get(instrucciones, i);
@@ -98,15 +93,22 @@ void cargarNuevoScript(st_script *newScript) {
 
 void * ejecutarScript(){
     int i, resultado = NO_SALIO_OK;
-    stinstruccion *instruccionScript;
+    st_instruccion *instruccionScript;
     st_memoria *datomemoria;
     st_script *script = tomarScript();
+    char * tag;
+    TypeCriterio typeCriterio;
     printf("Ejecutando Script ----- [%s]\n", script->id);
     t_list *instrucciones = tomarInstrucciones(script->listaDeInstrucciones);
     //ejecutamos instruciones tomadas
     for (i = 0; i < instrucciones->elements_count; ++i) {
         instruccionScript = list_get(instrucciones, i);
-        datomemoria = getMemoria(instruccionScript->criteio, instruccionScript->tag);
+        typeCriterio = getCriterioBYInstruccion(instruccionScript->instruccion, instruccionScript->operacion);
+        if(typeCriterio == NO_SE_ENCONTRO_TABLA){
+            break;
+        }
+        tag = generarTag(typeCriterio,instruccionScript->instruccion, instruccionScript->operacion);
+        datomemoria = getMemoria(typeCriterio, tag);
         if (datomemoria) {
             resultado = enviarRequestMemoria(instruccionScript, datomemoria);
             if (resultado == NO_SALIO_OK || resultado == SE_DESCONECTO_SOCKET) {
@@ -135,7 +137,6 @@ void atenderScriptEntrantes() {
         sem_wait(&procesadores);
         pthread_create(&pthread_execution,NULL, ejecutarScript, NULL);
         pthread_detach(pthread_execution);
-        ejecutarScript();
         sleep(configuracion->SLEEP_EJECUCION);
         sem_post(&procesadores);
     }

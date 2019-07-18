@@ -27,13 +27,6 @@ enum OPERACION {
 
 typedef struct {
     enum OPERACION operacion;
-    void *instruccion;
-    int criteio;
-    char * tag;
-} stinstruccion;
-
-typedef struct {
-    enum OPERACION operacion;
     char *nameTable;
     char *tipoConsistencia;
     int numeroParticiones;

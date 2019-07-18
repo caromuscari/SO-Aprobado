@@ -16,14 +16,8 @@
 #include "utils.h"
 #include "threadPoolMemoria.h"
 #include "requestMemoria.h"
+#include "contracts.h"
 
-typedef struct {
-    st_memoria * memoria;
-    bool activo;
-    t_list * tags;
-    t_list * tipos;
-    int count;
-} st_kernel_memoria;
 void *loadPoolMemori();
 void updateListaMemorias(st_data_memoria * nuevaLista);
 bool setTipoConsistencia(int number,TypeCriterio tipo);

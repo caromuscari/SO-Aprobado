@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "requestMemoria.h"
 #include <funcionesCompartidas/codigoMensajes.h>
+#include "contracts.h"
 
 void * schedulerMetadata();
 TypeCriterio getCriterioByNameTabla(char *nameTable);

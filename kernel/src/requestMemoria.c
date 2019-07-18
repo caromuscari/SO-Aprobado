@@ -4,7 +4,6 @@
 
 #include "requestMemoria.h"
 
-
 extern t_log *file_log;
 
 void destroyStMessageResponse(st_messageResponse *stMR) {
@@ -74,7 +73,7 @@ int atenderResultadoSelect(st_messageResponse *mensaje) {
     return resultado;
 }
 
-int atenderResultadoInsert(st_messageResponse *mensaje, st_memoria *datoMemoria, stinstruccion *laInstruccion) {
+int atenderResultadoInsert(st_messageResponse *mensaje, st_memoria *datoMemoria, st_instruccion *laInstruccion) {
     int resultado = NO_SALIO_OK;
     if (mensaje == NULL) {
         return SE_DESCONECTO_SOCKET;
@@ -150,7 +149,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
     return resultado;
 }
 
-int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria) {
+int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria) {
     void *buffer = NULL;
     size_t size_buffer = 0;
     int resultado = NO_SALIO_OK;

@@ -7,22 +7,10 @@
 
 #include <string.h>
 #include <funcionesCompartidas/API.h>
+#include "threadMetadata.h"
+#include "contracts.h"
 
-typedef enum {
-    NoDefinido = -1,
-    StrongConsistency = 1,
-    StrongHashConsistency = 2,
-    EventualConsistency = 3
-} TypeCriterio;
-
-typedef enum {
-    SALIO_OK = 1,
-    NO_SALIO_OK = 2,
-    SE_DESCONECTO_SOCKET = 3,
-    MEMORIA_NO_DISPONIBLE = 4
-} Respuestas;
-
-char * getCriterioByEnum(TypeCriterio criterio);
 TypeCriterio getTipoCriterioByString(char * criterioString);
 char * generarTag(TypeCriterio tipo, void *st_intrucion, enum OPERACION type);
+TypeCriterio getCriterioBYInstruccion(void *st_intrucion, enum OPERACION type);
 #endif //KERNEL_UTILS_H

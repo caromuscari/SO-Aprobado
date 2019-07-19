@@ -245,8 +245,8 @@ void armarComando(char *comando) {
 
 void consola() {
     char *comando;
-    comando = readline(">");
     printf("Ingrese comando LQL\n");
+    comando = readline(">");
     string_trim(&comando);
     while (strcmp(comando, "exit") != 0) {
         armarComando(comando);

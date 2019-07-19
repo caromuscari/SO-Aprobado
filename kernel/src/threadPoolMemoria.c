@@ -9,6 +9,20 @@ extern config *configuracion;
 extern t_log *file_log;
 pthread_mutex_t mutex;
 
+void showMemoria(){
+    st_kernel_memoria * memoriaK;
+    printf("-----------------------------------------------\n");
+    for (int i = 0; i < poolMemoria->elements_count ; ++i) {
+        memoriaK = list_get(poolMemoria,i);
+        if(memoriaK->activo){
+            printf("ip [%s]\n",memoriaK->memoria->ip);
+            printf("puerto [%s]\n",memoriaK->memoria->puerto);
+            printf("numero [%d]\n",memoriaK->memoria->numero);
+        }
+
+    }
+}
+
 void destroyKernelMemoria(st_kernel_memoria * kernelMemoria){
     //clean tags
     list_iterate(kernelMemoria->tags, free);
@@ -423,6 +437,6 @@ void *loadPoolMemori() {
             log_error(file_log,"[gossiping] No hubo respuesta en el gossiping");
         }
         free(buffer);
-        sleep(500);
+        sleep(10);
     }
 }

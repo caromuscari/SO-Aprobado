@@ -50,10 +50,10 @@ void * atenderMensaje(int * fdClient){
     		buffer = strdup("1");
 
     		int resultado = comandoInsert(insert);
-    		if(resultado == -1){
+    		if(resultado == MAYORQUEVALUEMAX){
     			enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		}
-    		if(resultado == -2){
+    		if(resultado == FULLMEMORY){
     			//memoria full
     			enviarRespuesta(MEMORIAFULL, buffer, *fdClient, &control, strlen(buffer));
     		}else {
@@ -64,7 +64,7 @@ void * atenderMensaje(int * fdClient){
     	}
         case SELECT: {
             st_select * select = deserealizarSelect(paqueteDeRespuesta);
-            printf("El comando es un Insert\n");
+            printf("El comando es un Select\n");
 
             st_registro* registro = comandoSelect(select);
             if(registro){
@@ -137,43 +137,43 @@ void * atenderMensaje(int * fdClient){
     		st_messageResponse* respuesta;
     		printf("El comando es un Describe Global\n");
     		//mock
-//            t_list *listametadata = list_create();
-//            cargarLista(listametadata);
-    		//size_t size;
-//            buffer = serealizarListaMetaData(listametadata, &size);
-//            enviarRespuesta(SUCCESS, buffer, *fdClient, &control, size);
-            //
-    		respuesta = mandarDescribeGlobal();
-    		if(respuesta){
-    			if(respuesta->cabezera.codigo == 13){
-    				enviarRespuesta(SUCCESS, respuesta->buffer, *fdClient, &control, respuesta->cabezera.sizeData);
-    			}else{
-    				buffer = strdup("1");
-    				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
-    				free(buffer);
-    			}
-    			destroyStMessageResponse(respuesta);
-    		} else {
-				buffer = strdup("1");
-				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
-				free(buffer);
-    		}
+            t_list *listametadata = list_create();
+            cargarLista(listametadata);
+    		size_t size;
+            buffer = serealizarListaMetaData(listametadata, &size);
+            enviarRespuesta(SUCCESS, buffer, *fdClient, &control, size);
+
+//    		respuesta = mandarDescribeGlobal();
+//    		if(respuesta){
+//    			if(respuesta->cabezera.codigo == 13){
+//    				enviarRespuesta(SUCCESS, respuesta->buffer, *fdClient, &control, respuesta->cabezera.sizeData);
+//    			}else{
+//    				buffer = strdup("1");
+//    				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+//    				free(buffer);
+//    			}
+//    			destroyStMessageResponse(respuesta);
+//    		} else {
+//				buffer = strdup("1");
+//				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+//				free(buffer);
+//    		}
     		break;
     	}
         case BUSCARTABLAGOSSIPING: {
             void *paqueteLista = devolverListaMemoria(&sizePaqueteRes);
             enviarRespuesta(SUCCESS,paqueteLista,*fdClient,&control,sizePaqueteRes);
-            printf("Me estan haciendo gossiping\n");
+            log_info(file_log,"Realizando gossiping");
             break;
         }
     	case JOURNAL:{
-    		printf("Realizando Journal");
+    		printf("Realizando Journal\n");
     		int respuesta = comandoJournal();
     		buffer = strdup("1");
-    		if(respuesta == -1){
-    			enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+    		if(respuesta == OK){
+                enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		} else {
-    			enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
+                enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		}
     		break;
     	}
@@ -195,7 +195,6 @@ void * start_server() {
 	while (true){
         fdClient = malloc(sizeof(int));
         *fdClient = aceptar_conexion(socketServer, file_log, &control);
-        printf("conectando nuevo cliente %d\n", *fdClient);
         if (control != 0) {
             log_error(file_log, "No se puede aceptar la conexion");
             continue;

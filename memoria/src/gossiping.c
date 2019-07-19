@@ -168,6 +168,6 @@ void *pthreadGossping() {
             memoria = list_get(seedFallidas,i);
             removeMemoriaFallida(memoria);
         }
-        sleep(60);
+        sleep(configMemoria->TIEMPO_GOSSIPING/1000);
     }
 }

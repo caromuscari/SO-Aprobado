@@ -18,8 +18,8 @@ void inicializarMemoria(){
 
 int comandoInsert(st_insert* comandoInsert){
 	if(strlen(comandoInsert->value) > tamanioValue){
-		log_info(file_log, "El value es mayor al tamaño máximo\n");
-		return -1;
+		log_error(file_log, "El value es mayor al tamaño máximo\n");
+		return MAYORQUEVALUEMAX;
 	}
 	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoInsert->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
@@ -32,13 +32,13 @@ int comandoInsert(st_insert* comandoInsert){
 			paginaDeTablaEncontrada->flagModificado = 1;
 
 			log_info(file_log, "El Insert se realizo correctamente\n");
-			return 0;
+			return OK;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key\n");
 
 		int posMarcoLibre = buscarMarcoLibre();
 		if(posMarcoLibre == -1){
-            return -2;
+            return FULLMEMORY;
 		}
 
 		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
@@ -59,7 +59,7 @@ int comandoInsert(st_insert* comandoInsert){
 		marco->condicion = OCUPADO;
         mostrarPaginasCargadas();
         log_info(file_log, "El Insert se realizo correctamente\n");
-		return 0;
+		return OK;
 	}
 	log_info(file_log, "No se encontro el segmento de esa tabla\n");
 	//creo el segmento
@@ -70,7 +70,7 @@ int comandoInsert(st_insert* comandoInsert){
 
 	int posMarcoLibre = buscarMarcoLibre();
 	if(posMarcoLibre == -1){
-        return -2;
+        return FULLMEMORY;
 	}
 	//creo la pagina
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
@@ -93,7 +93,7 @@ int comandoInsert(st_insert* comandoInsert){
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
 	log_info(file_log, "El Insert se realizo correctamente\n");
-	return 0;
+	return OK;
 }
 
 
@@ -272,10 +272,11 @@ int comandoJournal(){
     		list_remove(listaDeSegmentos, i);
     	}
     }
-    log_info(file_log, "Termino el Journal\n");
     if(resultado){
-    	return 0;
+    log_info(file_log, "Termino el Journal\n");
+    return OK;
     }
-    return -1;
+    log_error(file_log, "No se pudo realizar el Journal");
+    return NOOK;
 }
 

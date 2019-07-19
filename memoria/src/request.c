@@ -12,92 +12,80 @@
 #include <stdlib.h>
 #include <string.h>
 #include "request.h"
+#include "contrato.h"
 
 extern int fdFileSystem;
 extern t_log * file_log;
-extern t_list *listaDeMarcos;
-extern t_list* listaDeSegmentos;
 
 int mandarCreate(st_create * create){
 	size_t size;
-	header head, head2;
+	header request, respuesta;
 	message * mensaje;
 	int controlador;
 	char * buffer = serealizarCreate(create,&size);
 
-	head.letra = 'M';
-	head.codigo = 3;
-	head.sizeData = size;
+	request.letra = 'M';
+	request.codigo = CREATE;
+	request.sizeData = size;
 
-	mensaje = createMessage(&head, buffer);
+	mensaje = createMessage(&request, buffer);
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
 
+	if(controlador != 0){
+		log_error(file_log, "No se pudo enviar el mensaje");
+		return NOOK; //VERRRR
+	}
+
 	free(buffer);
 
-	buffer = getMessage(fdFileSystem,&head2,&controlador);
+	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
+
+	if(buffer == NULL){
+		log_error(file_log, "Fallo la conexion con el File System");
+		return SOCKETDESCONECTADO;
+	}
 
 	free(buffer);
 
-	return head2.codigo;
+	return respuesta.codigo;
 }
 
 int mandarDrop(st_drop * drop){
 	size_t size;
-	header head, head2;
+	header request, respuesta;
 	message * mensaje;
 	int controlador;
 	char * buffer;
 
-    st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(drop->nameTable);
-    if(segmentoEncontrado){
-        log_info(file_log, "Se encontro el segmento por Drop");
-
-        for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
-            st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
-            st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
-            free(paginaDeTabla);
-            marco->condicion = LIBRE;
-        }
-
-        list_destroy(segmentoEncontrado->tablaDePaginas);
-        free(segmentoEncontrado->nombreTabla);
-        list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
-        for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
-            st_segmento* segmento = list_get(listaDeSegmentos, i);
-            int nro = segmento->nroSegmento;
-            segmento->nroSegmento = nro - 1;
-        }
-    }
-
 	buffer = serealizarDrop(drop,&size);
 
-	head.letra = 'M';
-	head.codigo = 4;
-	head.sizeData = size;
+	request.letra = 'M';
+	request.codigo = 4;
+	request.sizeData = size;
 
-	mensaje = createMessage(&head, buffer);
+	mensaje = createMessage(&request, buffer);
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
+	free(mensaje->buffer);
+	free(mensaje);
+	free(buffer);
     if(controlador != 0){
-        log_error(file_log, "no se pudo enviar el mensaje al FS");
-        return -1;
+        log_error(file_log, "No se pudo enviar el mensaje al FS");
+        return NOOK;
+    }
+
+	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
+    if(buffer == NULL){
+        log_error(file_log, "Fallo la conexion con File System");
+        return SOCKETDESCONECTADO;
     }
 
 	free(buffer);
-
-	buffer = getMessage(fdFileSystem,&head2,&controlador);
-    if(controlador != 0){
-        log_error(file_log, "no se pudo recibir un mensaje");
-        return -1;
-    }
-
-	free(buffer);
-
-	return head2.codigo;
+	return respuesta.codigo;
 }
 
-int mandarDescribe(st_describe * describe, st_metadata ** buff){
+st_messageResponse* mandarDescribe(st_describe * describe){
 	size_t size;
 	header head, head2;
 	message * mensaje;
@@ -114,41 +102,65 @@ int mandarDescribe(st_describe * describe, st_metadata ** buff){
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
 
+	if(controlador != 0){
+		log_error(file_log, "No se pudo enviar el mensaje");
+		return NULL;
+	}
+
 	free(buffer);
 
 	buffer = getMessage(fdFileSystem,&head2,&controlador);
 
-	if(head2.codigo == 15) *buff = deserealizarMetaData(buffer,&head2.sizeData);
+	if(buffer == NULL){
+		log_error(file_log, "Se desconecto file system");
+		return NULL;
+	}
 
-	return head2.codigo;
+	st_messageResponse* mensajeResp = malloc(sizeof(st_messageResponse));
+	mensajeResp->cabezera.codigo = head2.codigo;
+	mensajeResp->cabezera.letra = head2.letra;
+	mensajeResp->cabezera.sizeData = head2.sizeData;
+
+	mensajeResp->buffer = buffer;
+
+	return mensajeResp;
 }
 
-int mandarDescribeGlobal(void ** paquete, size_t *size){
-	header head, head2;
+st_messageResponse* mandarDescribeGlobal(){
+	header request, respuesta;
 	message * mensaje;
 	int controlador;
+	void* buffer;
 
-	head.letra = 'M';
-	head.codigo = DESCRIBEGLOBAL;
-	head.sizeData = 0;
+	request.letra = 'M';
+	request.codigo = DESCRIBEGLOBAL;
+	request.sizeData = 1;
 
-	mensaje = createMessage(&head, NULL);
+	buffer = strdup("1");
+
+	mensaje = createMessage(&request, buffer);
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
 	if(controlador != 0){
-        return -1;
+		log_error(file_log, "No se pudo enviar el mensaje");
+		return NULL;
+	}
+	free(buffer);
+
+	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
+	if(buffer == NULL){
+		log_error(file_log, "Se desconecto file system");
+        return NULL;
 	}
 
-	void * buffer = getMessage(fdFileSystem,&head2,&controlador);
-	if(controlador < 0){
-        return -1;
-	}
+	st_messageResponse* mensajeResp = malloc(sizeof(st_messageResponse));
+		mensajeResp->cabezera.codigo = respuesta.codigo;
+		mensajeResp->cabezera.letra = respuesta.letra;
+		mensajeResp->cabezera.sizeData = respuesta.sizeData;
 
-	if(head2.codigo == 13) {
-	    *paquete = buffer;
-	    *size = head2.sizeData;
-	}
-	return head2.codigo;
+		mensajeResp->buffer = buffer;
+
+		return mensajeResp;
 }
 
 int mandarInsert(st_insert * insert){

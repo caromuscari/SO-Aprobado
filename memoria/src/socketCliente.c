@@ -21,22 +21,26 @@ st_registro* obtenerSelect(st_select * comandoSelect){
 
     request.sizeData = size;
 
-    void* mensaje = createMessage(&request, paqueteDatos);
+    message* mensaje = createMessage(&request, paqueteDatos);
     enviar_message(fdFileSystem, mensaje, file_log, &control);
-
-    if(control == 0){
-        paqueteDeRespuesta = getMessage(fdFileSystem, &respuesta, &control);
-        if(respuesta.codigo != 14){
-            return NULL;
-        }else{
-            st_registro* registro = deserealizarRegistro(paqueteDeRespuesta);
-            return registro;
-        }
-    } else {
-        log_error(file_log, "Fallo el envio del Select");
-        return NULL;
+    free(paqueteDatos);
+    free(mensaje->buffer);
+    free(mensaje);
+    if(control != 0){
+    	log_error(file_log, "No se pudo enviar el mensaje del select");
+    	return NULL;
     }
 
+    paqueteDeRespuesta = getMessage(fdFileSystem, &respuesta, &control);
+    if(paqueteDeRespuesta== NULL){
+    	log_error(file_log, "Fallo la conexion con el File System");
+    	return NULL;
+    }
+    if(respuesta.codigo == 14){
+    	return deserealizarRegistro(paqueteDeRespuesta);
+    } else {
+    	return NULL;
+    }
 }
 
 void* informarDrop(st_drop* comandoDrop){

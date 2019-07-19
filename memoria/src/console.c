@@ -3,6 +3,7 @@
 #include "request.h"
 #include "comandos.h"
 #include <funcionesCompartidas/listaMetadata.h>
+#include <readline/readline.h>
 
 extern t_log *file_log;
 
@@ -15,14 +16,16 @@ void makeCommand(char *command){
   		  st_insert * insert;
   		  int codigoInsert = 0;
   		  if((insert = cargarInsert(command))){
-              if((codigoInsert = comandoInsert(insert)) == -1){
-                  printf("no se pudo hacer el insert\n");
-                  log_error(file_log, "no se pudo hacer el insert");
+              if((codigoInsert = comandoInsert(insert)) == MAYORQUEVALUEMAX){
+                  printf("El value es mayor al tamaño maximo\n");
               }
-              if(codigoInsert == -2){
-                  printf("no hay espacio en las paginas\n");
+              if(codigoInsert == FULLMEMORY){
+                  printf("No hay espacio en las paginas\n");
                   log_error(file_log, "no hay espacio en las paginas");
               }
+  		  } else {
+  			  printf("Verifique los parametros\n");
+  			  log_error(file_log, "No se pudo cargar el comando Insert");
   		  }
   		  if(insert){
               destroyInsert(insert);
@@ -42,10 +45,11 @@ void makeCommand(char *command){
                 printf("No hay resultados para este select\n");
                 log_info(file_log, "No hay resultados para este select");
               }
+              destoySelect(select);
     	  }else{
-              log_error(file_log, "[+] Error en datos de SELECT. \n");
+              log_error(file_log, "Error en datos de SELECT. \n");
     	  }
-    	  destoySelect(select);
+
     	  break;
       case CREATE:
     	  log_info(file_log, "[+] El comando es un CREATE\n");
@@ -53,13 +57,14 @@ void makeCommand(char *command){
     	  int codigo;
 
 		  if((create = cargarCreate(command))){
-			  log_info(file_log, "[+] Ejecutando CREATE\n");
 			  codigo = mandarCreate(create);
+			  if(codigo != NOOK && codigo != SOCKETDESCONECTADO){
+				  mostrarRespuesta(codigo);
 
-			  mostrarRespuesta(codigo);
+			  }
+			  destroyCreate(create);
 		  }else log_info(file_log, "[+] Error en datos de CREATE\n");
 
-    	  destroyCreate(create);
     	  break;
       case DROP:
     	  log_info(file_log, "[+] El comando es un DROP\n");
@@ -67,39 +72,55 @@ void makeCommand(char *command){
     	  int cod;
 
 		  if((drop = cargarDrop(command))){
-			  log_info(file_log, "[+] Ejecutando DROP\n");
 			  cod = mandarDrop(drop);
+			  if(cod != NOOK && cod != SOCKETDESCONECTADO){
+				  mostrarRespuesta(cod);
+				  if(cod == 9){
+					  removerSegmentoPorNombrePagina(drop->nameTable);
+				  }
+			  }
+			  destroyDrop(drop);
+		  }else log_error(file_log, "Error en datos de DROP\n");
 
-			  mostrarRespuesta(cod);
-		  }else log_info(file_log, "[+] Error en datos de DROP\n");
-
-    	  destroyDrop(drop);
     	  break;
-      case DESCRIBE:
-    	  log_info(file_log, "[+] El comando es un DESCRIBE\n");
+      case DESCRIBE:{
     	  st_describe * describe;
-    	  st_metadata * meta;
     	  t_list * lista;
-    	  int respuesta;
-//    	  if((describe = cargarDescribe(command))){
-//    		  log_info(file_log, "[+] Ejecutando DESCRIBE\n");
-//    		  respuesta = mandarDescribe(describe,&meta);
-//
-//    		  mostrarRespuesta(respuesta);
-//    		  if(respuesta == 15){
-//    			  mostrarTabla(meta);
-//    		  }
-//    		  destroyDescribe(describe);
-//    	  }else{
-//    		  respuesta = mandarDescribeGlobal(&lista);
-//
-//    		  mostrarRespuesta(respuesta);
-//    		  if(respuesta == 13){
-//    			  list_iterate(lista,(void*)mostrarTabla);
-//    			  destroyListaMetaData(lista);
-//    		  }
-//    	  }
-  	 	break;
+    	  st_messageResponse* respuesta;
+    	  if((describe = cargarDescribe(command))){
+    		  //describe
+    		  log_info(file_log, "Ejecutando Describe\n");
+    		  respuesta = mandarDescribe(describe);
+    		  if(respuesta){
+    			  mostrarRespuesta(respuesta->cabezera.codigo);
+    			  if(respuesta->cabezera.codigo == 15){
+    				  size_t size = 0;
+    				  st_metadata* meta = deserealizarMetaData(respuesta->buffer, &size);
+    				  mostrarTabla(meta);
+    				  destroyMetaData(meta);
+    		      }
+    		      destroyStMessageResponse(respuesta);
+    		  } else {
+    			  printf("Fallo al recibir respuesta del describe\n");
+    		  }
+    		  destroyDescribe(describe);
+    	  }else{
+    		  //describe global
+    		  log_info(file_log, "Ejecutando Describe Global\n");
+    		  respuesta = mandarDescribeGlobal();
+    		  if(respuesta){
+    			  mostrarRespuesta(respuesta->cabezera.codigo);
+    			  if(respuesta->cabezera.codigo == 13){
+    				  lista = deserealizarListaMetaData(respuesta->buffer, respuesta->cabezera.sizeData);
+    				  list_iterate(lista,(void*)mostrarTabla);
+    				  destroyListaMetaData(lista);
+    			  }
+    			  destroyStMessageResponse(respuesta);
+    		  } else {
+    			  printf("Fallo al recibir respuesta del Describe Global\n");
+    		  }
+    	}
+  	 	break;}
       case JOURNAL:
     	  log_info(file_log, "[+] El comando es un JOURNAL\n");
     	  comandoJournal();
@@ -114,26 +135,17 @@ void makeCommand(char *command){
 }
 
 void console(){
-  char *command, *ingreso ;
-  size_t tamBuffer = 100;
-  printf("[+] Write a LQL command: \n");
-
-  ingreso = malloc(sizeof(char) * tamBuffer);
-  getline(&ingreso, &tamBuffer, stdin);
-  command = strtok(ingreso, "\n");
-
-  while(strcmp(command,"exit") != 0){
-    makeCommand(command);
-    printf("------------------------------\n");
-
-    free(ingreso);
-    ingreso = malloc(sizeof(char) * tamBuffer);
-    printf("[+] Write a LQL command: \n");
-    getline(&ingreso, &tamBuffer, stdin);
-    command = strtok(ingreso, "\n");
-  }
-  free(ingreso);
-  printf("[-] Exiting console\n" );
+	char *comando;
+	printf("Ingrese comando LQL\n");
+	comando = readline(">");
+	string_trim(&comando);
+	while (strcmp(comando, "exit") != 0) {
+		makeCommand(comando);
+		free(comando);
+		comando = readline(">");
+		string_trim(&comando);
+	}
+	free(comando);
 }
 
 void mostrarRespuesta(int respuesta){

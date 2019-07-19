@@ -8,6 +8,7 @@
 #include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/list.h>
 #include <commons/config.h>
+#include <commons/string.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -15,7 +16,7 @@
 #include <funcionesCompartidas/log.h>
 #include <pthread.h>
 #include "segmentacionPaginada.h"
-
+#include "contrato.h"
 #include "socketCliente.h"
 
 

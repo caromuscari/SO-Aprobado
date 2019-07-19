@@ -12,6 +12,7 @@
 #include "socketCliente.h"
 #include <funcionesCompartidas/API.h>
 #include "request.h"
+#include "contrato.h"
 
 void inicializarMemoria();
 

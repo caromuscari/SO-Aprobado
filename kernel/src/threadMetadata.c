@@ -11,7 +11,7 @@ extern config *configuracion;
 extern t_log *file_log;
 pthread_mutex_t mutex;
 
-TypeCriterio getCriterioByNameTabla(char *nameTable) {
+int getCriterioByNameTabla(char *nameTable) {
     st_metadata *result = NULL;
     pthread_mutex_lock(&mutex);
     int search_tabla(st_metadata *p) {
@@ -22,7 +22,7 @@ TypeCriterio getCriterioByNameTabla(char *nameTable) {
     if (result) {
         return getTipoCriterioByString(result->consistency);
     } else {
-        return -1;
+        return NO_SE_ENCONTRO_TABLA;
     }
 }
 
@@ -39,12 +39,20 @@ int buscarNameTable(char *nameTable) {
 }
 
 void removeTablaByName(char * nameTable){
-    int pos = buscarNameTable(nameTable);
     st_metadata * metadata;
     pthread_mutex_lock(&mutex);
+    int pos = buscarNameTable(nameTable);
     metadata = list_remove(listMetadata,pos);
     pthread_mutex_unlock(&mutex);
     destroyMetaData(metadata);
+}
+
+void addNuevaTabla(st_metadata * metadata){
+    pthread_mutex_lock(&mutex);
+    if(buscarNameTable(metadata->nameTable) == -1){
+        list_add(listMetadata,metadata);
+    }
+    pthread_mutex_unlock(&mutex);
 }
 
 void updateListaMetadata(t_list *nuevaLista) {
@@ -57,41 +65,37 @@ void updateListaMetadata(t_list *nuevaLista) {
 }
 
 void *schedulerMetadata() {
-    int socketClient;
     listMetadata = list_create();
-    int control = 0;
-    message *bufferMensaje = NULL;
+    st_messageResponse * respuestaMesanje = NULL;
     void *buffer = NULL;
-    header request;
-    header response;
     if (pthread_mutex_init(&mutex, NULL) != 0) {
         printf("\n mutex init failed\n");
         pthread_exit(NULL);
     }
     while (1) {
-        socketClient = establecerConexion(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA, file_log, &control);
-        if (control != 0) {
-            sleep(configuracion->METADATA_REFRESH);
-            continue;
-        }
-        log_info(file_log, "Actulizando metadata");
-        request.letra = 'K';
-        request.codigo = 6;
-        request.sizeData = 0;
-        bufferMensaje = createMessage(&request, NULL);
-        enviar_message(socketClient, bufferMensaje, file_log, &control);
-        if (bufferMensaje->buffer) free(bufferMensaje->buffer);
-        free(bufferMensaje);
-        if (control == 0) {
-            buffer = getMessage(socketClient, &response, &control);
-            if (control >= 0) {
-                if (response.codigo == 13) {
-                    updateListaMetadata(deserealizarListaMetaData(buffer, response.sizeData));
+        log_info(file_log,"[MetaData] buscando metadata\n");
+        buffer = strdup("1");
+        respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA,DESCRIBEGLOBAL,buffer,1);
+        if(respuestaMesanje){
+            switch (respuestaMesanje->cabezera.codigo){
+                case SUCCESS:{
+                    updateListaMetadata(deserealizarListaMetaData(respuestaMesanje->buffer, respuestaMesanje->cabezera.sizeData));
+                    destroyStMessageResponse(respuestaMesanje);
+                    break;
                 }
-                free(buffer);
+                case NOSUCCESS:{
+                    log_info(file_log,"[MetaData] no hay resultado\n");
+                    break;
+                }
+                default:{
+                    log_info(file_log,"[MetaData] no entiendo el codigo re respuesta\n");
+                    break;
+                }
             }
+        }else{
+            log_error(file_log,"[MetaData] No hubo respuesta en el DESRIBE GLOBAL");
         }
-        close(socketClient);
+        free(buffer);
         sleep(configuracion->METADATA_REFRESH);
     }
 }

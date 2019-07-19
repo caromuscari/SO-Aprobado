@@ -6,14 +6,11 @@
 #define KERNEL_UTILS_H
 
 #include <string.h>
+#include <funcionesCompartidas/API.h>
+#include "threadMetadata.h"
+#include "contracts.h"
 
-typedef enum {
-    NoDefinido = -1,
-    StrongConsistency = 1,
-    StrongHashConsistency = 2,
-    EventualConsistency = 3
-} TypeCriterio;
-
-char * getCriterioByEnum(TypeCriterio criterio);
 TypeCriterio getTipoCriterioByString(char * criterioString);
+char * generarTag(TypeCriterio tipo, void *st_intrucion, enum OPERACION type);
+TypeCriterio getCriterioBYInstruccion(void *st_intrucion, enum OPERACION type);
 #endif //KERNEL_UTILS_H

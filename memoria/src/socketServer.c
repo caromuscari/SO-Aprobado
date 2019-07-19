@@ -31,12 +31,11 @@ void cargarLista(t_list *listaMetaData) {
 void * atenderMensaje(int * fdClient){
     int control = 0;
     header request;
-    header response;
     size_t sizePaqueteRes = 0;
     void * buffer = NULL;
     void * paqueteDeRespuesta = getMessage(*fdClient,&request,&control);
-    if (control < 0) {
-        log_error(file_log, "Error al obtener el mensaje\n");
+    if (paqueteDeRespuesta == NULL) {
+        log_error(file_log, "Fallo la conexion con el kernel\n");
         close(*fdClient);
         pthread_exit(NULL);
     }
@@ -48,30 +47,35 @@ void * atenderMensaje(int * fdClient){
     		printf("Key [%d]\n", insert->key);
     		printf("Value [%s]\n", insert->value);
 
+    		buffer = strdup("1");
+
     		int resultado = comandoInsert(insert);
-    		if(resultado == -1){
-    			enviarRespuesta(2, NULL, *fdClient, &control, 0);
+    		if(resultado == MAYORQUEVALUEMAX){
+    			enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		}
-    		if(resultado == -2){
+    		if(resultado == FULLMEMORY){
     			//memoria full
-    			enviarRespuesta(3, NULL, *fdClient, &control, 0);
+    			enviarRespuesta(MEMORIAFULL, buffer, *fdClient, &control, strlen(buffer));
     		}else {
-    			enviarRespuesta(1, NULL, *fdClient, &control, 0);
+    			enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		}
     		destroyInsert(insert);
     		break;
     	}
         case SELECT: {
             st_select * select = deserealizarSelect(paqueteDeRespuesta);
-            printf("El comando es un Insert\n");
+            printf("El comando es un Select\n");
+
             st_registro* registro = comandoSelect(select);
             if(registro){
             	buffer = serealizarRegistro(registro, &sizePaqueteRes);
-            	enviarRespuesta(1, buffer, *fdClient, &control, sizePaqueteRes);
+            	enviarRespuesta(SUCCESS, buffer, *fdClient, &control, sizePaqueteRes);
             } else {
-            	 enviarRespuesta(2, NULL, *fdClient, &control, 0);
+            	buffer = strdup("1");
+            	 enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
             }
             destoySelect(select);
+            free(buffer);
             break;
         }
     	case CREATE:{
@@ -81,10 +85,10 @@ void * atenderMensaje(int * fdClient){
 
             respuesta = mandarCreate(create);
 
-            buffer = strdup("");
+            buffer = strdup("1");
 
-            if(respuesta == 8) enviarRespuesta(7, buffer, *fdClient, &control, sizeof(buffer));
-            else enviarRespuesta(8, buffer, *fdClient, &control, sizeof(buffer));
+            if(respuesta == 8) enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer)); //la tabla ya existe
+            else enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer)); //se creo todo ok
 
             destroyCreate(create);
             free(buffer);
@@ -96,68 +100,80 @@ void * atenderMensaje(int * fdClient){
             printf("El comando es un Drop\n");
 
             respuesta = mandarDrop(drop);
+            buffer = strdup("1");
 
-            if(respuesta == 9) enviarRespuesta(1, NULL, *fdClient, &control, 0);
-            else enviarRespuesta(2, NULL, *fdClient, &control, 0);
+            if(respuesta == 9) enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
+            else enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
 
             destroyDrop(drop);
-            break;
-    	}
-    	case DESCRIBE:{
-    		int respuesta;
-    		st_metadata * meta;
-    		size_t size;
-            st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
-            printf("El comando es un Describe \n");
-
-            respuesta = mandarDescribe(describe,&meta);
-
-            //Cambiar Numeros
-            if(respuesta == 15){
-            	buffer = serealizarMetaData(meta,&size);
-            	enviarRespuesta(15,buffer,*fdClient,&control,size);
-            	destroyMetaData(meta);
-            }else{
-            	buffer = strdup("");
-            	enviarRespuesta(15,buffer,*fdClient,&control,sizeof(buffer));
-            }
-
-            destroyDescribe(describe);
             free(buffer);
             break;
     	}
+    	case DESCRIBE:{
+    		st_messageResponse* respuesta;
+            st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
+            printf("El comando es un Describe \n");
+
+            respuesta = mandarDescribe(describe);
+            if(respuesta){
+            	 if(respuesta->cabezera.codigo == 15){
+            		enviarRespuesta(SUCCESS,respuesta->buffer,*fdClient,&control,respuesta->cabezera.sizeData);
+            	 }else{
+            		buffer = strdup("1");
+            		enviarRespuesta(NOSUCCESS,buffer,*fdClient,&control,strlen(buffer));
+                    free(buffer);
+            	 }
+
+                 destroyStMessageResponse(respuesta);
+            } else {
+            	buffer = strdup("1");
+            	enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+            	free(buffer);
+            }
+            destroyDescribe(describe);
+            break;
+    	}
     	case DESCRIBEGLOBAL:{
-    		int respuesta;
-    		size_t size = 0;
+    		st_messageResponse* respuesta;
     		printf("El comando es un Describe Global\n");
     		//mock
             t_list *listametadata = list_create();
             cargarLista(listametadata);
+    		size_t size;
             buffer = serealizarListaMetaData(listametadata, &size);
-            enviarRespuesta(13, buffer, *fdClient, &control,size);
-            //
-    		//respuesta = mandarDescribeGlobal(&buffer,&size);
-    		//Cambiar Numeros
-//    		if(respuesta == 13){
-//    			enviarRespuesta(13, buffer, *fdClient, &control,size);
-//    		}else{
-//    			enviarRespuesta(20, NULL, *fdClient, &control,size);
+            enviarRespuesta(SUCCESS, buffer, *fdClient, &control, size);
+
+//    		respuesta = mandarDescribeGlobal();
+//    		if(respuesta){
+//    			if(respuesta->cabezera.codigo == 13){
+//    				enviarRespuesta(SUCCESS, respuesta->buffer, *fdClient, &control, respuesta->cabezera.sizeData);
+//    			}else{
+//    				buffer = strdup("1");
+//    				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+//    				free(buffer);
+//    			}
+//    			destroyStMessageResponse(respuesta);
+//    		} else {
+//				buffer = strdup("1");
+//				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+//				free(buffer);
 //    		}
-    		if(buffer) free(buffer);
     		break;
     	}
         case BUSCARTABLAGOSSIPING: {
             void *paqueteLista = devolverListaMemoria(&sizePaqueteRes);
-            enviarRespuesta(DEVOLVERTABLAGOSSIPING,paqueteLista,*fdClient,&control,sizePaqueteRes);
+            enviarRespuesta(SUCCESS,paqueteLista,*fdClient,&control,sizePaqueteRes);
+            log_info(file_log,"Realizando gossiping");
             break;
         }
     	case JOURNAL:{
-    		printf("Realizando Journal");
+    		printf("Realizando Journal\n");
     		int respuesta = comandoJournal();
-    		if(respuesta == -1){
-    			enviarRespuesta(2, NULL, *fdClient, &control, 0);
+    		buffer = strdup("1");
+    		if(respuesta == OK){
+                enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		} else {
-    			enviarRespuesta(1, NULL, *fdClient, &control, 0);
+                enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		}
     		break;
     	}

@@ -19,15 +19,15 @@ void crearTemporal(char * key, st_tabla* data){
     char* nombreArchivo = buscarNombreProximoTemporal(key);
     char* str = list_fold(data->lista, strdup(""), (void*)armarStrLista);
 
-    t_list* bloques = crearArchivoTemporal(nombreArchivo, string_length(str));
+    t_list* bloques = crearArchivoTemporal(nombreArchivo, string_length(str) * 4);
 
 
-    int tamanioRestante = (int) string_length(str), iElem = 0;
+    int tamanioRestante = (int) string_length(str) * 4, iElem = 0;
 
     if(bloques->elements_count > 0){
         //ITERAR POR EL TAMANIO Y PONER DATA
         int* numeroBloque = list_get(bloques, 0);
-        int caracteresPorString = tBloques * 1024/ sizeof(char);
+        int caracteresPorString = tBloques / (4 * sizeof(char));
         while(tamanioRestante > 0 && numeroBloque != NULL){
 
         	char * bloque = string_itoa(*numeroBloque);
@@ -35,7 +35,7 @@ void crearTemporal(char * key, st_tabla* data){
             free(bloque);
             FILE *write_ptr;
 
-            write_ptr = fopen(path,"wb");
+            write_ptr = fopen(path,"w");
             char* strBloque = string_substring(str, iElem * caracteresPorString, caracteresPorString);
             fwrite(strBloque,sizeof(strBloque),string_length(strBloque),write_ptr);
             fclose(write_ptr);

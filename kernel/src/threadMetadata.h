@@ -11,8 +11,13 @@
 #include <funcionesCompartidas/log.h>
 #include "load_config.h"
 #include "utils.h"
+#include "requestMemoria.h"
+#include <funcionesCompartidas/codigoMensajes.h>
+#include "contracts.h"
 
 void * schedulerMetadata();
 TypeCriterio getCriterioByNameTabla(char *nameTable);
 void removeTablaByName(char * nameTable);
+void addNuevaTabla(st_metadata * metadata);
+void updateListaMetadata(t_list *nuevaLista);
 #endif //KERNEL_THREADMETADATA_H

@@ -6,8 +6,14 @@
 #define KERNEL_CODIGOMENSAJES_H
 
 typedef enum {
-    BUSCARTABLAGOSSIPING = 0,
-    DEVOLVERTABLAGOSSIPING = 1
-} enum_mensaje_memoria;
+    BUSCARTABLAGOSSIPING = 0
+
+} enum_peticiones;
+
+typedef enum {
+    SUCCESS = 3,
+    NOSUCCESS = 4,
+    MEMORIAFULL = 5
+} enum_respuestas;
 
 #endif //KERNEL_CODIGOMENSAJES_H

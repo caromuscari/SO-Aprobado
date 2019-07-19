@@ -70,8 +70,9 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
         header request;
         request.letra = 'M';
         request.codigo = BUSCARTABLAGOSSIPING;
-        request.sizeData = 0;
-        void *paquete = createMessage(&request,NULL);
+        request.sizeData = 1;
+        void * buffer = strdup("1");
+        void * paquete = createMessage(&request,buffer);
         enviar_message(fdClient, paquete, file_log, &control);
         if (control != 0) {
             return;
@@ -79,7 +80,7 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
             control = 0;
             header response;
             paquete = getMessage(fdClient, &response, &control);
-            if (control < 0) {
+            if (paquete == NULL) {
                 return;
             } else {
                 dataMemoria = deserealizarMemoria(paquete, response.sizeData);
@@ -151,7 +152,7 @@ void *pthreadGossping() {
     if (pthread_mutex_init(&mutex, NULL) != 0)
     {
         printf("\n mutex init failed\n");
-        return NULL;
+        pthread_exit(NULL);
     }
     int i;
     while (true) {
@@ -167,6 +168,6 @@ void *pthreadGossping() {
             memoria = list_get(seedFallidas,i);
             removeMemoriaFallida(memoria);
         }
-        sleep(60);
+        sleep(configMemoria->TIEMPO_GOSSIPING/1000);
     }
 }

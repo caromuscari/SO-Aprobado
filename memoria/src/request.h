@@ -10,13 +10,15 @@
 
 #include <funcionesCompartidas/listaMetadata.h>
 #include "segmentacionPaginada.h"
+#include "contrato.h"
 
 
 int mandarCreate(st_create * create);
 int mandarDrop(st_drop * drop);
-int mandarDescribe(st_describe * describe, st_metadata ** buff);
-int mandarDescribeGlobal(void ** paquete, size_t *size);
+st_messageResponse* mandarDescribe(st_describe * describe);
+st_messageResponse* mandarDescribeGlobal();
 int mandarInsert(st_insert * insert);
+st_registro* obtenerSelect(st_select * comandoSelect);
 
 
 #endif /* SRC_REQUEST_H_ */

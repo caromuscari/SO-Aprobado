@@ -11,6 +11,10 @@
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/registroTabla.h>
 #include "threadMetadata.h"
+#include "threadPoolMemoria.h"
+#include "contracts.h"
 
-int enviarRequestMemoria(stinstruccion *laInstruccion, st_memoria *datoMemoria);
+int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria);
+st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *buffer, size_t sizeBuffer);
+void destroyStMessageResponse(st_messageResponse *stMR);
 #endif //KERNEL_REQUESTMEMORIA_H

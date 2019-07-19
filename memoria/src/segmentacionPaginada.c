@@ -6,6 +6,7 @@ extern void *memoriaPrincipal;
 extern t_list* listaDeSegmentos;
 extern int cantPaginas;
 extern int tamanioTotalDePagina;
+extern t_log *file_log;
 
 
 void mostrarPaginasCargadas(){
@@ -32,7 +33,6 @@ st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 	}
 	return (st_segmento*)list_find(listaDeSegmentos, (void*)mismoNombreTabla);
 }
-
 
 st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 	bool paginaConEsaKey(st_tablaDePaginas * tablaPagina){
@@ -92,5 +92,32 @@ st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tab
 		free(marcoSemilla);
 		return paginaSemilla;
 	}
+}
+
+int removerSegmentoPorNombrePagina(char* nombreTabla){
+	  st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(nombreTabla);
+	    if(segmentoEncontrado){
+	        log_info(file_log, "Se encontro el segmento por Drop");
+
+	        for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
+	            st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
+	            st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
+	            free(paginaDeTabla);
+	            marco->condicion = LIBRE;
+	        }
+
+	        list_destroy(segmentoEncontrado->tablaDePaginas);
+	        free(segmentoEncontrado->nombreTabla);
+	        list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
+	        for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
+	            st_segmento* segmento = list_get(listaDeSegmentos, i);
+	            int nro = segmento->nroSegmento;
+	            segmento->nroSegmento = nro - 1;
+	        }
+	        return OK;
+	    } else {
+	    	log_info(file_log, "No se encontro el segmento");
+	    	return NOOK;
+	    }
 }
 

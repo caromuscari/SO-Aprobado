@@ -150,6 +150,7 @@ t_list * llenarTabla(char * path){
 				list_add(lista, reg);
 
 				free(flag);
+				flag = NULL;
 			}else{
 				split = string_split(linea,";");
 				if(split[0] != NULL){
@@ -201,7 +202,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 		while(getline(&linea, &tamBuffer, archivo) != -1){
 			if(flag != NULL){
 				string_append(&flag, linea);
-				split = string_split(linea,";");
+				split = string_split(flag,";");
 
 				part = atoi(split[1]) % totalPart;
 				t_list * listPart = dictionary_get(lista,string_itoa(part));
@@ -228,6 +229,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 				}
 
 				free(flag);
+				flag =NULL;
 			}else{
 				split = string_split(linea,";");
 				if(split[0] != NULL){

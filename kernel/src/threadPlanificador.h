@@ -12,10 +12,14 @@
 #include <funcionesCompartidas/log.h>
 #include <unistd.h>
 #include "load_config.h"
-#include "threadPoolMemoria.h"
 #include "requestMemoria.h"
+#include "threadPoolMemoria.h"
+#include "contracts.h"
 
 void * inicialPlanificador();
-void cargarNuevoScript(t_list * listInstrucciones);
+void cargarNuevoScript(st_script * newProceso);
+st_script *crearNuevoScript(char *id, t_list *listaInstrucciones);
+st_instruccion *crearInstruccion(void *instruccion, enum OPERACION type);
+void destroyListaInstruciones(t_list *instrucciones);
 
 #endif //KERNEL_PLANIFICADOR_H

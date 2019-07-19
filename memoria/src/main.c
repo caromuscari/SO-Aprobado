@@ -70,7 +70,7 @@ void liberarConfig(t_configuracionMemoria * config){
 
 int inicializar(char *pathConfig){
     int i;
-    file_log = crear_archivo_log("Memoria", true, "./logMemoria");
+    file_log = crear_archivo_log("Memoria", false, "./logMemoria");
     log_info(file_log, "Cargando el archivo de configuracion\n");
     configMemoria = leerConfiguracion(pathConfig);
     if (!configMemoria) {
@@ -78,13 +78,15 @@ int inicializar(char *pathConfig){
         log_destroy(file_log);
         return -1;
     }
-  //  if(!buscarValueMaximo()){
-  //      return -1;
-  //  }
+//    if(!buscarValueMaximo()){
+//        return -1;
+//    }
     log_info(file_log, "Inicializando Memoria\n");
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;
     memoriaPrincipal = malloc(configMemoria->TAM_MEM);
+    inicializarSemaforos();
+    listaDeSegmentos = list_create();
     listaDeMarcos = list_create();
     for (i = 0; i < cantPaginas; i++) {
         st_marco *marco = malloc(sizeof(st_marco));
@@ -118,7 +120,6 @@ int main(int argc, char *argv[]){
         return -1;
     }
     //descomentar cando el File entienda este mensaje
-    inicializarMemoria();
     log_info(file_log, "La memoria se inicio correctamente\n");
     pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);

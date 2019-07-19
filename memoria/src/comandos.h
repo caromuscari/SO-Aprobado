@@ -9,12 +9,12 @@
 #define SRC_COMANDOS_H_
 
 #include "segmentacionPaginada.h"
-#include "socketCliente.h"
 #include <funcionesCompartidas/API.h>
 #include "request.h"
+#include "contrato.h"
+#include "pthread.h"
 
-void inicializarMemoria();
-
+void inicializarSemaforos();
 st_registro* comandoSelect(st_select* comandoSelect);
 
 int comandoInsert(st_insert* comandoInsert);

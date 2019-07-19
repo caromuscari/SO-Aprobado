@@ -70,7 +70,7 @@ void liberarConfig(t_configuracionMemoria * config){
 
 int inicializar(char *pathConfig){
     int i;
-    file_log = crear_archivo_log("Memoria", true, "./logMemoria");
+    file_log = crear_archivo_log("Memoria", false, "./logMemoria");
     log_info(file_log, "Cargando el archivo de configuracion\n");
     configMemoria = leerConfiguracion(pathConfig);
     if (!configMemoria) {

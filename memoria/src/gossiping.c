@@ -70,8 +70,9 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
         header request;
         request.letra = 'M';
         request.codigo = BUSCARTABLAGOSSIPING;
-        request.sizeData = 0;
-        void *paquete = createMessage(&request,NULL);
+        request.sizeData = 1;
+        void * buffer = strdup("1");
+        void * paquete = createMessage(&request,buffer);
         enviar_message(fdClient, paquete, file_log, &control);
         if (control != 0) {
             return;
@@ -79,7 +80,7 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
             control = 0;
             header response;
             paquete = getMessage(fdClient, &response, &control);
-            if (control < 0) {
+            if (paquete == NULL) {
                 return;
             } else {
                 dataMemoria = deserealizarMemoria(paquete, response.sizeData);

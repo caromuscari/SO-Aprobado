@@ -19,4 +19,5 @@ void * schedulerMetadata();
 TypeCriterio getCriterioByNameTabla(char *nameTable);
 void removeTablaByName(char * nameTable);
 void addNuevaTabla(st_metadata * metadata);
+void updateListaMetadata(t_list *nuevaLista);
 #endif //KERNEL_THREADMETADATA_H

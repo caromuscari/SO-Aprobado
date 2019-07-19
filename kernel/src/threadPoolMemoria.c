@@ -21,8 +21,8 @@ void destroyKernelMemoria(st_kernel_memoria * kernelMemoria){
 st_memoria * clonarMemoria(st_memoria * memoriaAclonar){
     st_memoria * memoria = malloc(sizeof(st_memoria));
     memoria->numero = memoriaAclonar->numero;
-    memoria->puerto = strdup(memoria->puerto);
-    memoria->ip = strdup(memoria->ip);
+    memoria->puerto = strdup(memoriaAclonar->puerto);
+    memoria->ip = strdup(memoriaAclonar->ip);
     return memoria;
 }
 

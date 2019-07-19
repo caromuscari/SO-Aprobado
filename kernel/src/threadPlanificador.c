@@ -91,12 +91,12 @@ void cargarNuevoScript(st_script *newScript) {
     sem_post(&colaDeListos);
 }
 
-void * ejecutarScript(){
+void *ejecutarScript() {
     int i, resultado = NO_SALIO_OK;
     st_instruccion *instruccionScript;
     st_memoria *datomemoria;
     st_script *script = tomarScript();
-    char * tag;
+    char *tag;
     TypeCriterio typeCriterio;
     printf("Ejecutando Script ----- [%s]\n", script->id);
     t_list *instrucciones = tomarInstrucciones(script->listaDeInstrucciones);
@@ -104,10 +104,11 @@ void * ejecutarScript(){
     for (i = 0; i < instrucciones->elements_count; ++i) {
         instruccionScript = list_get(instrucciones, i);
         typeCriterio = getCriterioBYInstruccion(instruccionScript->instruccion, instruccionScript->operacion);
-        if(typeCriterio == NO_SE_ENCONTRO_TABLA){
+        if (typeCriterio == NO_SE_ENCONTRO_TABLA) {
+            printf("No se encontro tabla\n");
             break;
         }
-        tag = generarTag(typeCriterio,instruccionScript->instruccion, instruccionScript->operacion);
+        tag = generarTag(typeCriterio, instruccionScript->instruccion, instruccionScript->operacion);
         datomemoria = getMemoria(typeCriterio, tag);
         if (datomemoria) {
             resultado = enviarRequestMemoria(instruccionScript, datomemoria);
@@ -123,7 +124,9 @@ void * ejecutarScript(){
     printf("Fin Ejecucion de Script ----- [%s]\n", script->id);
     //Evaluar resultado de Ejecucion
     if (resultado == SALIO_OK) {
-        cargarNuevoScript(script);
+        if (script->listaDeInstrucciones->elements_count > 0) {
+            cargarNuevoScript(script);
+        }
     } else {
         destroyScript(script);
     }
@@ -135,7 +138,7 @@ void atenderScriptEntrantes() {
     while (1) {
         sem_wait(&colaDeListos);
         sem_wait(&procesadores);
-        pthread_create(&pthread_execution,NULL, ejecutarScript, NULL);
+        pthread_create(&pthread_execution, NULL, ejecutarScript, NULL);
         pthread_detach(pthread_execution);
         sleep(configuracion->SLEEP_EJECUCION);
         sem_post(&procesadores);

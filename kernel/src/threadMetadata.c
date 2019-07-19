@@ -49,7 +49,9 @@ void removeTablaByName(char * nameTable){
 
 void addNuevaTabla(st_metadata * metadata){
     pthread_mutex_lock(&mutex);
-    list_add(listMetadata,metadata);
+    if(buscarNameTable(metadata->nameTable) == -1){
+        list_add(listMetadata,metadata);
+    }
     pthread_mutex_unlock(&mutex);
 }
 
@@ -79,6 +81,10 @@ void *schedulerMetadata() {
                 case SUCCESS:{
                     updateListaMetadata(deserealizarListaMetaData(respuestaMesanje->buffer, respuestaMesanje->cabezera.sizeData));
                     destroyStMessageResponse(respuestaMesanje);
+                    break;
+                }
+                case NOSUCCESS:{
+                    log_info(file_log,"[MetaData] no hay resultado\n");
                     break;
                 }
                 default:{

@@ -200,14 +200,13 @@ void armarComando(char *comando) {
         }
         case DESCRIBE: {
             st_describe *_describe = cargarDescribe(comando);
-            flagErrorSintaxis = true;
             if (_describe) {
                 idText = strdup("Script Describe ");
                 string_append(&idText, _describe->nameTable);
                 cargarScriptConUnaInstruccion(_describe, DESCRIBE, idText);
             } else {
                 idText = strdup("Script Describe Global");;
-                cargarScriptConUnaInstruccion(NULL, DESCRIBE, idText);
+                cargarScriptConUnaInstruccion(NULL, DESCRIBEGLOBAL, idText);
             }
             break;
         }

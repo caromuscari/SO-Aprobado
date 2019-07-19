@@ -130,7 +130,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
     switch (mensaje->cabezera.codigo) {
         case SUCCESS: {
             printf("se creo la tabla sin probl+emas\n");
-            st_metadata * newMetadata = malloc(sizeof(st_metadata));
+            st_metadata *newMetadata = malloc(sizeof(st_metadata));
             newMetadata->nameTable = strdup(_create->nameTable);
             newMetadata->consistency = strdup(_create->tipoConsistencia);
             newMetadata->compaction_time = _create->compactionTime;
@@ -144,6 +144,66 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
             break;
         }
 
+    }
+    destroyStMessageResponse(mensaje);
+    return resultado;
+}
+
+int atenderResultadoDescribe(st_messageResponse *mensaje) {
+    int resultado = NO_SALIO_OK;
+    if (mensaje == NULL) {
+        return SE_DESCONECTO_SOCKET;
+    }
+    switch (mensaje->cabezera.codigo) {
+        case SUCCESS: {
+            size_t size;
+            st_metadata *metadata = deserealizarMetaData(mensaje->buffer, &size);
+            printf("********----resultado de Describe -------******\n");
+            printf("nameTable [%s]\n", metadata->nameTable),
+            printf("Consistencia [%s]\n", metadata->consistency);
+            addNuevaTabla(metadata);
+            resultado = SALIO_OK;
+            break;
+        }
+        case NOSUCCESS: {
+            printf("no hay respuesta para esta tabla\n");
+            break;
+        }
+        default: {
+            printf("no entiendo el codigo de respuesta\n");
+        }
+    }
+    destroyStMessageResponse(mensaje);
+    return resultado;
+}
+
+int atenderResultadoDescribeGlobal(st_messageResponse *mensaje) {
+    int resultado = NO_SALIO_OK;
+    if (mensaje == NULL) {
+        return SE_DESCONECTO_SOCKET;
+    }
+    switch (mensaje->cabezera.codigo) {
+        case SUCCESS: {
+            int i;
+            st_metadata * metadata;
+            t_list * listMetadata = deserealizarListaMetaData(mensaje->buffer, mensaje->cabezera.sizeData);
+            for (i = 0; i < listMetadata->elements_count; ++i) {
+                metadata = list_get(listMetadata, i);
+                printf("********----resultado de Describe -------******\n");
+                printf("nameTable [%s]\n", metadata->nameTable),
+                printf("Consistencia [%s]\n", metadata->consistency);
+            }
+            updateListaMetadata(listMetadata);
+            resultado = SALIO_OK;
+            break;
+        }
+        case NOSUCCESS: {
+            printf("no hay respuesta para describe global \n");
+            break;
+        }
+        default: {
+            printf("no entiendo el codigo de respuesta\n");
+        }
     }
     destroyStMessageResponse(mensaje);
     return resultado;
@@ -173,7 +233,7 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
         case DROP: {
             buffer = serealizarDrop(laInstruccion->instruccion, &size_buffer);
             resultado = atenderResultadoSDrop(
-                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer),
+                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, DROP, buffer, size_buffer),
                     ((st_drop *) laInstruccion->instruccion)->nameTable
             );
             break;
@@ -181,8 +241,23 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
         case CREATE: {
             buffer = serealizarCreate(laInstruccion->instruccion, &size_buffer);
             resultado = atenderResultadoCreate(
-                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer),
+                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, CREATE, buffer, size_buffer),
                     laInstruccion->instruccion
+            );
+            break;
+        }
+        case DESCRIBE: {
+            buffer = serealizarDescribe(laInstruccion->instruccion, &size_buffer);
+            resultado = atenderResultadoDescribe(
+                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, DESCRIBE, buffer, size_buffer)
+            );
+            break;
+        }
+        case DESCRIBEGLOBAL: {
+            buffer = strdup("1");
+            size_buffer = strlen(buffer);
+            resultado = atenderResultadoDescribeGlobal(
+                    consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, DESCRIBEGLOBAL, buffer, size_buffer)
             );
             break;
         }

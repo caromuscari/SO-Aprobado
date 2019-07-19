@@ -85,6 +85,8 @@ int inicializar(char *pathConfig){
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;
     memoriaPrincipal = malloc(configMemoria->TAM_MEM);
+    inicializarSemaforos();
+    listaDeSegmentos = list_create();
     listaDeMarcos = list_create();
     for (i = 0; i < cantPaginas; i++) {
         st_marco *marco = malloc(sizeof(st_marco));
@@ -118,7 +120,6 @@ int main(int argc, char *argv[]){
         return -1;
     }
     //descomentar cando el File entienda este mensaje
-    inicializarMemoria();
     log_info(file_log, "La memoria se inicio correctamente\n");
     pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);

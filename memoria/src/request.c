@@ -85,6 +85,41 @@ int mandarDrop(st_drop * drop){
 	return respuesta.codigo;
 }
 
+st_registro* obtenerSelect(st_select * comandoSelect){
+    int control = 0;
+    header request;
+    void* paqueteDeRespuesta;
+    header respuesta;
+    request.letra = 'M';
+    request.codigo = SELECT;
+
+    size_t size;
+    void* paqueteDatos = serealizarSelect(comandoSelect, &size);
+
+    request.sizeData = size;
+
+    message* mensaje = createMessage(&request, paqueteDatos);
+    enviar_message(fdFileSystem, mensaje, file_log, &control);
+    free(paqueteDatos);
+    free(mensaje->buffer);
+    free(mensaje);
+    if(control != 0){
+        log_error(file_log, "No se pudo enviar el mensaje del select");
+        return NULL;
+    }
+
+    paqueteDeRespuesta = getMessage(fdFileSystem, &respuesta, &control);
+    if(paqueteDeRespuesta== NULL){
+        log_error(file_log, "Fallo la conexion con el File System");
+        return NULL;
+    }
+    if(respuesta.codigo == 14){
+        return deserealizarRegistro(paqueteDeRespuesta);
+    } else {
+        return NULL;
+    }
+}
+
 st_messageResponse* mandarDescribe(st_describe * describe){
 	size_t size;
 	header head, head2;

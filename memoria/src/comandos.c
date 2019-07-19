@@ -5,22 +5,22 @@ extern int tamanioValue;
 extern t_list* listaDeMarcos;
 extern void *memoriaPrincipal;
 extern t_list* listaDeSegmentos;
+pthread_mutex_t mutex;
 
-
-// INICIALIZO MEMORIA
-
-void inicializarMemoria(){
-	listaDeSegmentos = list_create();
-	log_info(file_log, "La lista de segmentos se creo correctamente\n");
+void inicializarSemaforos(){
+    if (pthread_mutex_init(&mutex, NULL) != 0) {
+        printf("\n mutex init failed\n");
+        pthread_exit(NULL);
+    }
 }
 
 //COMANDO INSERT
-
 int comandoInsert(st_insert* comandoInsert){
 	if(strlen(comandoInsert->value) > tamanioValue){
 		log_error(file_log, "El value es mayor al tamaño máximo\n");
 		return MAYORQUEVALUEMAX;
 	}
+    pthread_mutex_lock(&mutex);
 	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoInsert->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
 		log_info(file_log, "Segmento encontrado por comando Insert\n");
@@ -32,12 +32,14 @@ int comandoInsert(st_insert* comandoInsert){
 			paginaDeTablaEncontrada->flagModificado = 1;
 
 			log_info(file_log, "El Insert se realizo correctamente\n");
+            pthread_mutex_unlock(&mutex);
 			return OK;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key\n");
 
 		int posMarcoLibre = buscarMarcoLibre();
 		if(posMarcoLibre == -1){
+            pthread_mutex_unlock(&mutex);
             return FULLMEMORY;
 		}
 
@@ -57,8 +59,8 @@ int comandoInsert(st_insert* comandoInsert){
 
 		st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 		marco->condicion = OCUPADO;
-        mostrarPaginasCargadas();
         log_info(file_log, "El Insert se realizo correctamente\n");
+        pthread_mutex_unlock(&mutex);
 		return OK;
 	}
 	log_info(file_log, "No se encontro el segmento de esa tabla\n");
@@ -70,6 +72,7 @@ int comandoInsert(st_insert* comandoInsert){
 
 	int posMarcoLibre = buscarMarcoLibre();
 	if(posMarcoLibre == -1){
+        pthread_mutex_unlock(&mutex);
         return FULLMEMORY;
 	}
 	//creo la pagina
@@ -93,15 +96,15 @@ int comandoInsert(st_insert* comandoInsert){
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
 	log_info(file_log, "El Insert se realizo correctamente\n");
+    pthread_mutex_unlock(&mutex);
 	return OK;
 }
 
-
 // COMANDO SELECT
-
 st_registro* comandoSelect(st_select* comandoSelect){
 	st_segmento* segmentoEncontrado;
 	st_registro* registro;
+    pthread_mutex_lock(&mutex);
 	segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoSelect->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
 		log_info(file_log, "Segmento encontrado por comando Select\n");
@@ -117,7 +120,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 			memcpy(&registro->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
 			memcpy(&registro->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
 			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), sizeValue);
-
+            pthread_mutex_unlock(&mutex);
 			return registro;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key\n");
@@ -125,6 +128,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		registro = obtenerSelect(comandoSelect);
 
 		if(registro == NULL){
+            pthread_mutex_unlock(&mutex);
 			return NULL;
 		}
 
@@ -147,13 +151,14 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 		marco->condicion = OCUPADO;
 		marco->timestamp = obtenerMilisegundosDeHoy();
-        mostrarPaginasCargadas();
+        pthread_mutex_unlock(&mutex);
 		return registro;
 	}
 	log_info(file_log, "No se encontro el segmento de la tabla pedida por Select\n");
 	registro = obtenerSelect(comandoSelect);
 
 	if(registro == NULL){
+        pthread_mutex_unlock(&mutex);
 		return NULL;
 	}
 
@@ -185,40 +190,9 @@ st_registro* comandoSelect(st_select* comandoSelect){
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
 	marco->timestamp = obtenerMilisegundosDeHoy();
-	mostrarPaginasCargadas();
-
+    pthread_mutex_unlock(&mutex);
 	return registro;
 }
-
-/*
-int comandoDrop(st_drop* comandoDrop){
-	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoDrop->nameTable);
-	if(segmentoEncontrado){
-		log_info(file_log, "Se encontro el segmento por Drop");
-
-		for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
-			st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
-			free(paginaDeTabla->pagina);
-			st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
-			marco->condicion = LIBRE;
-		}
-
-		list_destroy(segmentoEncontrado->tablaDePaginas);
-		free(segmentoEncontrado->tablaDePaginas);
-		free(segmentoEncontrado->nombreTabla);
-		list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
-		for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
-			st_segmento* segmento = list_get(listaDeSegmentos, i);
-			int nro = segmento->nroSegmento;
-			segmento->nroSegmento = nro - 1;
-		}
-		return 0;
-	} else {
-		//se informa al file system
-		informarDrop(comandoDrop);
-		return 0;
-	}
-}*/
 
 //COMANDO JOURNAL
 bool enviarSegmentoAFS(st_segmento* segmento){
@@ -244,6 +218,7 @@ bool enviarSegmentoAFS(st_segmento* segmento){
              log_error(file_log, string_from_format("El Filesystem rechazó el registro \nTabla:%s | Key:%d | Value:%s\n", insert->nameTable, insert->key, insert->value));
              huboError = true;
             }
+            destroyInsert(insert);
         }
     }
     list_iterate(segmento->tablaDePaginas, (void *)enviarPaginasAFS);
@@ -264,6 +239,7 @@ int comandoJournal(){
 	log_info(file_log, "Ejecutando Journal\n");
 	bool resultado = true;
 	st_segmento * segmento;
+    pthread_mutex_lock(&mutex);
 	for (int i = 0; i < list_size(listaDeSegmentos); i++){
     	segmento = list_get(listaDeSegmentos, i);
     	if(!enviarSegmentoAFS(segmento)){
@@ -272,6 +248,7 @@ int comandoJournal(){
     		list_remove(listaDeSegmentos, i);
     	}
     }
+    pthread_mutex_unlock(&mutex);
     if(resultado){
     log_info(file_log, "Termino el Journal\n");
     return OK;

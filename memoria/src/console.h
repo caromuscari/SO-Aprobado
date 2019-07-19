@@ -17,7 +17,6 @@
 #include <pthread.h>
 #include "segmentacionPaginada.h"
 #include "contrato.h"
-#include "socketCliente.h"
 
 
 void console();

@@ -15,7 +15,6 @@
 #include <commons/collections/list.h>
 #include <funcionesCompartidas/codigoMensajes.h>
 #include "gossiping.h"
-#include "socketCliente.h"
 #include "comandos.h"
 
 void * start_server();

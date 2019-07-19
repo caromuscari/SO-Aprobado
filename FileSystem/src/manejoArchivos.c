@@ -156,6 +156,9 @@ int realizarCreate(st_create * create){
 			tabla->meta = leerMetadata(create->nameTable);
 			char * name = strdup(create->nameTable);
 
+			sem_init(&tabla->compactacion,0,1);
+			sem_init(&tabla->opcional,0,0);
+
 			sem_wait(&sNombre);
 			queue_push(nombre, name);
 			sem_post(&sNombre);
@@ -186,6 +189,12 @@ int realizarDrop(st_drop * drop){
 
 		tabla = eliminarDeTablas(drop->nameTable);
 
+		sem_wait(&tabla->compactacion);
+		pthread_cancel(tabla->hilo);
+
+		sem_destroy(&tabla->compactacion);
+		sem_destroy(&tabla->opcional);
+
 		path = armar_path(drop->nameTable);
 
 		if(existeEnMemtable(drop->nameTable)){
@@ -209,11 +218,6 @@ int realizarDrop(st_drop * drop){
 		eliminarTemporales(path);
 
 		eliminarDirectorio(path);
-
-		pthread_cancel(tabla->hilo);
-
-		sem_destroy(&tabla->compactacion);
-		sem_destroy(&tabla->opcional);
 
 		respuesta = 9;
 
@@ -240,21 +244,22 @@ int realizarDescribe(st_describe * describe, st_metadata ** m){
 int realizarDescribeGlobal(t_list ** lista){
 	int respuesta;
 
-	*lista = list_create();
+
 	void obtenerMetadatas(char * key, st_tablaCompac * tabla){
 
 		list_add(*lista, tabla->meta);
 	}
 
-	sem_wait(&sTablas);
-	dictionary_iterator(tablas,(void*)obtenerMetadatas);
-	sem_post(&sTablas);
+	if(!tablasVacia()){
+		*lista = list_create();
 
-	if(list_size(*lista) != 0){
+		sem_wait(&sTablas);
+		dictionary_iterator(tablas,(void*)obtenerMetadatas);
+		sem_post(&sTablas);
+
 		respuesta = 13;
-	}else{
-		respuesta = 12;
-	}
+	}else respuesta = 12;
+
 
 	return respuesta;
 }

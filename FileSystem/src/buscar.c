@@ -12,9 +12,8 @@
 #include "buscar.h"
 #include <dirent.h>
 #include "Funciones.h"
+#include "Semaforos.h"
 
-extern t_dictionary * memtable;
-extern sem_t sMemtable;
 
 char * buscarKey(char * name, int key, int particion){
 	char * value;
@@ -26,9 +25,8 @@ char * buscarKey(char * name, int key, int particion){
 	char * path = armar_path(name);
 	char * completo;
 
-	sem_wait(&sMemtable);
-	if(dictionary_has_key(memtable,name)){
-		data = dictionary_get(memtable, name);
+	if(existeEnMemtable(name)){
+		data = leerDeMemtable(name);
 
 		reg = buscarEnLista(data, key);
 
@@ -39,7 +37,6 @@ char * buscarKey(char * name, int key, int particion){
 			free(reg);
 		}
 	}
-	sem_post(&sMemtable);
 
 	completo = string_from_format("%s/%d.bin", path, particion);
 	reg = buscarEnParticion(completo,key);
@@ -110,7 +107,7 @@ structRegistro * buscarEnParticion(char * path, uint16_t key){
 	structRegistro * reg, * prueba;
 	structParticion * part;
 	int i = 0, flag = 0;
-	char * exep;
+	char * exep = NULL;
 
 	part = leerParticion(path);
 
@@ -121,8 +118,7 @@ structRegistro * buscarEnParticion(char * path, uint16_t key){
 				reg = malloc(sizeof(structRegistro));
 				reg->time = prueba->time;
 				reg->key = prueba->key;
-				reg->value = string_new();
-				string_append(&reg->value, prueba->value);
+				reg->value = strdup(prueba->value);
 
 				flag = 1;
 

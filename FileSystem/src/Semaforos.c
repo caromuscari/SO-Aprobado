@@ -78,6 +78,14 @@ bool existeEnTablas(char* nameTable){
 	return resp;
 }
 
+bool tablasVacia(){
+	bool resp;
+	sem_wait(&sTablas);
+	resp = dictionary_is_empty(tablas);
+	sem_post(&sTablas);
+	return resp;
+}
+
 //Config
 int getRetardo(){
 	int retardo;

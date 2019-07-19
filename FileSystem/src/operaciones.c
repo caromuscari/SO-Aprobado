@@ -78,8 +78,8 @@ int verificar_bloque()
 void actualizar_bitmap(){
 	sem_wait(&sBitmap);
 	memcpy(posicion,bitmap,mystat.st_size);
-	msync(posicion,mystat.st_size,MS_SYNC);
 	sem_post(&sBitmap);
+	msync(posicion,mystat.st_size,MS_SYNC);
 }
 
 char * armar_path(char * archivo){
@@ -298,10 +298,10 @@ t_dictionary * listarDirectorio(){
         		sem_wait(&sNombre);
         		queue_push(nombre, table);
         		sem_post(&sNombre);
+        		dictionary_put(tablas, name, tabla);
         		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
         		pthread_detach(tabla->hilo);
 
-        		dictionary_put(tablas, name, tabla);
         	}
 
         	free(name);
@@ -427,7 +427,7 @@ t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio_size){
 
 
     if(valido){
-        list_iterate(bits, (void*) seteoBit);
+        //list_iterate(bits, (void*) seteoBit);
         char* strBloques = list_fold(bits, strdup(""), (void*)armarStrBloques);
         contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", tamanio_size, strBloques);
 
@@ -438,7 +438,7 @@ t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio_size){
         fclose(archivo);
 
         free(contenido);
-    }
+    }else; //Liberar los que si pudo tomar
 
 
     return bits;

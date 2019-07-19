@@ -26,6 +26,7 @@ st_registro *cargarRegistro(char *text) {
         free(splitText);
     } else {
         string_iterate_lines(splitText, (void *) free);
+        free(splitText);
         free(registro);
         registro = NULL;
     }

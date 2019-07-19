@@ -43,7 +43,7 @@ void tratarCliente(cliente_t * cliente){
 
 		recibido->buffer = getMessage(cliente->socket, &(recibido->head), &status);
 
-		if(recibido->buffer == NULL) flag=false;
+		//if(recibido->buffer == NULL) flag=false;
 
 		switch(recibido->head.codigo)
 		{

@@ -181,7 +181,7 @@ int abrir_bitmap()
 
 	close(fdbitmap);
 
-	posicion = malloc(cantBloques);
+	//posicion = malloc(cantBloques/8);
 
 	log_info(alog, "Abre el bitmap");
 
@@ -212,7 +212,7 @@ void finalizar(){
 		msync(posicion,mystat.st_size,MS_SYNC);
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
-		free(posicion);
+		//free(posicion);
 
 		queue_clean_and_destroy_elements(nombre, free);
 

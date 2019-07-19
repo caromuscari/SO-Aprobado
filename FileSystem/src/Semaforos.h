@@ -20,6 +20,7 @@ st_tablaCompac * leerDeTablas(char* nameTable);
 void agregarATablas(st_tablaCompac * data, char* nameTable);
 st_tablaCompac * eliminarDeTablas(char* nameTable);
 bool existeEnTablas(char* nameTable);
+bool tablasVacia();
 int getRetardo();
 int getDump();
 int getValue();

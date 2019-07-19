@@ -222,7 +222,7 @@ void mostrarRespuesta(int respuesta){
 			printf("La tabla se creo correctamente\n");
 			break;
 		case 9:
-			log_error(alog, "La tabla se elimino correctamente");
+			log_info(alog, "La tabla se elimino correctamente");
 			printf("La tabla se elimino correctamente\n");
 			break;
 		case 10:

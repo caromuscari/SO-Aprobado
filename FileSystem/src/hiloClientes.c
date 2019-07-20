@@ -38,7 +38,7 @@ void tratarCliente(cliente_t * cliente){
 	while(loop && flag){
 		mensaje * recibido = malloc(sizeof(mensaje));
 		int respuesta;
-		char * buffer = NULL;
+		char * buffer = strdup(" ");
 		size_t size;
 
 		recibido->buffer = getMessage(cliente->socket, &(recibido->head), &status);
@@ -55,25 +55,27 @@ void tratarCliente(cliente_t * cliente){
 				if(string_length(insert->value) <= getValue())
 				{
 					respuesta = realizarInsert(insert);
-					enviarRespuesta(respuesta, buffer, cliente->socket, &status, 0);
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
 
 				}else{
-					enviarRespuesta(3, buffer, cliente->socket, &status, 0);
+					enviarRespuesta(3, buffer, cliente->socket, &status, string_length(buffer));
 				}
 
 				destroyInsert(insert);
+				free(buffer);
 				break;
 
 			case SELECT:
 				log_info(alog, "Recibi un Select");
 				st_select * selectt;
-				char * registro;
+				char * registro = NULL;
 				st_registro * reg;
 				selectt = deserealizarSelect(recibido->buffer);
 
 				respuesta = realizarSelect(selectt, &registro);
 				if(registro != NULL){
 					reg = cargarRegistro(registro);
+					free(buffer);
 					buffer = serealizarRegistro(reg,&size);
 				}else size = 0;
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
@@ -94,9 +96,10 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarCreate(create);
 				actualizar_bitmap();
 
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, 0);
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
 
 				destroyCreate(create);
+				free(buffer);
 				break;
 
 			case DROP:
@@ -107,9 +110,10 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarDrop(drop);
 				actualizar_bitmap();
 
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, 0);
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
 
 				destroyDrop(drop);
+				free(buffer);
 				break;
 
 			case DESCRIBE:
@@ -120,14 +124,15 @@ void tratarCliente(cliente_t * cliente){
 
 				respuesta = realizarDescribe(describe, &meta);
 
-				if(respuesta == 15)
+				if(respuesta == 15){
+					free(buffer);
 					buffer = serealizarMetaData(meta, &size);
-				else size = 0;
+				}else size = 0;
 
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
 				destroyDescribe(describe);
-				if(buffer != NULL) free(buffer);
+				free(buffer);
 				break;
 
 			case DESCRIBEGLOBAL:
@@ -137,14 +142,15 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarDescribeGlobal(&lista);
 
 				if(respuesta == 13){
+					free(buffer);
 					buffer = serealizarListaMetaData(lista,&size);
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
 					list_destroy(lista);
 				}else{
-					enviarRespuesta(respuesta, buffer, cliente->socket, &status,0);
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status,string_length(buffer));
 				}
 
-				if(buffer != NULL) free(buffer);
+				free(buffer);
 				break;
 			default:
 				flag = false;

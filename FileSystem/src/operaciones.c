@@ -7,6 +7,7 @@
 
 #include "manejoArchivos.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "operaciones.h"
 #include <commons/bitarray.h>
 #include <commons/config.h>
@@ -240,7 +241,7 @@ structParticion * leerParticion(char * path){
 void actualizar_bloques(char * path,int bit){
 	t_config *configuracion;
 	char ** bloques;
-	int i;
+	int i=0;
 
 	configuracion = config_create(path);
 
@@ -334,16 +335,24 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 		value = string_from_format("%s%s", *exep, linea);
 
 		split = string_split(value,";");
-		if(atoi(split[1]) == key){
-			reg = malloc(sizeof(structRegistro));
-			reg->time = atol(split[0]);
-			reg->key = atoi(split[1]);
-			reg->value = strdup(strtok(split[2], "\n"));
+		if(split[0] != NULL){
+			if(split[1] == NULL) *exep = strdup(value);
+			else if(split[2] != NULL && string_contains(split[2], "\n")){
+				if(atoi(split[1]) == key){
+					reg = malloc(sizeof(structRegistro));
+					reg->time = strtod(split[0],NULL);
+					reg->key = atoi(split[1]);
+					reg->value = strdup(strtok(split[2], "\n"));
 
-			flag = 1;
+					flag = 1;
+					free(*exep);
+				}
+			}else *exep = strdup(value);
+		}else if(!string_is_empty(value)){
+			*exep = strdup(value);
 		}
 
-		free(*exep);
+		free(value);
 
 		string_iterate_lines(split, (void*)free);
 		free(split);
@@ -359,13 +368,13 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 				if(atoi(split[1]) == key){
 					if(flag == 0){
 						reg = malloc(sizeof(structRegistro));
-						reg->time = atol(split[0]);
+						reg->time = strtod(split[0],NULL);
 						reg->key = atoi(split[1]);
 						reg->value = strdup(strtok(split[2], "\n"));
 
 						flag = 1;
-					}else if(reg->time < atol(split[0])){
-							reg->time = atol(split[0]);
+					}else if(reg->time < strtod(split[0],NULL)){
+							reg->time = strtod(split[0],NULL);
 							reg->key = atoi(split[1]);
 							reg->value = strdup(strtok(split[2], "\n"));
 						}

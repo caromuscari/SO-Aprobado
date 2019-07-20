@@ -45,7 +45,7 @@ void hilocompactacion(){
 
 	while(loop){
 
-		sleep(tabla->meta->compaction_time);
+		sleep((tabla->meta->compaction_time)/1000);
 
 		pathTabla = armar_path(nomTabla);
 
@@ -140,24 +140,31 @@ t_list * llenarTabla(char * path){
 
 			structRegistro * reg;
 			if(flag != NULL){
-				string_append(&flag, linea);
-				split = string_split(linea,";");
-				reg = malloc(sizeof(structRegistro));
-				reg->time = atol(split[0]);
-				reg->key = atoi(split[1]);
-				reg->value = strdup(strtok(split[2], "\n"));
+				char * value = string_from_format("%s%s",flag,linea);
+				//string_append(&flag, linea);
+				split = string_split(value,";");
+				if(split[0] != NULL){
+					if(split[1] == NULL) flag = strdup(value);
+					else if(split[2] != NULL && string_contains(split[2], "\n")){
+						reg = malloc(sizeof(structRegistro));
+						reg->time = strtod(split[0],NULL);
+						reg->key = atoi(split[1]);
+						reg->value = strdup(strtok(split[2], "\n"));
 
-				list_add(lista, reg);
+						list_add(lista, reg);
 
-				free(flag);
-				flag = NULL;
+						free(flag);
+						flag = NULL;
+					}else flag = strdup(value);
+				}else flag = strdup(value);
+				free(value);
 			}else{
 				split = string_split(linea,";");
 				if(split[0] != NULL){
 					if(split[1] == NULL) flag = strdup(linea);
 					else if(split[2] != NULL && string_contains(split[2], "\n")){
 						reg = malloc(sizeof(structRegistro));
-						reg->time = atol(split[0]);
+						reg->time = strtod(split[0],NULL);
 						reg->key = atoi(split[1]);
 						reg->value = strdup(strtok(split[2], "\n"));
 
@@ -201,35 +208,42 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 		linea = malloc(sizeof(char) * tamBuffer);
 		while(getline(&linea, &tamBuffer, archivo) != -1){
 			if(flag != NULL){
-				string_append(&flag, linea);
-				split = string_split(flag,";");
+				char * value = string_from_format("%s%s",flag, linea);
+				//string_append(&flag, linea);
+				split = string_split(value,";");
+				if(split[0] != NULL){
+					if(split[1] == NULL) flag = strdup(value);
+					else if(split[2] != NULL && string_contains(split[2], "\n")){
 
-				part = atoi(split[1]) % totalPart;
-				t_list * listPart = dictionary_get(lista,string_itoa(part));
+						part = atoi(split[1]) % totalPart;
+						t_list * listPart = dictionary_get(lista,string_itoa(part));
 
-				while(j<list_size(listPart)){
-					structRegistro * reg = list_get(listPart, j);
-					if(atoi(split[1]) == reg->key){
-						if(atol(split[0]) > reg->time){
-							reg->time = atol(split[0]);
-							free(reg->value);
-							reg->value = strdup(strtok(split[2], "\n"));
+						while(j<list_size(listPart)){
+							structRegistro * reg = list_get(listPart, j);
+							if(atoi(split[1]) == reg->key){
+								if(strtod(split[0],NULL) > reg->time){
+									reg->time = strtod(split[0],NULL);
+									free(reg->value);
+									reg->value = strdup(strtok(split[2], "\n"));
+								}
+								flag2 = 1;
+							}
+							j++;
 						}
-						flag2 = 1;
-					}
-					j++;
-				}
-				if(flag2 == 0){
-					structRegistro * reg2 = malloc(sizeof(structRegistro));
-					reg2->time = atol(split[0]);
-					reg2->key = atoi(split[1]);
-					reg2->value = strdup(strtok(split[2], "\n"));
+						if(flag2 == 0){
+							structRegistro * reg2 = malloc(sizeof(structRegistro));
+							reg2->time = strtod(split[0],NULL);
+							reg2->key = atoi(split[1]);
+							reg2->value = strdup(strtok(split[2], "\n"));
 
-					list_add(listPart,reg2);
-				}
+							list_add(listPart,reg2);
+						}
+						free(flag);
+					}else flag = strdup(value);
+				}else flag = strdup(value);
 
-				free(flag);
-				flag =NULL;
+				free(value);
+				//flag =NULL;
 			}else{
 				split = string_split(linea,";");
 				if(split[0] != NULL){
@@ -241,8 +255,8 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 						while(j<list_size(listPart)){
 							structRegistro * reg = list_get(listPart, j);
 							if(atoi(split[1]) == reg->key){
-								if(atol(split[0]) > reg->time){
-									reg->time = atol(split[0]);
+								if(strtod(split[0],NULL) > reg->time){
+									reg->time = strtod(split[0],NULL);
 									free(reg->value);
 									reg->value = strdup(strtok(split[2], "\n"));
 								}
@@ -252,7 +266,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 						}
 						if(flag2 == 0){
 							structRegistro * reg2 = malloc(sizeof(structRegistro));
-							reg2->time = atol(split[0]);
+							reg2->time = strtod(split[0],NULL);
 							reg2->key = atoi(split[1]);
 							reg2->value = strdup(strtok(split[2], "\n"));
 
@@ -260,7 +274,9 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 						}
 
 					}else flag = strdup(linea);
-				}else flag = strdup(linea);
+				}else if(!string_is_empty(linea)){
+					flag = strdup(linea);
+				}
 			}
 			j=0;
 
@@ -271,10 +287,8 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 			linea = malloc(sizeof(char) * tamBuffer);
 		}
 		i++;
-		fclose
-
-
-		(archivo);
+		fclose(archivo);
+		free(linea);
 		free(bloque);
 
 	}
@@ -288,7 +302,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 void generarParticion(char * path, int part, t_dictionary * lista){
 	char * pathPart = string_from_format("%s/%d.bin", path, part);
 	FILE * archivo;
-	int bit, i=0, offset=0;
+	int bit, i=0, offset=0,sizeRestante;
 	char * contenido,* registro, * bloque;
 	t_list * listPart = dictionary_get(lista, string_itoa(part));
 
@@ -310,32 +324,31 @@ void generarParticion(char * path, int part, t_dictionary * lista){
 
 	while(i<list_size(listPart)){
 		structRegistro * reg = list_remove(listPart,i);
-		registro = string_from_format("%d;%d;%s\n", reg->time, reg->key, reg->value);
+		registro = string_from_format("%f;%d;%s\n", reg->time, reg->key, reg->value);
 
 		free(reg->value);
 		free(reg);
 
-		if((offset+string_length(registro)) > tBloques){
-			fwrite(registro,sizeof(char),(tBloques-offset),archivo);
-			registro += (tBloques-offset);
+		sizeRestante = string_length(registro);
+		if((offset+sizeRestante) > (tBloques/4)){
+			while(sizeRestante > 0){
+				fwrite(registro,sizeof(char),((tBloques/4)-offset),archivo);
+				registro += ((tBloques/4)-offset);
+				sizeRestante -= ((tBloques/4)-offset);
 
-			bit = verificar_bloque();
-			if(bit != -1){
-				actualizar_bloques(pathPart,bit);
-				actualizar_size(pathPart,(tBloques-offset));
+				bit = verificar_bloque();
+				if(bit != -1){
+					printf("Bit %d\n", bit);
+					actualizar_bloques(pathPart,bit);
+					actualizar_size(pathPart,((tBloques/4)-offset));
+				}
+				offset = 0;
+
+				fclose(archivo);
+				free(bloque);
+				bloque = armar_PathBloque(string_itoa(bit));
+				archivo = fopen(bloque,"w");
 			}
-			offset = 0;
-
-			fclose(archivo);
-			free(bloque);
-			bloque = armar_PathBloque(string_itoa(bit));
-			archivo = fopen(bloque,"w");
-
-			fwrite(registro,sizeof(char),string_length(registro),archivo);
-			offset += string_length(registro);
-
-			actualizar_size(pathPart, string_length(registro));
-
 		}else{
 			fwrite(registro,sizeof(char),string_length(registro),archivo);
 			offset += string_length(registro);

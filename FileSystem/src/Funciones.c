@@ -69,7 +69,7 @@ void archivoDeConfiguracion(char* argv)
 	string_append(&montaje, config_get_string_value(configuracion, "PUNTO_MONTAJE"));
 	config->retardo = config_get_int_value(configuracion, "RETARDO");
 	config->tam_value = config_get_int_value(configuracion, "TAMAÑO_VALUE");
-	config->tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP");
+	config->tiempo_dump = config_get_int_value(configuracion, "TIEMPO_DUMP")/1000;
 
 	log_info(alog, "Lee el archivo de configuracion");
 
@@ -181,7 +181,7 @@ int abrir_bitmap()
 
 	close(fdbitmap);
 
-	//posicion = malloc(cantBloques/8);
+	posicion = malloc(mystat.st_size);
 
 	log_info(alog, "Abre el bitmap");
 
@@ -212,7 +212,7 @@ void finalizar(){
 		msync(posicion,mystat.st_size,MS_SYNC);
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
-		//free(posicion);
+		free(posicion);
 
 		queue_clean_and_destroy_elements(nombre, free);
 

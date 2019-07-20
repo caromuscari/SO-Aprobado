@@ -116,7 +116,7 @@ int removerSegmentoPorNombrePagina(char* nombreTabla){
 	        }
 	        return OK;
 	    } else {
-	    	log_info(file_log, "No se encontro el segmento");
+	    	log_info(file_log, "No se encontro el segmento por Drop");
 	    	return NOOK;
 	    }
 }

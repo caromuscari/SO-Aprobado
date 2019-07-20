@@ -12,7 +12,7 @@ void makeCommand(char *command) {
 
     switch (typeCommand) {
         case INSERT:
-            log_info(file_log, "Ejecutando un insert");
+            log_info(file_log, "Ejecutando un Insert");
             st_insert *insert;
             int codigoInsert = 0;
             if ((insert = cargarInsert(command))) {
@@ -21,7 +21,7 @@ void makeCommand(char *command) {
                 }
                 if (codigoInsert == FULLMEMORY) {
                     printf("No hay espacio en las paginas\n");
-                    log_error(file_log, "no hay espacio en las paginas");
+                    log_error(file_log, "No hay espacio en las paginas");
                 }
                 if (codigoInsert == OK) {
                     printf("Se realizo correctamente el Insert\n");
@@ -35,11 +35,10 @@ void makeCommand(char *command) {
             }
             break;
         case SELECT:
-            log_info(file_log, "[+] El comando es un SELECT\n");
+            log_info(file_log, "Ejecutando Select");
             st_select *select;
             st_registro *registro;
             if ((select = cargarSelect(command))) {
-                log_info(file_log, "[+] Ejecutando SELECT.\n");
                 registro = comandoSelect(select);
                 if (registro) {
                     printf("value [%s]\n", registro->value);
@@ -50,12 +49,12 @@ void makeCommand(char *command) {
                 }
                 destoySelect(select);
             } else {
-                log_error(file_log, "Error en datos de SELECT. \n");
+                log_error(file_log, "Error en datos de Select");
             }
 
             break;
         case CREATE:
-            log_info(file_log, "[+] El comando es un CREATE\n");
+            log_info(file_log, "Ejecutando Create");
             st_create *create;
             int codigo;
 
@@ -66,11 +65,11 @@ void makeCommand(char *command) {
 
                 }
                 destroyCreate(create);
-            } else log_info(file_log, "[+] Error en datos de CREATE\n");
+            } else log_info(file_log, "Error en datos de Create");
 
             break;
         case DROP:
-            log_info(file_log, "[+] El comando es un DROP\n");
+            log_info(file_log, "Ejecutando Drop");
             st_drop *drop;
             int cod;
 
@@ -85,7 +84,7 @@ void makeCommand(char *command) {
 			      printf("No se pudo relizar el drop\n");
                 }
                 destroyDrop(drop);
-            } else log_error(file_log, "Error en datos de DROP\n");
+            } else log_error(file_log, "Error en datos de DROP");
 
             break;
         case DESCRIBE: {
@@ -94,7 +93,7 @@ void makeCommand(char *command) {
             st_messageResponse *respuesta;
             if ((describe = cargarDescribe(command))) {
                 //describe
-                log_info(file_log, "Ejecutando Describe\n");
+                log_info(file_log, "Ejecutando Describe");
                 respuesta = mandarDescribe(describe);
                 if (respuesta) {
                     mostrarRespuesta(respuesta->cabezera.codigo);
@@ -111,7 +110,7 @@ void makeCommand(char *command) {
                 destroyDescribe(describe);
             } else {
                 //describe global
-                log_info(file_log, "Ejecutando Describe Global\n");
+                log_info(file_log, "Ejecutando Describe Global");
                 respuesta = mandarDescribeGlobal();
                 if (respuesta) {
                     mostrarRespuesta(respuesta->cabezera.codigo);
@@ -128,7 +127,7 @@ void makeCommand(char *command) {
             break;
         }
         case JOURNAL:
-            log_info(file_log, "[+] El comando es un JOURNAL\n");
+            log_info(file_log, "Ejecutando Journal");
             comandoJournal();
             break;
         case EXIT:

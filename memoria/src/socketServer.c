@@ -6,27 +6,27 @@ extern t_configuracionMemoria * configMemoria;
 #include <funcionesCompartidas/API.h>
 #include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/list.h>
-
-void cargarLista(t_list *listaMetaData) {
-    st_metadata *metadata = malloc(sizeof(st_metadata));
-    metadata->nameTable = strdup("TABLA_A");
-    metadata->consistency = strdup("SC");
-    metadata->partitions = 4;
-    metadata->compaction_time = 5000;
-    list_add(listaMetaData, metadata);
-    metadata = malloc(sizeof(st_metadata));
-    metadata->nameTable = strdup("TABLA_B");
-    metadata->consistency = strdup("EC");
-    metadata->partitions = 3;
-    metadata->compaction_time = 6000;
-    list_add(listaMetaData, metadata);
-    metadata = malloc(sizeof(st_metadata));
-    metadata->nameTable = strdup("TABLA_C");
-    metadata->consistency = strdup("SHC");
-    metadata->partitions = 5;
-    metadata->compaction_time = 10000;
-    list_add(listaMetaData, metadata);
-}
+//
+//void cargarLista(t_list *listaMetaData) {
+//    st_metadata *metadata = malloc(sizeof(st_metadata));
+//    metadata->nameTable = strdup("TABLA_A");
+//    metadata->consistency = strdup("SC");
+//    metadata->partitions = 4;
+//    metadata->compaction_time = 5000;
+//    list_add(listaMetaData, metadata);
+//    metadata = malloc(sizeof(st_metadata));
+//    metadata->nameTable = strdup("TABLA_B");
+//    metadata->consistency = strdup("EC");
+//    metadata->partitions = 3;
+//    metadata->compaction_time = 6000;
+//    list_add(listaMetaData, metadata);
+//    metadata = malloc(sizeof(st_metadata));
+//    metadata->nameTable = strdup("TABLA_C");
+//    metadata->consistency = strdup("SHC");
+//    metadata->partitions = 5;
+//    metadata->compaction_time = 10000;
+//    list_add(listaMetaData, metadata);
+//}
 
 void * atenderMensaje(int * fdClient){
     int control = 0;
@@ -35,7 +35,7 @@ void * atenderMensaje(int * fdClient){
     void * buffer = NULL;
     void * paqueteDeRespuesta = getMessage(*fdClient,&request,&control);
     if (paqueteDeRespuesta == NULL) {
-        log_error(file_log, "Fallo la conexion con el kernel\n");
+        log_error(file_log, "Fallo la conexion con el kernel");
         close(*fdClient);
         pthread_exit(NULL);
     }
@@ -137,27 +137,27 @@ void * atenderMensaje(int * fdClient){
     		st_messageResponse* respuesta;
     		printf("El comando es un Describe Global\n");
     		//mock
-            t_list *listametadata = list_create();
-            cargarLista(listametadata);
-    		size_t size;
-            buffer = serealizarListaMetaData(listametadata, &size);
-            enviarRespuesta(SUCCESS, buffer, *fdClient, &control, size);
+//            t_list *listametadata = list_create();
+//            cargarLista(listametadata);
+//    		size_t size;
+//            buffer = serealizarListaMetaData(listametadata, &size);
+//            enviarRespuesta(SUCCESS, buffer, *fdClient, &control, size);
 
-//    		respuesta = mandarDescribeGlobal();
-//    		if(respuesta){
-//    			if(respuesta->cabezera.codigo == 13){
-//    				enviarRespuesta(SUCCESS, respuesta->buffer, *fdClient, &control, respuesta->cabezera.sizeData);
-//    			}else{
-//    				buffer = strdup("1");
-//    				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
-//    				free(buffer);
-//    			}
-//    			destroyStMessageResponse(respuesta);
-//    		} else {
-//				buffer = strdup("1");
-//				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
-//				free(buffer);
-//    		}
+    		respuesta = mandarDescribeGlobal();
+    		if(respuesta){
+    			if(respuesta->cabezera.codigo == 13){
+    				enviarRespuesta(SUCCESS, respuesta->buffer, *fdClient, &control, respuesta->cabezera.sizeData);
+    			}else{
+    				buffer = strdup("1");
+    				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+    				free(buffer);
+    			}
+    			destroyStMessageResponse(respuesta);
+    		} else {
+				buffer = strdup("1");
+				enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+				free(buffer);
+    		}
     		break;
     	}
         case BUSCARTABLAGOSSIPING: {

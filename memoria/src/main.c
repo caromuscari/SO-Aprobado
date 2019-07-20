@@ -23,30 +23,30 @@ void *memoriaPrincipal;
 
 bool buscarValueMaximo(){
     int control = 0;
-    log_info(file_log,"Conectando con FileSysten");
+    log_info(file_log,"Conectando con FileSystem");
     fdFileSystem = establecerConexion(configMemoria->IP_FS, configMemoria->PUERTO_FS, file_log, &control);
     if(control != 0){
-        log_error(file_log,"no se puedo establecer conexion con el FILESYSTEM");
+        log_error(file_log,"No se pudo establecer conexion con el FileSystem");
         return false;
     }
 
-    log_info(file_log,"enviando mensaje para solicitar el valor maximo");
+    log_info(file_log,"Enviando mensaje para solicitar el valor maximo");
     header request;
     request.letra = 'M';
     request.codigo = 1;
     request.sizeData = 1;
     void * paqueteDeMensaje = createMessage(&request," ");
     if(enviar_message(fdFileSystem,paqueteDeMensaje,file_log,&control) < 0){
-        log_error(file_log,"no se puedo enviar el mensaje");
+        log_error(file_log,"No se pudo enviar el mensaje");
         return false;
     }
     free(paqueteDeMensaje);
 
-    log_info(file_log,"esperando respuesta del valor maximo");
+    log_info(file_log,"Esperando respuesta del valor maximo");
     header response;
     void * paqueteDeRespuesta = getMessage(fdFileSystem,&response,&control);
     if(paqueteDeMensaje == NULL){
-        log_error(file_log,"erro al recibir el la respuesta");
+        log_error(file_log,"Error al recibir la respuesta");
         return  false;
     }
     //verificar como enviar el mensaje
@@ -71,17 +71,17 @@ void liberarConfig(t_configuracionMemoria * config){
 int inicializar(char *pathConfig){
     int i;
     file_log = crear_archivo_log("Memoria", false, "./logMemoria");
-    log_info(file_log, "Cargando el archivo de configuracion\n");
+    log_info(file_log, "Cargando el archivo de configuracion");
     configMemoria = leerConfiguracion(pathConfig);
     if (!configMemoria) {
-        log_error(file_log, "No se pudo cargar el archivo de configuracion\n");
+        log_error(file_log, "No se pudo cargar el archivo de configuracion");
         log_destroy(file_log);
         return -1;
     }
-//    if(!buscarValueMaximo()){
-//        return -1;
-//    }
-    log_info(file_log, "Inicializando Memoria\n");
+    if(!buscarValueMaximo()){
+        return -1;
+    }
+    log_info(file_log, "Inicializando Memoria");
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;
     memoriaPrincipal = malloc(configMemoria->TAM_MEM);
@@ -108,7 +108,7 @@ void finalizar(){
 	pthread_cancel(server);
 	liberar_log(file_log);
 	liberarConfig(configMemoria);
-	free(memoriaPrincipal);//Revisar
+	free(memoriaPrincipal);
 	list_clean_and_destroy_elements(listaDeMarcos, (void*)free);
 	list_destroy(listaDeMarcos);
 	list_clean_and_destroy_elements(listaDeSegmentos, (void*)liberarSegmentos);
@@ -119,13 +119,11 @@ int main(int argc, char *argv[]){
     if (inicializar(argv[1]) < 0) {
         return -1;
     }
-    //descomentar cando el File entienda este mensaje
-    log_info(file_log, "La memoria se inicio correctamente\n");
+    log_info(file_log, "La memoria se inicio correctamente");
     pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);
     pthread_create(&gossiping, NULL,pthreadGossping, NULL);
     pthread_detach(gossiping);
-    //Falta el join
     console();
     finalizar();
     return 0;

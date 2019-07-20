@@ -63,7 +63,7 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
     st_memoria *auxMemoria;
     int fdClient = establecerConexion(ip, puerto, file_log, &control);
     if (control != 0) {
-        log_error(file_log, "no se pudo extableser conexion");
+        log_error(file_log, "No se pudo establecer conexion");
         addSeedFallidas(ip,puerto);
         return;
     } else {

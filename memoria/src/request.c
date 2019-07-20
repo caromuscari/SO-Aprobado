@@ -34,7 +34,7 @@ int mandarCreate(st_create * create){
 
 	if(controlador != 0){
 		log_error(file_log, "No se pudo enviar el mensaje");
-		return NOOK; //VERRRR
+		return NOOK;
 	}
 
 	free(buffer);
@@ -71,7 +71,7 @@ int mandarDrop(st_drop * drop){
 	free(mensaje);
 	free(buffer);
     if(controlador != 0){
-        log_error(file_log, "No se pudo enviar el mensaje al FS");
+        log_error(file_log, "No se pudo enviar el mensaje al File System");
         return NOOK;
     }
 
@@ -215,14 +215,14 @@ int mandarInsert(st_insert * insert){
 
     enviar_message(fdFileSystem, mensaje,file_log,&controlador);
     if(controlador != 0){
-        log_error(file_log, "no se pudo enviar el mensaje al FS");
+        log_error(file_log, "No se pudo enviar el mensaje al File System");
         return -1;
     }
     free(buffer);
 
     buffer = getMessage(fdFileSystem,&head2,&controlador);
     if(controlador < 0){
-        log_error(file_log, "no se pudo recibir un mensaje");
+        log_error(file_log, "No se pudo recibir el mensaje");
         return -1;
     }
 

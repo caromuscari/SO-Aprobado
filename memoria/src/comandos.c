@@ -218,12 +218,16 @@ bool enviarSegmentoAFS(st_segmento* segmento){
     bool huboError = false;
     void enviarPaginasAFS(st_tablaDePaginas * pagina){
         if(pagina->flagModificado) {
+            pthread_mutex_lock(&mutexListaMarcos);
             st_marco *marco = list_get(listaDeMarcos, pagina->nroDePagina);
+
             st_insert *insert = malloc(sizeof(st_insert));
             //insert->value = malloc(pagina->desplazamiento);
 
+            pthread_mutex_lock(&mutexMemPrinc);
             memcpy(&insert->timestamp, pagina->pagina, sizeof(double));
             memcpy(&insert->key, pagina->pagina + sizeof(double), sizeof(uint16_t));
+            pthread_mutex_unlock(&mutexMemPrinc);
 
             st_select* comandoSelec = malloc(sizeof(st_select));
             comandoSelec->nameTable = strdup(segmento->nombreTabla);
@@ -246,15 +250,18 @@ bool enviarSegmentoAFS(st_segmento* segmento){
              log_error(file_log, string_from_format("El Filesystem rechazó el registro \nTabla:%s | Key:%d | Value:%s", insert->nameTable, insert->key, insert->value));
              huboError = true;
             }
+            pthread_mutex_unlock(&mutexListaMarcos);
             destroyInsert(insert);
         }
     }
     list_iterate(segmento->tablaDePaginas, (void *)enviarPaginasAFS);
     if(!huboError){
         //ELIMINA EL SEGMENTO DE MEMORIA
+        pthread_mutex_lock(&mutexListaSeg);
         list_destroy(segmento->tablaDePaginas);
         free(segmento->nombreTabla);
         free(segmento);
+        pthread_mutex_unlock(&mutexListaSeg);
         return true;
     } else {
     	log_info(file_log, "No se pudieron borrar todas las paginas");
@@ -268,7 +275,7 @@ int comandoJournal(){
 	bool resultado = true;
 	st_segmento * segmento;
 
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(&mutexListaSeg);
 	for (int i = 0; i < list_size(listaDeSegmentos); i++){
     	segmento = list_get(listaDeSegmentos, i);
     	if(!enviarSegmentoAFS(segmento)){
@@ -277,7 +284,7 @@ int comandoJournal(){
     		list_remove(listaDeSegmentos, i);
     	}
     }
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(&mutexListaSeg);
     sleep(configMemoria->RETARDO_MEM/1000);
     if(resultado){
     log_info(file_log, "Termino el Journal");

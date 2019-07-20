@@ -40,15 +40,15 @@ cp /home/utnso/tp-2019-1c-misc/FileSystem/Metadata.bin /home/utnso/lfs-base/Meta
 
 echo "Metadata File copiada"
 
-cd /home/utnso/tp-2017-1c-misc/FileSystem/ 
+cd /home/utnso/tp-2019-1c-misc/FileSystem/ 
 
 make compiler
 
-cd /home/utnso/tp-2017-1c-misc/kernel/
+cd /home/utnso/tp-2019-1c-misc/kernel/
 
 make compiler
 
-cd /home/utnso/tp-2017-1c-misc/memoria/
+cd /home/utnso/tp-2019-1c-misc/memoria/
 
 make compiler
 

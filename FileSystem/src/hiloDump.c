@@ -37,7 +37,6 @@ void crearTemporal(char * key, st_tabla* data){
 
             write_ptr = fopen(path,"w");
             char* strBloque = string_substring(str, iElem * caracteresPorString, caracteresPorString);
-            printf("%s", strBloque);
             fwrite(strBloque,sizeof(strBloque),string_length(strBloque),write_ptr);
             fclose(write_ptr);
 

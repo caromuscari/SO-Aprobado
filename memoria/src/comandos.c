@@ -30,6 +30,7 @@ int comandoInsert(st_insert* comandoInsert){
 			memcpy(paginaDeTablaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, string_length(comandoInsert->value));
 			memcpy(paginaDeTablaEncontrada->pagina, &comandoInsert->timestamp, sizeof(double));
 			paginaDeTablaEncontrada->flagModificado = 1;
+			paginaDeTablaEncontrada->desplazamiento = string_length(comandoInsert->value) + sizeof(double) + sizeof(uint16_t);
 
 			log_info(file_log, "El Insert se realizo correctamente");
             pthread_mutex_unlock(&mutex);
@@ -112,16 +113,16 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		if(paginaDeTablaEncontrada){
 			log_info(file_log, "Pagina encontrada por comando Select");
 			int sizeValue = paginaDeTablaEncontrada->desplazamiento - (sizeof(double) + sizeof(uint16_t));
-			registro = malloc(sizeof(st_registro));
-			registro->value = malloc(sizeValue);
+			st_registro * M = malloc(sizeof(st_registro));
+            M->value = malloc(sizeValue);
 			st_marco* marco = list_get(listaDeMarcos, paginaDeTablaEncontrada->nroDePagina);
 			marco->timestamp = obtenerMilisegundosDeHoy();
+			memcpy(&M->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
+			memcpy(&M->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
+			memcpy(M->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), sizeValue);
 
-			memcpy(&registro->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
-			memcpy(&registro->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
-			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), sizeValue);
             pthread_mutex_unlock(&mutex);
-			return registro;
+			return M;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key");
 
@@ -255,5 +256,36 @@ int comandoJournal(){
     }
     log_error(file_log, "No se pudo realizar el Journal");
     return NOOK;
+}
+
+
+int removerSegmentoPorNombrePagina(char* nombreTabla){
+	  st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(nombreTabla);
+	  pthread_mutex_lock(&mutex);
+	    if(segmentoEncontrado){
+	        log_info(file_log, "Se encontro el segmento por Drop");
+
+	        for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
+	            st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
+	            st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
+	            free(paginaDeTabla);
+	            marco->condicion = LIBRE;
+	        }
+
+	        list_destroy(segmentoEncontrado->tablaDePaginas);
+	        free(segmentoEncontrado->nombreTabla);
+	        list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
+	        for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
+	            st_segmento* segmento = list_get(listaDeSegmentos, i);
+	            int nro = segmento->nroSegmento;
+	            segmento->nroSegmento = nro - 1;
+	        }
+	        pthread_mutex_unlock(&mutex);
+	        return OK;
+	    } else {
+	    	log_info(file_log, "No se encontro el segmento por Drop");
+	    	pthread_mutex_unlock(&mutex);
+	    	return NOOK;
+	    }
 }
 

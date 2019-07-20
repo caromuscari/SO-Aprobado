@@ -16,7 +16,7 @@ config * load_config(char * path){
     configuracion->QUANTUM =  atoi(config_get_string_value(bufferConfig, "QUANTUM"));
     configuracion->MULTIPROCESAMIENTO = atoi(config_get_string_value(bufferConfig, "MULTIPROCESAMIENTO"));
     configuracion->METADATA_REFRESH = atoi(config_get_string_value(bufferConfig, "METADATA_REFRESH"));
-    configuracion->SLEEP_EJECUCION = atoi(config_get_string_value(bufferConfig, "SLEEP_EJECUCION"));
+    configuracion->SLEEP_EJECUCION = atoi(config_get_string_value(bufferConfig, "SLEEP_EJECUCION"))/1000;
 
     config_destroy(bufferConfig);
     return  configuracion;

@@ -57,6 +57,6 @@ st_tablaDePaginas* paginaConMenorTiempoPorSegmento(st_segmento * stSegmento);
 
 st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tablaDePaginas* paginaAComparar);
 
-int removerSegmentoPorNombrePagina(char* nombreTabla);
+
 
 #endif /* SRC_SEGMENTACIONPAGINADA_H_ */

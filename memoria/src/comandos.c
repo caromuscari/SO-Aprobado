@@ -30,7 +30,7 @@ int comandoInsert(st_insert* comandoInsert){
 			memcpy(paginaDeTablaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, string_length(comandoInsert->value));
 			memcpy(paginaDeTablaEncontrada->pagina, &comandoInsert->timestamp, sizeof(double));
 			paginaDeTablaEncontrada->flagModificado = 1;
-			paginaDeTablaEncontrada->desplazamiento = string_length(comandoInsert->value) + sizeof(double) + sizeof(uint16_t);
+			paginaDeTablaEncontrada->desplazamiento = string_length(comandoInsert->value);
 
 			log_info(file_log, "El Insert se realizo correctamente");
             pthread_mutex_unlock(&mutex);
@@ -53,7 +53,7 @@ int comandoInsert(st_insert* comandoInsert){
 		st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
 		paginaDeTabla->nroDePagina = posMarcoLibre;
 		paginaDeTabla->pagina = paginaLibre;
-		paginaDeTabla->desplazamiento = sizeof(double) + sizeof(uint16_t) + string_length(comandoInsert->value);
+		paginaDeTabla->desplazamiento =string_length(comandoInsert->value);
 		paginaDeTabla->flagModificado = 1;
 
 		list_add(segmentoEncontrado->tablaDePaginas, paginaDeTabla);
@@ -86,7 +86,7 @@ int comandoInsert(st_insert* comandoInsert){
 	st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
 	paginaDeTabla->nroDePagina = posMarcoLibre;
 	paginaDeTabla->pagina = paginaLibre;
-    paginaDeTabla->desplazamiento = sizeof(double) + sizeof(uint16_t) + string_length(comandoInsert->value);
+    paginaDeTabla->desplazamiento =string_length(comandoInsert->value);
 	paginaDeTabla->flagModificado = 1;
 	//agrego la pag a la lista
 	list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
@@ -112,17 +112,16 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
 		if(paginaDeTablaEncontrada){
 			log_info(file_log, "Pagina encontrada por comando Select");
-			int sizeValue = paginaDeTablaEncontrada->desplazamiento - (sizeof(double) + sizeof(uint16_t));
-			st_registro * M = malloc(sizeof(st_registro));
-            M->value = malloc(sizeValue);
+			registro = malloc(sizeof(st_registro));
+            registro->value = malloc(paginaDeTablaEncontrada->desplazamiento);
 			st_marco* marco = list_get(listaDeMarcos, paginaDeTablaEncontrada->nroDePagina);
 			marco->timestamp = obtenerMilisegundosDeHoy();
-			memcpy(&M->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
-			memcpy(&M->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
-			memcpy(M->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), sizeValue);
+			memcpy(&registro->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
+			memcpy(&registro->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
+			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), paginaDeTablaEncontrada->desplazamiento);
 
             pthread_mutex_unlock(&mutex);
-			return M;
+			return registro;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key");
 
@@ -144,7 +143,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
 		paginaDeTabla->nroDePagina = posMarcoLibre;
 		paginaDeTabla->pagina = paginaLibre;
-		paginaDeTabla->desplazamiento = sizeof(double) + sizeof(uint16_t) + string_length(registro->value);
+		paginaDeTabla->desplazamiento = string_length(registro->value);
 		paginaDeTabla->flagModificado = 0;
 
 		list_add(segmentoEncontrado->tablaDePaginas, paginaDeTabla);
@@ -179,7 +178,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 	st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
 	paginaDeTabla->nroDePagina = posMarcoLibre;
 	paginaDeTabla->pagina = paginaLibre;
-    paginaDeTabla->desplazamiento = sizeof(double) + sizeof(uint16_t) + string_length(registro->value);
+    paginaDeTabla->desplazamiento = string_length(registro->value);
 	paginaDeTabla->flagModificado = 0;
 
 	list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
@@ -202,12 +201,11 @@ bool enviarSegmentoAFS(st_segmento* segmento){
         if(pagina->flagModificado) {
             st_marco *marco = list_get(listaDeMarcos, pagina->nroDePagina);
             st_insert *insert = malloc(sizeof(st_insert));
-            int sizeValue = pagina->desplazamiento - (sizeof(double) + sizeof(uint16_t));
-            insert->value = malloc(sizeValue);
+            insert->value = malloc(pagina->desplazamiento);
 
             memcpy(&insert->timestamp, pagina->pagina, sizeof(double));
             memcpy(&insert->key, pagina->pagina + sizeof(double), sizeof(uint16_t));
-            memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), sizeValue);
+            memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), pagina->desplazamiento);
             insert->operacion = INSERT;
             insert->nameTable = strdup(segmento->nombreTabla);
 

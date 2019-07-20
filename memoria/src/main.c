@@ -22,6 +22,7 @@ int cantPaginas;
 int tamanioValue = 255; //esto me lo va a pasa fs
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
+pthread_mutex_t mutexListaSeg, mutexListaMarcos, mutexMemPrinc;
 
 bool buscarValueMaximo(){
     int control = 0;
@@ -47,7 +48,7 @@ bool buscarValueMaximo(){
     log_info(file_log,"Esperando respuesta del valor maximo");
     header response;
     void * paqueteDeRespuesta = getMessage(fdFileSystem,&response,&control);
-    if(paqueteDeMensaje == NULL){
+    if(paqueteDeRespuesta == NULL){
         log_error(file_log,"Error al recibir la respuesta");
         return  false;
     }
@@ -96,6 +97,9 @@ int inicializar(char *pathConfig){
         marco->timestamp = 0;
         list_add(listaDeMarcos, marco);
     }
+    pthread_mutex_init(mutexListaMarcos, 1);
+    pthread_mutex_init(mutexMemPrinc, 1);
+    pthread_mutex_init(mutexListaSeg, 1);
     return 0;
 }
 

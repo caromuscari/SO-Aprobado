@@ -60,6 +60,7 @@ void * atenderMensaje(int * fdClient){
     			enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		}
     		destroyInsert(insert);
+    		free(buffer);
     		break;
     	}
         case SELECT: {
@@ -167,6 +168,7 @@ void * atenderMensaje(int * fdClient){
             void *paqueteLista = devolverListaMemoria(&sizePaqueteRes);
             enviarRespuesta(SUCCESS,paqueteLista,*fdClient,&control,sizePaqueteRes);
             log_info(file_log,"Realizando gossiping");
+            free(paqueteLista);
             break;
         }
     	case JOURNAL:{
@@ -178,12 +180,14 @@ void * atenderMensaje(int * fdClient){
     		} else {
                 enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
     		}
+    		free(buffer);
     		break;
     	}
     }
 
     free(paqueteDeRespuesta);
     close(*fdClient);
+    free(fdClient);
     pthread_exit(NULL);
 }
 

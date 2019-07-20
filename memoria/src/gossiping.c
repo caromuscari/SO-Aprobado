@@ -44,7 +44,7 @@ void cleanSeed(){
     int i;
     st_memoria * memoria;
     for (i = 0; i < seedFallidas->elements_count ; ++i) {
-        memoria = list_get(seedFallidas,i);
+        memoria = list_remove(seedFallidas,i);
         destroyMemoria(memoria);
     }
     list_clean(seedFallidas);
@@ -72,18 +72,21 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
         request.codigo = BUSCARTABLAGOSSIPING;
         request.sizeData = 1;
         void * buffer = strdup("1");
-        void * paquete = createMessage(&request,buffer);
+        message * paquete = createMessage(&request,buffer);
         enviar_message(fdClient, paquete, file_log, &control);
+        free(buffer);
+        free(paquete->buffer);
+        free(paquete);
         if (control != 0) {
             return;
         } else {
             control = 0;
             header response;
-            paquete = getMessage(fdClient, &response, &control);
-            if (paquete == NULL) {
+            buffer = getMessage(fdClient, &response, &control);
+            if (buffer == NULL) {
                 return;
             } else {
-                dataMemoria = deserealizarMemoria(paquete, response.sizeData);
+                dataMemoria = deserealizarMemoria(buffer, response.sizeData);
                 st_memoria *nuevoMemoria = malloc(sizeof(st_memoria));
                 nuevoMemoria->numero = dataMemoria->numero;
                 nuevoMemoria->ip = strdup(ip);
@@ -102,6 +105,7 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
                 }
                 list_destroy(dataMemoria->listaMemorias);
                 free(dataMemoria);
+                free(buffer);
             }
         }
 
@@ -111,11 +115,11 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
 void cleanMemoria() {
     int i = 0;
     pthread_mutex_lock(&mutex);
-    st_memoria *memoriaAux = list_get(listaTablas, i);
+    st_memoria *memoriaAux = list_remove(listaTablas, i);
     while (memoriaAux) {
         destroyMemoria(memoriaAux);
         ++i;
-        memoriaAux = list_get(listaTablas, i);
+        memoriaAux = list_remove(listaTablas, i);
     }
     list_clean(listaTablas);
     pthread_mutex_unlock(&mutex);
@@ -142,6 +146,7 @@ void *devolverListaMemoria(size_t *size_paquetes) {
     pthread_mutex_lock(&mutex);
     void * buffer = serealizarMemoria(memoria, size_paquetes);
     pthread_mutex_unlock(&mutex);
+    free(memoria);
     return buffer;
 }
 
@@ -165,7 +170,7 @@ void *pthreadGossping() {
         }
         //verificar seeed ingresado
         for (i = 0; i < seedFallidas->elements_count ; ++i) {
-            memoria = list_get(seedFallidas,i);
+            memoria = list_remove(seedFallidas,i);
             removeMemoriaFallida(memoria);
         }
         sleep(configMemoria->TIEMPO_GOSSIPING/1000);

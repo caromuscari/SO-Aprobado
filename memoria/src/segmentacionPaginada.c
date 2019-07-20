@@ -8,7 +8,7 @@ extern int cantPaginas;
 extern int tamanioTotalDePagina;
 
 
-void mostrarPaginasCargadas(){
+/*void mostrarPaginasCargadas(){
     int i,offset = 0;
     uint16_t key;
     double timeStamp;
@@ -24,7 +24,7 @@ void mostrarPaginasCargadas(){
         printf("%s\n",value);
     }
     free(value);
-}
+}*/
 
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 	bool mismoNombreTabla(st_segmento* segmento){
@@ -44,20 +44,22 @@ st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 
 int buscarMarcoLibre(){
 	st_marco* marco;
+	pthread_mutex_lock(&mutexListaMarcos);
 	for(int i = 0; i < listaDeMarcos->elements_count; i++){
 		marco = list_get(listaDeMarcos, i);
 		if(marco->condicion == LIBRE){
-		return i;
+			pthread_mutex_unlock(&mutexListaMarcos);
+			return i;
 		}
-	}
+	} pthread_mutex_unlock(&mutexListaMarcos);
 	int posMarcoLibre = algoritmoLRU(); //encuentro el marco de la pagina que puedo reemplazar porque se uso hace mas tiempo
 	return posMarcoLibre;
 }
 
 int algoritmoLRU(){
-
+	pthread_mutex_lock(&mutexListaSeg);
 	st_tablaDePaginas* paginaAReemplazar = list_fold(listaDeSegmentos, listaDeSegmentos->head->data, (void*)paginaConMenorTiempoPorSegmento);
-
+	pthread_mutex_unlock(&mutexListaSeg);
 	if(paginaAReemplazar){
         return paginaAReemplazar->nroDePagina;
 	}else{
@@ -83,12 +85,8 @@ st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tab
 	st_marco* marcoAComparar = list_get(listaDeMarcos, paginaAComparar->nroDePagina);
 
 	if(marcoSemilla->timestamp > marcoAComparar->timestamp){
-		free(marcoAComparar);
-		free(marcoSemilla);
 		return paginaAComparar;
 	} else {
-		free(marcoAComparar);
-		free(marcoSemilla);
 		return paginaSemilla;
 	}
 }

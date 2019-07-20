@@ -5,15 +5,9 @@ extern int tamanioValue;
 extern t_list* listaDeMarcos;
 extern void *memoriaPrincipal;
 extern t_list* listaDeSegmentos;
-pthread_mutex_t mutex;
+extern pthread_mutex_t mutexListaSeg, mutexListaMarcos, mutexMemPrinc;
 extern t_configuracionMemoria* configMemoria;
 
-void inicializarSemaforos(){
-    if (pthread_mutex_init(&mutex, NULL) != 0) {
-        printf("\n mutex init failed\n");
-        pthread_exit(NULL);
-    }
-}
 
 //COMANDO INSERT
 int comandoInsert(st_insert* comandoInsert){
@@ -21,31 +15,36 @@ int comandoInsert(st_insert* comandoInsert){
 		log_error(file_log, "El value es mayor al tamaño máximo");
 		return MAYORQUEVALUEMAX;
 	}
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&mutexListaSeg);
+
 	st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoInsert->nameTable);//devuelve el segmento con ese nombre de tabla
 	if(segmentoEncontrado){
 		log_info(file_log, "Segmento encontrado por comando Insert");
+
 		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoInsert->key);
+
 		if(paginaDeTablaEncontrada){
 			log_info(file_log, "Pagina encontrada");
+			pthread_mutex_lock(&mutexMemPrinc);
 			memcpy(paginaDeTablaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, string_length(comandoInsert->value));
 			memcpy(paginaDeTablaEncontrada->pagina, &comandoInsert->timestamp, sizeof(double));
 			paginaDeTablaEncontrada->flagModificado = 1;
 			paginaDeTablaEncontrada->desplazamiento = string_length(comandoInsert->value);
 
+			pthread_mutex_unlock(&mutexMemPrinc);
 			log_info(file_log, "El Insert se realizo correctamente");
-            pthread_mutex_unlock(&mutex);
+
             sleep(configMemoria->RETARDO_MEM/1000);
+            pthread_mutex_unlock(&mutexListaSeg);
 			return OK;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key");
-
 		int posMarcoLibre = buscarMarcoLibre();
 		if(posMarcoLibre == -1){
-            pthread_mutex_unlock(&mutex);
+			pthread_mutex_unlock(&mutexListaSeg);
             return FULLMEMORY;
 		}
-
+		pthread_mutex_lock(&mutexMemPrinc);
 		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 
 		memcpy(paginaLibre, &comandoInsert->timestamp, sizeof(double));
@@ -59,14 +58,17 @@ int comandoInsert(st_insert* comandoInsert){
 		paginaDeTabla->flagModificado = 1;
 
 		list_add(segmentoEncontrado->tablaDePaginas, paginaDeTabla);
-
+		pthread_mutex_unlock(&mutexListaSeg);
+		pthread_mutex_unlock(&mutexMemPrinc);
+		pthread_mutex_lock(&mutexListaMarcos);
 		st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 		marco->condicion = OCUPADO;
+		pthread_mutex_unlock(&mutexListaMarcos);
         log_info(file_log, "El Insert se realizo correctamente");
-        pthread_mutex_unlock(&mutex);
         sleep(configMemoria->RETARDO_MEM/1000);
 		return OK;
 	}
+	pthread_mutex_unlock(&mutexListaSeg);
 	log_info(file_log, "No se encontro el segmento de esa tabla");
 	//creo el segmento
 	st_segmento* segmentoNuevo= malloc(sizeof(st_segmento));
@@ -76,10 +78,10 @@ int comandoInsert(st_insert* comandoInsert){
 
 	int posMarcoLibre = buscarMarcoLibre();
 	if(posMarcoLibre == -1){
-        pthread_mutex_unlock(&mutex);
         return FULLMEMORY;
 	}
 	//creo la pagina
+	pthread_mutex_lock(&mutexMemPrinc);
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 	//cargo datos a la memoria princ
 	memcpy(paginaLibre, &comandoInsert->timestamp, sizeof(double));
@@ -92,15 +94,18 @@ int comandoInsert(st_insert* comandoInsert){
     paginaDeTabla->desplazamiento =string_length(comandoInsert->value);
 	paginaDeTabla->flagModificado = 1;
 	//agrego la pag a la lista
+	pthread_mutex_lock(&mutexListaSeg);
 	list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
+	pthread_mutex_unlock(&mutexMemPrinc);
 	//agrego el segmento a la lista de segmentos en el ultimo lugar
 	segmentoNuevo->nroSegmento = list_size(listaDeSegmentos);
 	list_add_in_index(listaDeSegmentos, segmentoNuevo->nroSegmento, segmentoNuevo);
-
+	pthread_mutex_unlock(&mutexListaSeg);
+	pthread_mutex_lock(&mutexListaMarcos);
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
+	pthread_mutex_unlock(&mutexListaMarcos);
 	log_info(file_log, "El Insert se realizo correctamente");
-    pthread_mutex_unlock(&mutex);
     sleep(configMemoria->RETARDO_MEM/1000);
 	return OK;
 }
@@ -213,8 +218,8 @@ bool enviarSegmentoAFS(st_segmento* segmento){
             memcpy(&insert->timestamp, pagina->pagina, sizeof(double));
             memcpy(&insert->key, pagina->pagina + sizeof(double), sizeof(uint16_t));
 
-            st_select* comandoSelec;
-            comandoSelec->nameTable = segmento->nombreTabla;
+            st_select* comandoSelec = malloc(sizeof(st_select));
+            comandoSelec->nameTable = strdup(segmento->nombreTabla);
             comandoSelec->key = insert->key;
             comandoSelec->operacion= SELECT;
             st_registro* elSelect = comandoSelect(comandoSelec);
@@ -256,16 +261,16 @@ int comandoJournal(){
 	bool resultado = true;
 	st_segmento * segmento;
 
+	pthread_mutex_lock(&mutex);
 	for (int i = 0; i < list_size(listaDeSegmentos); i++){
     	segmento = list_get(listaDeSegmentos, i);
     	if(!enviarSegmentoAFS(segmento)){
     		resultado = false;
     	} else {
-    		pthread_mutex_lock(&mutex);
     		list_remove(listaDeSegmentos, i);
-    	    pthread_mutex_unlock(&mutex);
     	}
     }
+	pthread_mutex_unlock(&mutex);
     sleep(configMemoria->RETARDO_MEM/1000);
     if(resultado){
     log_info(file_log, "Termino el Journal");
@@ -291,7 +296,11 @@ int removerSegmentoPorNombrePagina(char* nombreTabla){
 
 	        list_destroy(segmentoEncontrado->tablaDePaginas);
 	        free(segmentoEncontrado->nombreTabla);
-	        list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
+	        st_segmento *seg = list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
+	        free(seg->nombreTabla);
+	        list_clean_and_destroy_elements(seg->tablaDePaginas, free);
+	        list_destroy(seg->tablaDePaginas);
+	        free(seg);
 	        for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
 	            st_segmento* segmento = list_get(listaDeSegmentos, i);
 	            int nro = segmento->nroSegmento;

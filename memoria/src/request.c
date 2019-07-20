@@ -32,6 +32,9 @@ int mandarCreate(st_create * create){
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
 
+	free(mensaje->buffer);
+	free(mensaje);
+
 	if(controlador != 0){
 		log_error(file_log, "No se pudo enviar el mensaje");
 		return NOOK;
@@ -43,6 +46,7 @@ int mandarCreate(st_create * create){
 
 	if(buffer == NULL){
 		log_error(file_log, "Fallo la conexion con el File System");
+
 		return SOCKETDESCONECTADO;
 	}
 
@@ -114,8 +118,11 @@ st_registro* obtenerSelect(st_select * comandoSelect){
         return NULL;
     }
     if(respuesta.codigo == 14){
-        return deserealizarRegistro(paqueteDeRespuesta);
+    	st_registro * reg = deserealizarRegistro(paqueteDeRespuesta);
+    	free(paqueteDeRespuesta);
+        return reg;
     } else {
+    	free(paqueteDeRespuesta);
         return NULL;
     }
 }
@@ -137,12 +144,14 @@ st_messageResponse* mandarDescribe(st_describe * describe){
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
 
+	free(mensaje->buffer);
+	free(mensaje);
+	free(buffer);
+
 	if(controlador != 0){
 		log_error(file_log, "No se pudo enviar el mensaje");
 		return NULL;
 	}
-
-	free(buffer);
 
 	buffer = getMessage(fdFileSystem,&head2,&controlador);
 
@@ -156,7 +165,9 @@ st_messageResponse* mandarDescribe(st_describe * describe){
 	mensajeResp->cabezera.letra = head2.letra;
 	mensajeResp->cabezera.sizeData = head2.sizeData;
 
-	mensajeResp->buffer = buffer;
+	mensajeResp->buffer = strdup(buffer);
+
+	free(buffer);
 
 	return mensajeResp;
 }
@@ -176,11 +187,15 @@ st_messageResponse* mandarDescribeGlobal(){
 	mensaje = createMessage(&request, buffer);
 
 	enviar_message(fdFileSystem, mensaje,file_log,&controlador);
+
+	free(mensaje->buffer);
+	free(mensaje);
+	free(buffer);
+
 	if(controlador != 0){
 		log_error(file_log, "No se pudo enviar el mensaje");
 		return NULL;
 	}
-	free(buffer);
 
 	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
 	if(buffer == NULL){
@@ -193,7 +208,9 @@ st_messageResponse* mandarDescribeGlobal(){
 		mensajeResp->cabezera.letra = respuesta.letra;
 		mensajeResp->cabezera.sizeData = respuesta.sizeData;
 
-		mensajeResp->buffer = buffer;
+		mensajeResp->buffer = strdup(buffer);
+
+		free(buffer);
 
 		return mensajeResp;
 }
@@ -214,14 +231,19 @@ int mandarInsert(st_insert * insert){
     mensaje = createMessage(&head, buffer);
 
     enviar_message(fdFileSystem, mensaje,file_log,&controlador);
+
+    free(mensaje->buffer);
+    free(mensaje);
+    free(buffer);
+
     if(controlador != 0){
         log_error(file_log, "No se pudo enviar el mensaje al File System");
         return -1;
     }
-    free(buffer);
 
     buffer = getMessage(fdFileSystem,&head2,&controlador);
     if(controlador < 0){
+    	free(buffer);
         log_error(file_log, "No se pudo recibir el mensaje");
         return -1;
     }

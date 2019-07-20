@@ -62,11 +62,11 @@ st_insert *cargarInsert(char *comando) {
         return NULL;
     }
 
-    string_iterate_lines(listSplit, (void *) free);
-    free(listSplit);
-
-    string_iterate_lines(listSplit2, (void *) free);
-    free(listSplit2);
+//    string_iterate_lines(listSplit, (void *) free);
+//    free(listSplit);
+//
+//    string_iterate_lines(listSplit2, (void *) free);
+//    free(listSplit2);
     return insert;
 }
 

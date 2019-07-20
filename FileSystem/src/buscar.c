@@ -17,7 +17,7 @@
 
 char * buscarKey(char * name, int key, int particion){
 	char * value;
-	long int time = 0;
+	double time = 0;
 
 	st_tabla * data;
 	structRegistro * reg;
@@ -65,7 +65,7 @@ char * buscarKey(char * name, int key, int particion){
 	}
 
 	free(path);
-	if(time != 0) return string_from_format("%d;%d;%s", time, key, value);
+	if(time != 0) return string_from_format("%f;%d;%s", time, key, value);
 	else return NULL;
 }
 
@@ -99,8 +99,8 @@ structRegistro * buscarEnLista(st_tabla * data, uint16_t key){
 
 	sem_post(&data->semaforo);
 
-
-	return reg;
+	if(flag == 0) return NULL;
+	else return reg;
 }
 
 structRegistro * buscarEnParticion(char * path, uint16_t key){

@@ -76,7 +76,7 @@ void* hiloconsola(){
 			case SELECT:
 				log_info(alog, "Request de tipo SELECT");
 				st_select * selectt;
-				char * value;
+				char * value = NULL;
 				selectt = cargarSelect(request);
 
 				if(selectt != NULL){

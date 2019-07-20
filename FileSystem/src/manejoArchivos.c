@@ -47,6 +47,7 @@ int realizarInsert(st_insert * insert){
 		registro->key = insert->key;
 		registro->value = strdup(insert->value);
 
+		printf("%f;%d;%s\n", registro->time, registro->key, registro->value);
 
 		if(existeEnMemtable(insert->nameTable)){
 			data = leerDeMemtable(insert->nameTable);

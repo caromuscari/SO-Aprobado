@@ -6,6 +6,7 @@
 #include <readline/readline.h>
 
 extern t_log *file_log;
+extern t_configuracionMemoria* configMemoria;
 
 void makeCommand(char *command) {
     int typeCommand = getEnumFromString(command);
@@ -136,8 +137,10 @@ void makeCommand(char *command) {
             log_info(file_log, "No se reconoce el comando");
         }
     }
-
+sleep(configMemoria->RETARDO_FS/1000);
 }
+
+
 
 void console() {
     char *comando;

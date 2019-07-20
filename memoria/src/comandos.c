@@ -6,6 +6,7 @@ extern t_list* listaDeMarcos;
 extern void *memoriaPrincipal;
 extern t_list* listaDeSegmentos;
 pthread_mutex_t mutex;
+extern t_configuracionMemoria* configMemoria;
 
 void inicializarSemaforos(){
     if (pthread_mutex_init(&mutex, NULL) != 0) {
@@ -34,6 +35,7 @@ int comandoInsert(st_insert* comandoInsert){
 
 			log_info(file_log, "El Insert se realizo correctamente");
             pthread_mutex_unlock(&mutex);
+            sleep(configMemoria->RETARDO_MEM/1000);
 			return OK;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key");
@@ -62,6 +64,7 @@ int comandoInsert(st_insert* comandoInsert){
 		marco->condicion = OCUPADO;
         log_info(file_log, "El Insert se realizo correctamente");
         pthread_mutex_unlock(&mutex);
+        sleep(configMemoria->RETARDO_MEM/1000);
 		return OK;
 	}
 	log_info(file_log, "No se encontro el segmento de esa tabla");
@@ -98,6 +101,7 @@ int comandoInsert(st_insert* comandoInsert){
 	marco->condicion = OCUPADO;
 	log_info(file_log, "El Insert se realizo correctamente");
     pthread_mutex_unlock(&mutex);
+    sleep(configMemoria->RETARDO_MEM/1000);
 	return OK;
 }
 
@@ -121,6 +125,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), paginaDeTablaEncontrada->desplazamiento);
 
             pthread_mutex_unlock(&mutex);
+            sleep(configMemoria->RETARDO_MEM/1000);
 			return registro;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key");
@@ -152,6 +157,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		marco->condicion = OCUPADO;
 		marco->timestamp = obtenerMilisegundosDeHoy();
         pthread_mutex_unlock(&mutex);
+        sleep(configMemoria->RETARDO_MEM/1000);
 		return registro;
 	}
 	log_info(file_log, "No se encontro el segmento de la tabla pedida por Select");
@@ -191,6 +197,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 	marco->condicion = OCUPADO;
 	marco->timestamp = obtenerMilisegundosDeHoy();
     pthread_mutex_unlock(&mutex);
+    sleep(configMemoria->RETARDO_MEM/1000);
 	return registro;
 }
 
@@ -248,6 +255,7 @@ int comandoJournal(){
     	}
     }
     pthread_mutex_unlock(&mutex);
+    sleep(configMemoria->RETARDO_MEM/1000);
     if(resultado){
     log_info(file_log, "Termino el Journal");
     return OK;
@@ -279,6 +287,7 @@ int removerSegmentoPorNombrePagina(char* nombreTabla){
 	            segmento->nroSegmento = nro - 1;
 	        }
 	        pthread_mutex_unlock(&mutex);
+	        sleep(configMemoria->RETARDO_MEM/1000);
 	        return OK;
 	    } else {
 	    	log_info(file_log, "No se encontro el segmento por Drop");

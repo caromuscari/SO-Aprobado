@@ -123,7 +123,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 			memcpy(&registro->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
 			memcpy(&registro->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
 			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), paginaDeTablaEncontrada->desplazamiento);
-
+			printf("%s", registro->value);
             pthread_mutex_unlock(&mutex);
             sleep(configMemoria->RETARDO_MEM/1000);
 			return registro;
@@ -208,11 +208,20 @@ bool enviarSegmentoAFS(st_segmento* segmento){
         if(pagina->flagModificado) {
             st_marco *marco = list_get(listaDeMarcos, pagina->nroDePagina);
             st_insert *insert = malloc(sizeof(st_insert));
-            insert->value = malloc(pagina->desplazamiento);
+            //insert->value = malloc(pagina->desplazamiento);
 
             memcpy(&insert->timestamp, pagina->pagina, sizeof(double));
             memcpy(&insert->key, pagina->pagina + sizeof(double), sizeof(uint16_t));
-            memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), pagina->desplazamiento);
+
+            st_select* comandoSelec;
+            comandoSelec->nameTable = segmento->nombreTabla;
+            comandoSelec->key = insert->key;
+            comandoSelec->operacion= SELECT;
+            st_registro* elSelect = comandoSelect(comandoSelec);
+
+
+            insert->value = strdup(elSelect->value);
+            //memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), pagina->desplazamiento);
             insert->operacion = INSERT;
             insert->nameTable = strdup(segmento->nombreTabla);
 
@@ -245,16 +254,17 @@ int comandoJournal(){
 	log_info(file_log, "Ejecutando Journal");
 	bool resultado = true;
 	st_segmento * segmento;
-    pthread_mutex_lock(&mutex);
+
 	for (int i = 0; i < list_size(listaDeSegmentos); i++){
     	segmento = list_get(listaDeSegmentos, i);
     	if(!enviarSegmentoAFS(segmento)){
     		resultado = false;
     	} else {
+    		pthread_mutex_lock(&mutex);
     		list_remove(listaDeSegmentos, i);
+    	    pthread_mutex_unlock(&mutex);
     	}
     }
-    pthread_mutex_unlock(&mutex);
     sleep(configMemoria->RETARDO_MEM/1000);
     if(resultado){
     log_info(file_log, "Termino el Journal");

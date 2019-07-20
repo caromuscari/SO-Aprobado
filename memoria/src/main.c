@@ -80,9 +80,9 @@ int inicializar(char *pathConfig){
         log_destroy(file_log);
         return -1;
     }
-//    if(!buscarValueMaximo()){
-//        return -1;
-//    }
+    if(!buscarValueMaximo()){
+        return -1;
+    }
     log_info(file_log, "Inicializando Memoria");
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;

@@ -88,7 +88,6 @@ int inicializar(char *pathConfig){
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;
     memoriaPrincipal = malloc(configMemoria->TAM_MEM);
-    inicializarSemaforos();
     listaDeSegmentos = list_create();
     listaDeMarcos = list_create();
     for (i = 0; i < cantPaginas; i++) {
@@ -97,11 +96,11 @@ int inicializar(char *pathConfig){
         marco->timestamp = 0;
         list_add(listaDeMarcos, marco);
     }
-    pthread_mutex_init(mutexListaMarcos, NULL);
-    pthread_mutex_init(mutexMemPrinc, NULL);
-    pthread_mutex_init(mutexListaSeg, NULL);
-    pthread_mutex_init(mutex, NULL);
-    pthread_mutex_init(mutexSeeds, NULL);
+    pthread_mutex_init(&mutexListaMarcos, NULL);
+    pthread_mutex_init(&mutexMemPrinc, NULL);
+    pthread_mutex_init(&mutexListaSeg, NULL);
+    pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&mutexSeeds, NULL);
     return 0;
 }
 

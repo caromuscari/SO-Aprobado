@@ -296,36 +296,44 @@ int comandoJournal(){
 
 
 int removerSegmentoPorNombrePagina(char* nombreTabla){
+	  pthread_mutex_lock(&mutexListaSeg);
 	  st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(nombreTabla);
-	  pthread_mutex_lock(&mutex);
 	    if(segmentoEncontrado){
 	        log_info(file_log, "Se encontro el segmento por Drop");
 
+	        pthread_mutex_lock(&mutexMemPrinc);
 	        for(int i = 0; i < list_size(segmentoEncontrado->tablaDePaginas); i++){
 	            st_tablaDePaginas* paginaDeTabla = list_get(segmentoEncontrado->tablaDePaginas, i);
+	            pthread_mutex_lock(&mutexListaMarcos);
 	            st_marco* marco = list_get(listaDeMarcos, paginaDeTabla->nroDePagina);
 	            free(paginaDeTabla);
 	            marco->condicion = LIBRE;
+	            pthread_mutex_unlock(&mutexListaMarcos);
 	        }
+	        pthread_mutex_unlock(&mutexListaSeg);
+	        pthread_mutex_unlock(&mutexMemPrinc);
 
 	        list_destroy(segmentoEncontrado->tablaDePaginas);
 	        free(segmentoEncontrado->nombreTabla);
+	        pthread_mutex_lock(&mutexListaSeg);
 	        st_segmento *seg = list_remove(listaDeSegmentos, segmentoEncontrado->nroSegmento);
+	        pthread_mutex_unlock(&mutexListaSeg);
 	        free(seg->nombreTabla);
 	        list_clean_and_destroy_elements(seg->tablaDePaginas, free);
 	        list_destroy(seg->tablaDePaginas);
 	        free(seg);
+	        pthread_mutex_lock(&mutexListaSeg);
 	        for(int i = segmentoEncontrado->nroSegmento; i < list_size(listaDeSegmentos); i++){
 	            st_segmento* segmento = list_get(listaDeSegmentos, i);
 	            int nro = segmento->nroSegmento;
 	            segmento->nroSegmento = nro - 1;
 	        }
-	        pthread_mutex_unlock(&mutex);
+	        pthread_mutex_unlock(&mutexListaSeg);
 	        sleep(configMemoria->RETARDO_MEM/1000);
 	        return OK;
 	    } else {
 	    	log_info(file_log, "No se encontro el segmento por Drop");
-	    	pthread_mutex_unlock(&mutex);
+	    	pthread_mutex_unlock(&mutexListaSeg);
 	    	return NOOK;
 	    }
 }

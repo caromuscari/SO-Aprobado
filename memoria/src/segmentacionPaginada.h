@@ -16,6 +16,7 @@
 #include <time.h>
 #include <funcionesCompartidas/registroTabla.h>
 #include "contrato.h"
+#include "pthread.h"
 
 typedef struct{
 	int nroSegmento;

@@ -127,7 +127,7 @@ t_list * llenarTabla(char * path){
 	char * linea, * bloque;
 	size_t tamBuffer = 100;
 	char ** split;
-	char * flag;
+	char * flag = NULL;
 
 	particion = leerParticion(path);
 
@@ -298,70 +298,69 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 	free(particion);
 
 }
-
 void generarParticion(char * path, int part, t_dictionary * lista){
-	char * pathPart = string_from_format("%s/%d.bin", path, part);
-	FILE * archivo;
-	int bit, i=0, offset=0,sizeRestante;
-	char * contenido,* registro, * bloque;
-	t_list * listPart = dictionary_get(lista, string_itoa(part));
+    char * pathPart = string_from_format("%s/%d.bin", path, part);
+    FILE * archivo;
+    int* bit, i=0,sizeRestante;
+    char * contenido,* registro, * bloque;
+    t_list * listPart = dictionary_get(lista, string_itoa(part));
+    t_list * listBits = list_create();
 
-	bit = verificar_bloque();
-	if(bit != -1){
-		contenido = string_from_format("SIZE=0\nBLOQUES=[%d]", bit);
+    char* strParticion = strdup("");
+    while(i<list_size(listPart)) {
+        structRegistro *reg = list_remove(listPart, i);
+        registro = string_from_format("%f;%d;%s\n", reg->time, reg->key, reg->value);
+        string_append(&strParticion, registro);
 
-		archivo = fopen(pathPart, "a+");
+        free(reg->value);
+        free(reg);
+    }
 
-		fputs(contenido,archivo);
+    sizeRestante = string_length(strParticion);
+    int cantidadCaracteresPorString = tBloques/4;
+    int huboError = 0;
+    while (sizeRestante > 0){
+        bit = malloc(sizeof(int));
+        *bit = verificar_bloque();
+        if(*bit != -1){
+            list_add(listBits, bit);
+        }else{
+            huboError = 1;
+        }
+        sizeRestante -= cantidadCaracteresPorString;
+    }
 
-		fclose(archivo);
+    if(huboError == 0){
+        sizeRestante = string_length(strParticion);
+        char * stringBits = list_fold(listBits, strdup(""), (void*)armarStrBloques);
+        contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", string_length(strParticion)*4, stringBits);
+        archivo = fopen(pathPart, "a+");
+        fputs(contenido,archivo);
+        fclose(archivo);
+        free(contenido);
+        free(stringBits);
 
-		free(contenido);
-	}
+        int * siguienteBloque = list_get(listBits, 0);
+        int iBloque = 0;
+        while(sizeRestante > 0 && siguienteBloque != NULL){
+            char* strBloque = string_substring(strParticion, cantidadCaracteresPorString * iBloque, cantidadCaracteresPorString);
+            bloque = armar_PathBloque(string_itoa(*siguienteBloque));
+            archivo = fopen(bloque,"w");
+            fputs(strBloque, archivo);
+            fclose(archivo);
+            
+            sizeRestante -= cantidadCaracteresPorString;
+            free(strBloque);
+            iBloque++;
+            siguienteBloque = list_get(listBits, iBloque);
+        }
+    }else{
+        list_iterate(listBits, (void*)liberarBit);
+    }
 
-	bloque = armar_PathBloque(string_itoa(bit));
-	archivo = fopen(bloque,"w");
-
-	while(i<list_size(listPart)){
-		structRegistro * reg = list_remove(listPart,i);
-		registro = string_from_format("%f;%d;%s\n", reg->time, reg->key, reg->value);
-
-		free(reg->value);
-		free(reg);
-
-		sizeRestante = string_length(registro);
-		if((offset+sizeRestante) > (tBloques/4)){
-			while(sizeRestante > 0){
-				fwrite(registro,sizeof(char),((tBloques/4)-offset),archivo);
-				registro += ((tBloques/4)-offset);
-				sizeRestante -= ((tBloques/4)-offset);
-
-				bit = verificar_bloque();
-				if(bit != -1){
-					printf("Bit %d\n", bit);
-					actualizar_bloques(pathPart,bit);
-					actualizar_size(pathPart,((tBloques/4)-offset));
-				}
-				offset = 0;
-
-				fclose(archivo);
-				free(bloque);
-				bloque = armar_PathBloque(string_itoa(bit));
-				archivo = fopen(bloque,"w");
-			}
-		}else{
-			fwrite(registro,sizeof(char),string_length(registro),archivo);
-			offset += string_length(registro);
-
-			actualizar_size(pathPart, string_length(registro));
-		}
-
-		free(registro);
-		i++;
-	}
-
-	fclose(archivo);
-	free(bloque);
-	free(pathPart);
-	list_destroy(dictionary_remove(lista, string_itoa(part)));
+    free(strParticion);
+    free(pathPart);
+    list_iterate(listBits, free);
+    list_destroy(listBits);
+    list_destroy(dictionary_remove(lista, string_itoa(part)));
 }

@@ -159,6 +159,7 @@ int realizarCreate(st_create * create){
 
 			sem_init(&tabla->compactacion,0,1);
 			sem_init(&tabla->opcional,0,0);
+			tabla->contador = 0;
 
 			sem_wait(&sNombre);
 			queue_push(nombre, name);

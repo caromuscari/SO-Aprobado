@@ -224,6 +224,7 @@ bool enviarSegmentoAFS(st_segmento* segmento){
             //memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), pagina->desplazamiento);
             insert->operacion = INSERT;
             insert->nameTable = strdup(segmento->nombreTabla);
+            destoySelect(comandoSelec);
 
             if(mandarInsert(insert) == 5){
                 //BORRO DE MEMORIA

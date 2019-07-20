@@ -60,7 +60,7 @@ void crearTemporal(char * key, st_tabla* data){
 }
 
 char* armarStrLista(char * strLista, structRegistro *registro){
-   string_append_with_format(&strLista, "%d;%d;%s\n", registro->time, registro->key, registro->value);
+   string_append_with_format(&strLista, "%f;%d;%s\n", registro->time, registro->key, registro->value);
    return strLista;
 }
 
@@ -84,11 +84,9 @@ void* hilodump(){
 	while(loop){
 		sleep(getDump());
 		//Hacer copia y ver si existe la tablas
-		log_info(alog,"Inicia el dump");
 		sem_wait(&sMemtable);
 		dictionary_iterator(memtable,(void*)crearTemporal);
 		sem_post(&sMemtable);
-		log_info(alog,"Termina el dump");
 
 	}
 

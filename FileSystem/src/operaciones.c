@@ -293,6 +293,7 @@ t_dictionary * listarDirectorio(){
 
         		sem_init(&tabla->compactacion,0,1);
         		sem_init(&tabla->opcional,0,0);
+        		tabla->contador = 0;
         		//tabla->sem = list_create();
 
         		char * table = strdup(name);
@@ -410,6 +411,12 @@ void seteoBit(int* bit){
     sem_post(&sBitmap);
 }
 
+void liberarBit(int* bit){
+    sem_wait(&sBitmap);
+    bitarray_clean_bit(bitmap,*bit);
+    sem_post(&sBitmap);
+}
+
 char* armarStrBloques(char * strBloques, int *bit){
     if(!string_is_empty(strBloques)){
         string_append_with_format(&strBloques, ",%d", *bit);
@@ -447,7 +454,9 @@ t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio_size){
         fclose(archivo);
 
         free(contenido);
-    }else; //Liberar los que si pudo tomar
+    }else{
+        list_iterate(bits, (void*)liberarBit);
+    } //Liberar los que si pudo tomar
 
 
     return bits;

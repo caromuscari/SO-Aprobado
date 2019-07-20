@@ -29,6 +29,7 @@ t_dictionary * listarDirectorio();
 structRegistro * leerBloque(char* bloque, uint16_t key, char ** flag);
 bool chequearBitValido(int* bit);
 void seteoBit(int* bit);
+void liberarBit(int* bit);
 char* armarStrBloques(char * strBloques, int *bit);
 t_list* crearArchivoTemporal(char * pathCompleto, size_t tamanio);
 

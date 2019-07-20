@@ -51,6 +51,9 @@ struct stat mystat;
 int main(int argc, char *argv[]) {
 
 	int metadata;
+	printf("%d\n", obtenerMilisegundosDeHoy());
+	sleep(3);
+    printf("%d", obtenerMilisegundosDeHoy());
 
 	inicializar();
 	archivoDeConfiguracion(argv[1]);

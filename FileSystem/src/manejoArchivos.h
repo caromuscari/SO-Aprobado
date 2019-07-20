@@ -20,7 +20,8 @@ typedef struct {
 }structParticion;
 
 typedef struct {
-	long int time;
+//	long int time;
+    double time;
 	uint16_t key;
 	char * value;
 }structRegistro;

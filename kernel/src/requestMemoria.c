@@ -15,7 +15,7 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
     int control = 0;
     int socketClient = establecerConexion(ip, puerto, file_log, &control);
     if (control != 0) {
-        log_error(file_log, "no se puedo conectar con la memoria");
+        log_error(file_log, "no se pudo conectar con la memoria");
         return NULL;
     }
     header request;
@@ -27,14 +27,14 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
     free(paqueteMensaje->buffer);
     free(paqueteMensaje);
     if (control != 0) {
-        log_error(file_log, "no se puedo enviar el mensaje");
+        log_error(file_log, "no se pudo enviar el mensaje");
         return NULL;
     }
 
     header response;
     void *paqueteRespuesta = getMessage(socketClient, &response, &control);
     if (paqueteRespuesta == NULL) {
-        log_error(file_log, "no se puedo recibir el mensaje");
+        log_error(file_log, "no se pudo recibir el mensaje");
         return NULL;
     }
     st_messageResponse *messageResponse = malloc(sizeof(st_messageResponse));
@@ -129,7 +129,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
     }
     switch (mensaje->cabezera.codigo) {
         case SUCCESS: {
-            printf("se creo la tabla sin probl+emas\n");
+            printf("se creo la tabla sin problemas\n");
             st_metadata *newMetadata = malloc(sizeof(st_metadata));
             newMetadata->nameTable = strdup(_create->nameTable);
             newMetadata->consistency = strdup(_create->tipoConsistencia);
@@ -140,7 +140,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
             break;
         }
         case NOSUCCESS: {
-            printf("no se puedo crear la tabla\n");
+            printf("no se pudo crear la tabla\n");
             break;
         }
 

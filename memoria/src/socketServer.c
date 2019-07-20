@@ -87,8 +87,11 @@ void * atenderMensaje(int * fdClient){
 
             buffer = strdup("1");
 
-            if(respuesta == 8) enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer)); //la tabla ya existe
-            else enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer)); //se creo todo ok
+            if(respuesta == 8) {
+            	enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
+            } else {
+            	enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+            }
 
             destroyCreate(create);
             free(buffer);

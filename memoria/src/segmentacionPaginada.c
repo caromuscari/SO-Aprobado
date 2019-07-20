@@ -7,6 +7,7 @@ extern t_list* listaDeSegmentos;
 extern int cantPaginas;
 extern int tamanioTotalDePagina;
 extern t_log *file_log;
+pthread_mutex_t mutex;
 
 
 void mostrarPaginasCargadas(){
@@ -96,6 +97,7 @@ st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tab
 
 int removerSegmentoPorNombrePagina(char* nombreTabla){
 	  st_segmento* segmentoEncontrado = buscarSegmentoPorNombreTabla(nombreTabla);
+	  pthread_mutex_lock(&mutex);
 	    if(segmentoEncontrado){
 	        log_info(file_log, "Se encontro el segmento por Drop");
 
@@ -114,9 +116,11 @@ int removerSegmentoPorNombrePagina(char* nombreTabla){
 	            int nro = segmento->nroSegmento;
 	            segmento->nroSegmento = nro - 1;
 	        }
+	        pthread_mutex_unlock(&mutex);
 	        return OK;
 	    } else {
 	    	log_info(file_log, "No se encontro el segmento por Drop");
+	    	pthread_mutex_unlock(&mutex);
 	    	return NOOK;
 	    }
 }

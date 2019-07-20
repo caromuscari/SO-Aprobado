@@ -17,7 +17,7 @@ pthread_t pthreadMetadata;
 
 
 int inicializar(char *pathConfig) {
-    file_log = crear_archivo_log("Kernel", true, "./kernelLog");
+    file_log = crear_archivo_log("Kernel", false, "./kernelLog");
     log_info(file_log, "cargando el archivo de configuracion");
     configuracion = load_config(pathConfig);
     if (!configuracion) {

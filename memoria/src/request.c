@@ -41,13 +41,10 @@ int mandarCreate(st_create * create){
 
 	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
 
-	if(buffer == NULL){
-		log_error(file_log, "Fallo la conexion con el File System");
-		return SOCKETDESCONECTADO;
+	if(respuesta.codigo != 8){
+		log_error(file_log, "Fallo el Create");
+		return NOOK;
 	}
-
-	free(buffer);
-
 	return respuesta.codigo;
 }
 
@@ -76,12 +73,10 @@ int mandarDrop(st_drop * drop){
     }
 
 	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
-    if(buffer == NULL){
-        log_error(file_log, "Fallo la conexion con File System");
-        return SOCKETDESCONECTADO;
+    if(respuesta.codigo != 9) {
+        log_error(file_log, "Fallo el Drop");
+        return NOOK;
     }
-
-	free(buffer);
 	return respuesta.codigo;
 }
 
@@ -110,7 +105,7 @@ st_registro* obtenerSelect(st_select * comandoSelect){
 
     paqueteDeRespuesta = getMessage(fdFileSystem, &respuesta, &control);
     if(paqueteDeRespuesta== NULL){
-        log_error(file_log, "Fallo la conexion con el File System");
+        log_error(file_log, "No se encontro dato para ese Select");
         return NULL;
     }
     if(respuesta.codigo == 14){
@@ -146,8 +141,8 @@ st_messageResponse* mandarDescribe(st_describe * describe){
 
 	buffer = getMessage(fdFileSystem,&head2,&controlador);
 
-	if(buffer == NULL){
-		log_error(file_log, "Se desconecto file system");
+	if(head2.codigo != 15){
+		log_error(file_log, "No existe esa tabla");
 		return NULL;
 	}
 
@@ -183,8 +178,8 @@ st_messageResponse* mandarDescribeGlobal(){
 	free(buffer);
 
 	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
-	if(buffer == NULL){
-		log_error(file_log, "Se desconecto file system");
+	if(respuesta.codigo != 13){
+		log_error(file_log, "No hay tablas");
         return NULL;
 	}
 
@@ -226,7 +221,11 @@ int mandarInsert(st_insert * insert){
         return -1;
     }
 
-    free(buffer);
+    if(head2.codigo != 5) {
+    	log_error(file_log, "Fallo el Insert");
+    	return -1;
+    }
+
 
     return head2.codigo;
 }

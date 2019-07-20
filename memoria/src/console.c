@@ -60,7 +60,7 @@ void makeCommand(char *command) {
 
             if ((create = cargarCreate(command))) {
                 codigo = mandarCreate(create);
-                if (codigo != NOOK && codigo != SOCKETDESCONECTADO) {
+                if (codigo != NOOK) {
                     mostrarRespuesta(codigo);
 
                 }
@@ -75,7 +75,7 @@ void makeCommand(char *command) {
 
             if ((drop = cargarDrop(command))) {
                 cod = mandarDrop(drop);
-                if (cod != NOOK && cod != SOCKETDESCONECTADO) {
+                if (cod != NOOK) {
                     mostrarRespuesta(cod);
                     if (cod == 9) {
                         removerSegmentoPorNombrePagina(drop->nameTable);

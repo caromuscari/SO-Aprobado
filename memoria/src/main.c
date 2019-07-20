@@ -53,7 +53,7 @@ bool buscarValueMaximo(){
     tamanioValue = atoi(paqueteDeRespuesta);
 
     free(paqueteDeRespuesta);
-    printf("Tamanio del value: %d",tamanioValue);
+    printf("Tamanio del value: %d\n",tamanioValue);
     return true;
 }
 

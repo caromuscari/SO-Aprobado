@@ -9,16 +9,20 @@ pthread_mutex_t mutex;
 t_list *listaTablas;
 extern t_log *file_log;
 extern t_configuracionMemoria *configMemoria;
+extern pthread_mutex_t mutex, mutexSeeds;
 
 bool existeMemoria(int numeroMemoria) {
     int i;
     st_memoria *memoria;
+    pthread_mutex_lock(&mutex);
     for (i = 0; i < listaTablas->elements_count; ++i) {
         memoria = list_get(listaTablas, i);
         if (memoria->numero == numeroMemoria) {
-            return true;
+        	pthread_mutex_unlock(&mutex);
+        	return true;
         }
     }
+    pthread_mutex_unlock(&mutex);
     return false;
 }
 
@@ -37,17 +41,21 @@ void addSeedFallidas(char *ip,char * puerto){
     memoria->numero  = 0;
     memoria->ip = strdup(ip);
     memoria->puerto = strdup(puerto);
+    pthread_mutex_lock(&mutexSeeds);
     list_add(seedFallidas,memoria);
+    pthread_mutex_unlock(&mutexSeeds);
 }
 
 void cleanSeed(){
     int i;
     st_memoria * memoria;
+    pthread_mutex_lock(&mutexSeeds);
     for (i = 0; i < seedFallidas->elements_count ; ++i) {
         memoria = list_remove(seedFallidas,i);
         destroyMemoria(memoria);
     }
     list_clean(seedFallidas);
+    pthread_mutex_unlock(&mutexSeeds);
 }
 
 void addNewMemoria(st_memoria * memoria){
@@ -169,10 +177,12 @@ void *pthreadGossping() {
             consultarEstadoMemoria(list_get(configMemoria->IP_SEEDS, i), list_get(configMemoria->PUERTO_SEEDS, i));
         }
         //verificar seeed ingresado
+        pthread_mutex_lock(&mutexSeeds);
         for (i = 0; i < seedFallidas->elements_count ; ++i) {
             memoria = list_remove(seedFallidas,i);
             removeMemoriaFallida(memoria);
         }
+        pthread_mutex_unlock(&mutexSeeds);
         sleep(configMemoria->TIEMPO_GOSSIPING/1000);
     }
 }

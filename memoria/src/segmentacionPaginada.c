@@ -1,11 +1,8 @@
 #include "segmentacionPaginada.h"
 
-extern int tamanioValue;
 extern t_list* listaDeMarcos;
-extern void *memoriaPrincipal;
 extern t_list* listaDeSegmentos;
-extern int cantPaginas;
-extern int tamanioTotalDePagina;
+extern pthread_mutex_t mutexListaMarcos, mutexListaSeg;
 
 
 /*void mostrarPaginasCargadas(){

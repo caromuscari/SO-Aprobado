@@ -22,7 +22,7 @@ int cantPaginas;
 int tamanioValue = 255; //esto me lo va a pasa fs
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
-pthread_mutex_t mutexListaSeg, mutexListaMarcos, mutexMemPrinc;
+pthread_mutex_t mutexListaSeg, mutexListaMarcos, mutexMemPrinc, mutex, mutexSeeds;
 
 bool buscarValueMaximo(){
     int control = 0;
@@ -97,9 +97,11 @@ int inicializar(char *pathConfig){
         marco->timestamp = 0;
         list_add(listaDeMarcos, marco);
     }
-    pthread_mutex_init(mutexListaMarcos, 1);
-    pthread_mutex_init(mutexMemPrinc, 1);
-    pthread_mutex_init(mutexListaSeg, 1);
+    pthread_mutex_init(mutexListaMarcos, NULL);
+    pthread_mutex_init(mutexMemPrinc, NULL);
+    pthread_mutex_init(mutexListaSeg, NULL);
+    pthread_mutex_init(mutex, NULL);
+    pthread_mutex_init(mutexSeeds, NULL);
     return 0;
 }
 

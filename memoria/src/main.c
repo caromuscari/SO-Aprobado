@@ -8,6 +8,7 @@
 #include "socketServer.h"
 #include <funcionesCompartidas/funcionesNET.h>
 #include "comandos.h"
+#include "journal.h"
 
 t_log *file_log;
 t_list *listaDeMarcos;
@@ -15,6 +16,7 @@ t_list* listaDeSegmentos;
 t_configuracionMemoria *configMemoria;
 pthread_t server;
 pthread_t gossiping;
+pthread_t journal;
 int fdFileSystem;
 int cantPaginas;
 int tamanioValue = 255; //esto me lo va a pasa fs
@@ -78,9 +80,9 @@ int inicializar(char *pathConfig){
         log_destroy(file_log);
         return -1;
     }
-    if(!buscarValueMaximo()){
-        return -1;
-    }
+//    if(!buscarValueMaximo()){
+//        return -1;
+//    }
     log_info(file_log, "Inicializando Memoria");
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;
@@ -120,6 +122,8 @@ int main(int argc, char *argv[]){
         return -1;
     }
     log_info(file_log, "La memoria se inicio correctamente");
+    pthread_create(&journal, NULL, hiloJournal, NULL);
+    pthread_detach(journal);
     pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);
     pthread_create(&gossiping, NULL,pthreadGossping, NULL);

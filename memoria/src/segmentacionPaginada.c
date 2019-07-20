@@ -6,7 +6,6 @@ extern void *memoriaPrincipal;
 extern t_list* listaDeSegmentos;
 extern int cantPaginas;
 extern int tamanioTotalDePagina;
-extern t_log *file_log;
 
 
 void mostrarPaginasCargadas(){

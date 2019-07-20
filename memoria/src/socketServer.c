@@ -204,6 +204,7 @@ void * start_server() {
         }
         pthread_create(&nuevoCliente,NULL,(void *)atenderMensaje,fdClient);
         pthread_detach(nuevoCliente);
+        sleep(configMemoria->RETARDO_FS/1000);
 	}
 }
 

@@ -63,7 +63,7 @@ t_list * clonarPool(){
         kernelMemoria = list_get(poolMemoria,i);
         newKernelMemoria = malloc(sizeof(st_kernel_memoria));
         newKernelMemoria->count = kernelMemoria->count;
-        newKernelMemoria->activo = newKernelMemoria->activo;
+        newKernelMemoria->activo = kernelMemoria->activo;
         //copy memoria
         newKernelMemoria->memoria = malloc(sizeof(st_memoria));
         newKernelMemoria->memoria->numero = kernelMemoria->memoria->numero;

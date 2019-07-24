@@ -4,7 +4,7 @@
 #include "consola.h"
 
 extern t_log *file_log;
-extern config *configuracion;
+//extern config *configuracion;
 
 st_add_memoria *cargarAddMemoria(char *text) {
     st_add_memoria *addMemoria = malloc(sizeof(st_add_memoria));
@@ -57,7 +57,7 @@ void cargarScriptFile(char *text) {
     }
     FILE *fileScript = fopen(split[1], "r");
     char *line;
-    size_t len = 0;
+    size_t len = 100;
     if (fileScript == NULL) {
         printf("no se puedo abrir el archivo\n");
         string_iterate_lines(split, (void *) free);
@@ -67,8 +67,10 @@ void cargarScriptFile(char *text) {
     t_list *listaDeInstrucciones = list_create();
     bool flagError = false;
     char *lineClean = NULL;
+    line = malloc(sizeof(char) *len);
     while (getline(&line, &len, fileScript) != -1 && !flagError) {
         lineClean = getCleanLine(line);
+        free(line);
         int typeComando = getEnumFromString(lineClean);
         switch (typeComando) {
             case SELECT: {
@@ -129,6 +131,7 @@ void cargarScriptFile(char *text) {
             }
         }
         free(lineClean);
+        line = malloc(sizeof(char)* len);
     }
     free(line);
     fclose(fileScript);
@@ -160,6 +163,7 @@ void armarComando(char *comando) {
                     idText = strdup("Script insert ");
                     string_append(&idText, insert->nameTable);
                     cargarScriptConUnaInstruccion(insert, INSERT, idText);
+                    free(idText);
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destroyInsert(insert);
@@ -177,6 +181,7 @@ void armarComando(char *comando) {
                     idText = strdup("Script select ");
                     string_append(&idText, _select->nameTable);
                     cargarScriptConUnaInstruccion(_select, SELECT, idText);
+                    free(idText);
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destoySelect(_select);
@@ -194,6 +199,7 @@ void armarComando(char *comando) {
                     idText = strdup("Script Drop ");
                     string_append(&idText, _drop->nameTable);
                     cargarScriptConUnaInstruccion(_drop, DROP, idText);
+                    free(idText);
                 } else {
                     log_error(file_log, "Tabla no encontrada");
                     destroyDrop(_drop);
@@ -210,6 +216,7 @@ void armarComando(char *comando) {
                 string_append(&idText, _create->nameTable);
                 cargarScriptConUnaInstruccion(_create, CREATE, idText);
                 flagErrorSintaxis = false;
+                free(idText);
             }
             break;
         }
@@ -225,6 +232,7 @@ void armarComando(char *comando) {
                 idText = strdup("Script Describe Global");;
                 cargarScriptConUnaInstruccion(NULL, DESCRIBEGLOBAL, idText);
             }
+            free(idText);
             break;
         }
         case JOURNAL: {

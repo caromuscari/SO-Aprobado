@@ -16,8 +16,9 @@
 #include "threadPoolMemoria.h"
 #include "contracts.h"
 
-void * inicialPlanificador();
+void  inicialPlanificador();
 void cargarNuevoScript(st_script * newProceso);
+void ejecutarScript();
 st_script *crearNuevoScript(char *id, t_list *listaInstrucciones);
 st_instruccion *crearInstruccion(void *instruccion, enum OPERACION type);
 void destroyListaInstruciones(t_list *instrucciones);

@@ -32,13 +32,19 @@ int main(int argc, char **argv) {
     if (inicializar(argv[1]) < 0) {
         return -1;
     }
-    pthread_create(&plafinifcador,NULL, inicialPlanificador, NULL);
-    pthread_create(&pthreadMemoria,NULL,loadPoolMemori,NULL);
-    pthread_create(&pthreadMetadata, NULL, schedulerMetadata, NULL);
+    pthread_create(&plafinifcador,NULL, (void*)inicialPlanificador, NULL);
+    pthread_detach(plafinifcador);
+    pthread_create(&pthreadMemoria,NULL,(void*)loadPoolMemori,NULL);
+    pthread_detach(pthreadMemoria);
+    pthread_create(&pthreadMetadata, NULL, (void*)schedulerMetadata, NULL);
+    pthread_detach(pthreadMetadata);
     consola();
     pthread_cancel(plafinifcador);
     pthread_cancel(pthreadMemoria);
     pthread_cancel(pthreadMetadata);
+    free(configuracion->IP_MEMORIA);
+    free(configuracion->PUERTO_MEMORIA);
+    free(configuracion);
     log_destroy(file_log);
     return 0;
 }

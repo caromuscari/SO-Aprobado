@@ -100,10 +100,12 @@ void *schedulerMetadata() {
                 }
                 case NOSUCCESS: {
                     log_info(file_log, "[MetaData] no hay resultado");
+                    destroyStMessageResponse(respuestaMesanje);
                     break;
                 }
                 default: {
                     log_info(file_log, "[MetaData] no entiendo el codigo re respuesta");
+                    destroyStMessageResponse(respuestaMesanje);
                     break;
                 }
             }

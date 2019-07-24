@@ -40,12 +40,12 @@ st_memoria * clonarMemoria(st_memoria * memoriaAclonar){
     return memoria;
 }
 
-void destroyPoolMemory(t_list * listaMemoria){
+void destroyPoolMemory(t_list * listaMemoria){//revisar
     int i;
     st_kernel_memoria * kernelMemoria;
-    char * tag;
+    //char * tag;
     for (i = 0; i < listaMemoria->elements_count ; ++i) {
-        kernelMemoria = list_get(listaMemoria,i);
+        kernelMemoria = list_remove(listaMemoria,i);
         destroyKernelMemoria(kernelMemoria);
     }
 }
@@ -257,7 +257,7 @@ st_kernel_memoria *cargarNuevaKernelMemoria(st_memoria *data) {
 st_kernel_memoria *existeMemoria(t_list * listaMemoria, int numeroMemoria) {
     int i;
     st_kernel_memoria *memoria;
-    for (i = 0; i < listaMemoria->elements_count; ++i) {
+    for (i = 0; i < listaMemoria->elements_count; ++i) {//revisar
         memoria = list_get(listaMemoria, i);
         if (memoria->memoria->numero == numeroMemoria) {
             return memoria;
@@ -278,7 +278,7 @@ void eliminarMemoria(int numberMemoria){
         }
     }
     if(kernelMemoria){
-        list_remove(poolMemoria,i);
+        kernelMemoria = list_remove(poolMemoria,i);
         destroyKernelMemoria(kernelMemoria);
     }
     pthread_mutex_unlock(&mutex);
@@ -348,7 +348,7 @@ void updateListaMemorias(st_data_memoria *dataMemoria) {
             //update
             updateMemoria(newKernelMemoria, stMemoria);
         }
-        destroyMemoria(stMemoria);
+        //destroyMemoria(stMemoria);
     }
     pthread_mutex_unlock(&mutex);
     logStatusListaMemoria();
@@ -398,7 +398,7 @@ int journalMemoria(st_memoria * memoria){
 
 void hacerJournal(){
     int i;
-    t_list * listaMemoria = clonarPool();
+    t_list * listaMemoria = clonarPool();//revisar
     st_kernel_memoria * kernelMemoria;
     for (i = 0; i < listaMemoria->elements_count ; ++i) {
         kernelMemoria = list_get(listaMemoria,i);
@@ -427,8 +427,10 @@ void *loadPoolMemori() {
         if(respuestaMesanje){
             switch (respuestaMesanje->cabezera.codigo){
                 case SUCCESS:{
-                    updateListaMemorias(deserealizarMemoria(respuestaMesanje->buffer, respuestaMesanje->cabezera.sizeData));
-                    destroyStMessageResponse(respuestaMesanje);
+                	st_data_memoria * mem = deserealizarMemoria(respuestaMesanje->buffer, respuestaMesanje->cabezera.sizeData);
+                	updateListaMemorias(mem);
+                    destroyListaDataMemoria(mem);
+                	destroyStMessageResponse(respuestaMesanje);
                     break;
                 }
                 default:{

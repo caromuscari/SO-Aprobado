@@ -22,6 +22,7 @@ st_script *crearNuevoScript(char *id, t_list *listaInstrucciones) {
     st_script *stScript = malloc(sizeof(st_script));
     stScript->id = strdup(id);
     stScript->listaDeInstrucciones = listaInstrucciones;
+    return stScript;
 }
 
 void destroyInctruccion(st_instruccion *instruccion) {
@@ -54,7 +55,7 @@ void destroyListaInstruciones(t_list *instrucciones) {
     st_instruccion *instruccionScript;
     int i;
     for (i = 0; i < instrucciones->elements_count; ++i) {
-        instruccionScript = list_get(instrucciones, i);
+        instruccionScript = list_remove(instrucciones, i);
         destroyInctruccion(instruccionScript);
     }
     list_destroy(instrucciones);
@@ -91,9 +92,9 @@ void cargarNuevoScript(st_script *newScript) {
     sem_post(&colaDeListos);
 }
 
-void *ejecutarScript() {
+void ejecutarScript() {
     int i, resultado = NO_SALIO_OK;
-    st_instruccion *instruccionScript;
+    st_instruccion *instruccionScript;//Hay que liberar?
     st_memoria *datomemoria;
     st_script *script = tomarScript();
     char *tag;
@@ -124,6 +125,7 @@ void *ejecutarScript() {
             break;
         }
         sleep(configuracion->SLEEP_EJECUCION);
+        free(tag);
     }
     printf("Fin Ejecucion de Script ----- [%s]\n", script->id);
     //Evaluar resultado de Ejecucion
@@ -142,13 +144,13 @@ void atenderScriptEntrantes() {
     while (1) {
         sem_wait(&colaDeListos);
         sem_wait(&procesadores);
-        pthread_create(&pthread_execution, NULL, ejecutarScript, NULL);
+        pthread_create(&pthread_execution, NULL, (void*)ejecutarScript, NULL);
         pthread_detach(pthread_execution);
         sem_post(&procesadores);
     }
 }
 
-void *inicialPlanificador() {
+void inicialPlanificador() {
     listaDeScript = list_create();
     sem_init(&colaDeListos, 0, 0);
     sem_init(&procesadores, 0, configuracion->MULTIPROCESAMIENTO);

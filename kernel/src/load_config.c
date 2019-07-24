@@ -17,7 +17,7 @@ config * load_config(char * path){
     configuracion->MULTIPROCESAMIENTO = atoi(config_get_string_value(bufferConfig, "MULTIPROCESAMIENTO"));
     configuracion->METADATA_REFRESH = atoi(config_get_string_value(bufferConfig, "METADATA_REFRESH"));
     configuracion->SLEEP_EJECUCION = atoi(config_get_string_value(bufferConfig, "SLEEP_EJECUCION"))/1000;
-
+    configuracion->REFRESH_GOSSIPING = config_get_int_value(bufferConfig,"REFRESH_GOSSIPING");
     config_destroy(bufferConfig);
     return  configuracion;
 }

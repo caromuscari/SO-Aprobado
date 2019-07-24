@@ -106,6 +106,7 @@ void *ejecutarScript() {
         typeCriterio = getCriterioBYInstruccion(instruccionScript->instruccion, instruccionScript->operacion);
         if (typeCriterio == NO_SE_ENCONTRO_TABLA) {
             printf("No se encontro tabla\n");
+            sleep(configuracion->SLEEP_EJECUCION);
             break;
         }
         tag = generarTag(typeCriterio, instruccionScript->instruccion, instruccionScript->operacion);
@@ -113,13 +114,16 @@ void *ejecutarScript() {
         if (datomemoria) {
             resultado = enviarRequestMemoria(instruccionScript, datomemoria);
             if (resultado == NO_SALIO_OK || resultado == SE_DESCONECTO_SOCKET) {
+                sleep(configuracion->SLEEP_EJECUCION);
                 break;
             }
         } else {
             printf("no hay memoria disponible\n");
             resultado = MEMORIA_NO_DISPONIBLE;
+            sleep(configuracion->SLEEP_EJECUCION);
             break;
         }
+        sleep(configuracion->SLEEP_EJECUCION);
     }
     printf("Fin Ejecucion de Script ----- [%s]\n", script->id);
     //Evaluar resultado de Ejecucion
@@ -140,7 +144,6 @@ void atenderScriptEntrantes() {
         sem_wait(&procesadores);
         pthread_create(&pthread_execution, NULL, ejecutarScript, NULL);
         pthread_detach(pthread_execution);
-        sleep(configuracion->SLEEP_EJECUCION);
         sem_post(&procesadores);
     }
 }

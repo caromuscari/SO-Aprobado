@@ -9,15 +9,15 @@ extern config *configuracion;
 extern t_log *file_log;
 pthread_mutex_t mutex;
 
-void showMemoria(){
+void logStatusListaMemoria(){
     st_kernel_memoria * memoriaK;
-    printf("-----------------------------------------------\n");
+    log_info(file_log,"----Estado de Memoria---");
     for (int i = 0; i < poolMemoria->elements_count ; ++i) {
         memoriaK = list_get(poolMemoria,i);
         if(memoriaK->activo){
-            printf("ip [%s]\n",memoriaK->memoria->ip);
-            printf("puerto [%s]\n",memoriaK->memoria->puerto);
-            printf("numero [%d]\n",memoriaK->memoria->numero);
+            log_info(file_log,"Numero = [%d]",memoriaK->memoria->numero);
+            log_info(file_log,"Puerto [%s]", memoriaK->memoria->ip);
+            log_info(file_log,"IP [%s]",memoriaK->memoria->ip);
         }
 
     }
@@ -317,6 +317,7 @@ void updateMemoria(st_kernel_memoria *kernelMemoria, st_memoria *stMemoria) {
 
 void updateListaMemorias(st_data_memoria *dataMemoria) {
     //crear la memoria que consulto
+    log_info(file_log,"[gossiping] Actulizando lista de memorias");
     st_kernel_memoria *newKernelMemoria;
     st_memoria *stMemoria;
     pthread_mutex_lock(&mutex);
@@ -350,6 +351,7 @@ void updateListaMemorias(st_data_memoria *dataMemoria) {
         destroyMemoria(stMemoria);
     }
     pthread_mutex_unlock(&mutex);
+    logStatusListaMemoria();
 }
 
 void CleanListaMemoria() {
@@ -420,6 +422,7 @@ void *loadPoolMemori() {
     while (1) {
         CleanListaMemoria();
         buffer = strdup("1");
+        log_info(file_log,"[gossiping] Haciendo Gossiping\n");
         respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA,BUSCARTABLAGOSSIPING,buffer,1);
         if(respuestaMesanje){
             switch (respuestaMesanje->cabezera.codigo){
@@ -437,6 +440,7 @@ void *loadPoolMemori() {
             log_error(file_log,"[gossiping] No hubo respuesta en el gossiping");
         }
         free(buffer);
-        sleep(10);
+        logStatusListaMemoria();
+        sleep(configuracion->REFRESH_GOSSIPING / 1000);
     }
 }

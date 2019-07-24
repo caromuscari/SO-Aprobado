@@ -16,6 +16,7 @@ typedef  struct {
     int MULTIPROCESAMIENTO;
     int METADATA_REFRESH;
     int SLEEP_EJECUCION;
+    int REFRESH_GOSSIPING;
 } config;
 config * load_config(char * path);
 

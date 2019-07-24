@@ -8,7 +8,7 @@ t_list *listaDeScript;
 sem_t colaDeListos;
 sem_t procesadores;
 pthread_mutex_t mutex;
-extern t_log *file_log;
+//extern t_log *file_log;
 extern config *configuracion;
 
 st_instruccion *crearInstruccion(void *instruccion, enum OPERACION type) {

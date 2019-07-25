@@ -37,6 +37,7 @@ void cargarScriptConUnaInstruccion(void *instruccion, enum OPERACION type, char 
     t_list *listaDeInstrucciones = list_create();
     list_add(listaDeInstrucciones, crearInstruccion(instruccion, type));
     cargarNuevoScript(crearNuevoScript(id, listaDeInstrucciones));
+    free(id);
 }
 
 char *getCleanLine(char *line) {

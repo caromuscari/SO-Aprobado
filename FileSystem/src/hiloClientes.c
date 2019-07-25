@@ -143,9 +143,11 @@ void tratarCliente(cliente_t * cliente){
 
 				if(respuesta == 13){
 					free(buffer);
+					mostrarTabla(list_get(lista,0));
 					buffer = serealizarListaMetaData(lista,&size);
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
-					list_destroy(lista);
+					destroyListaMetaData(lista);
+					//list_destroy(lista);
 				}else{
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,string_length(buffer));
 				}

@@ -88,8 +88,8 @@ void *serealizarListaMetaData(t_list *listaMetaData, size_t *sizeBuffer) {
 
     buffer = malloc(*sizeBuffer);
     for (i = 0; i < lista_buffer->elements_count; ++i) {
-        buffer_metadata = list_get(lista_buffer, i);
-        size_buffer_metadata = list_get(lista_size_buffer, i);
+        buffer_metadata = list_remove(lista_buffer, i);
+        size_buffer_metadata = list_remove(lista_size_buffer, i);
         memcpy((buffer + offset), buffer_metadata, *size_buffer_metadata);
         offset += *size_buffer_metadata;
         free(buffer_metadata);
@@ -118,7 +118,7 @@ void destroyListaMetaData(t_list *lista_metadata) {
     st_metadata *metadata;
     int i;
     for (i = 0; i < lista_metadata->elements_count; ++i) {
-        metadata = list_get(lista_metadata, i);
+        metadata = list_remove(lista_metadata, i);
         destroyMetaData(metadata);
     }
     list_destroy(lista_metadata);

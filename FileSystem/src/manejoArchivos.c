@@ -249,7 +249,12 @@ int realizarDescribeGlobal(t_list ** lista){
 
 	void obtenerMetadatas(char * key, st_tablaCompac * tabla){
 
-		list_add(*lista, tabla->meta);
+		st_metadata * meta = malloc(sizeof(st_metadata));
+		meta->nameTable = strdup(tabla->meta->nameTable);
+		meta->consistency = strdup(tabla->meta->consistency);
+		meta->partitions = tabla->meta->partitions;
+		meta->compaction_time = tabla->meta->compaction_time;
+		list_add(*lista, meta);
 	}
 
 	if(!tablasVacia()){

@@ -13,6 +13,7 @@
 #include <string.h>
 #include "request.h"
 #include "contrato.h"
+#include "console.h"
 
 extern int fdFileSystem;
 extern t_log * file_log;
@@ -208,9 +209,7 @@ st_messageResponse* mandarDescribeGlobal(){
 		mensajeResp->cabezera.letra = respuesta.letra;
 		mensajeResp->cabezera.sizeData = respuesta.sizeData;
 
-		mensajeResp->buffer = strdup(buffer);
-
-		free(buffer);
+		mensajeResp->buffer = buffer;
 
 		return mensajeResp;
 }

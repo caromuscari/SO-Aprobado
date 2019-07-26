@@ -42,6 +42,7 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
     messageResponse->cabezera.sizeData = response.sizeData;
     messageResponse->cabezera.codigo = response.codigo;
     messageResponse->buffer = paqueteRespuesta;
+
     close(socketClient);
     return messageResponse;
 }

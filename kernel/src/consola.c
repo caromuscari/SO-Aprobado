@@ -37,7 +37,7 @@ void cargarScriptConUnaInstruccion(void *instruccion, enum OPERACION type, char 
     t_list *listaDeInstrucciones = list_create();
     list_add(listaDeInstrucciones, crearInstruccion(instruccion, type));
     cargarNuevoScript(crearNuevoScript(id, listaDeInstrucciones));
-    free(id);
+    //free(id);
 }
 
 char *getCleanLine(char *line) {
@@ -145,7 +145,7 @@ void cargarScriptFile(char *text) {
         }
         log_error(file_log, "[load-Script] No se reconocio algun comando del script");
     } else {
-        cargarNuevoScript(crearNuevoScript(strdup("Script File"), listaDeInstrucciones));
+        cargarNuevoScript(crearNuevoScript("Script File", listaDeInstrucciones));
     }
 }
 

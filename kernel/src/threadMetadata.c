@@ -93,8 +93,8 @@ void *schedulerMetadata() {
         if (respuestaMesanje) {
             switch (respuestaMesanje->cabezera.codigo) {
                 case SUCCESS: {
-                    updateListaMetadata(
-                            deserealizarListaMetaData(respuestaMesanje->buffer, respuestaMesanje->cabezera.sizeData));
+                	t_list * lista = deserealizarListaMetaData(respuestaMesanje->buffer, respuestaMesanje->cabezera.sizeData);
+                    updateListaMetadata(lista);
                     destroyStMessageResponse(respuestaMesanje);
                     break;
                 }

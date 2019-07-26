@@ -78,7 +78,7 @@ void destroyListaDataMemoria(st_data_memoria * memoria) {
     int i;
     st_memoria *memoriaAux;
     for (i = 0; i < memoria->listaMemorias->elements_count; i++) {
-        memoriaAux = list_get(memoria->listaMemorias, i);
+        memoriaAux = list_remove(memoria->listaMemorias, i);
         destroyMemoria(memoriaAux);
     }
     list_destroy(memoria->listaMemorias);

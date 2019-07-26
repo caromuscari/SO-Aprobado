@@ -15,9 +15,11 @@ void logStatusListaMemoria(){
     for (int i = 0; i < poolMemoria->elements_count ; ++i) {
         memoriaK = list_get(poolMemoria,i);
         if(memoriaK->activo){
-            log_info(file_log,"Numero = [%d]",memoriaK->memoria->numero);
+        	char * num = string_itoa(memoriaK->memoria->numero);
+            log_info(file_log,"Numero = [%s]",num);
             log_info(file_log,"Puerto [%s]", memoriaK->memoria->ip);
             log_info(file_log,"IP [%s]",memoriaK->memoria->ip);
+            free(num);
         }
 
     }
@@ -239,7 +241,7 @@ st_memoria *getMemoria(TypeCriterio tipo, char *text) {
 
 st_kernel_memoria *cargarNuevaKernelMemoria(st_memoria *data) {
     st_kernel_memoria *k_memoria = malloc(sizeof(st_kernel_memoria));
-    st_memoria *memoria = malloc(sizeof(st_data_memoria));
+    st_memoria *memoria = malloc(sizeof(st_memoria));
 
     memoria->numero = data->numero;
     memoria->puerto = strdup(data->puerto);
@@ -372,16 +374,16 @@ int journalMemoria(st_memoria * memoria){
         int resultado = NO_SALIO_OK;
         switch (respuestPeticion->cabezera.codigo){
             case SUCCESS:{
-                printf("se realizo correctamente el journal");
+                printf("se realizo correctamente el journal\n");
                 resultado = SALIO_OK;
                 break;
             }
             case NOSUCCESS:{
-                printf("no se puedo relizar el journal");
+                printf("no se puedo relizar el journal\n");
                 break;
             }
             default:{
-                printf("no entiendo el codigo de respuesta");
+                printf("no entiendo el codigo de respuesta\n");
                 break;
             }
         }

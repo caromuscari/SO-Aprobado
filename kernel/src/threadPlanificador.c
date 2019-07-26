@@ -140,7 +140,7 @@ void ejecutarScript() {
 }
 
 void atenderScriptEntrantes() {
-    pthread_t pthread_execution;
+    pthread_t pthread_execution;//Revisar
     while (1) {
         sem_wait(&colaDeListos);
         sem_wait(&procesadores);

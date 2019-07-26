@@ -6,6 +6,8 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <funcionesCompartidas/listaMetadata.h>
+#include <funcionesCompartidas/funcionesNET.h>
+#include <funcionesCompartidas/codigoMensajes.h>
 
 
 void cargarLista(t_list *listaMetaData) {
@@ -41,31 +43,35 @@ void showLista(t_list *listaMetaData) {
     }
 }
 
-st_metadata *getTabla(char *nameTable, t_list *listMetadata) {
-    st_metadata *result = NULL;
-    int search_tabla(st_metadata *p) {
-        return string_equals_ignore_case(p->nameTable, nameTable);
-    }
-    result = list_find(listMetadata, (void *) search_tabla);
-    return result;
-}
-
 int main() {
     t_list *listametadata = list_create();
     cargarLista(listametadata);
-    st_metadata *metadata = getTabla("TABLA_C",listametadata);
-    printf("%s\n", metadata->nameTable);
-    printf("%s\n", metadata->consistency);
-    printf("%d\n", metadata->partitions);
-    printf("%d\n", metadata->compaction_time);
-//    cargarLista(listametadata);
-//    size_t size_buffer;
-//    void *buffer = serealizarListaMetaData(listametadata, &size_buffer);
-//    t_list *lista_metadata_deserealizado = deserealizarListaMetaData(buffer, size_buffer);
-//    showLista(lista_metadata_deserealizado);
-//
-//    //liberar memoria
-//    destroyListaMetaData(lista_metadata_deserealizado);
-//    destroyListaMetaData(listametadata);
-//    free(buffer);
+    size_t size_buffer;
+    void *buffer = serealizarListaMetaData(listametadata, &size_buffer);
+
+    /// senviar
+    t_log *log = crear_archivo_log("Server", true, "./loggMetada.log");
+    int control = 0;
+    int socketServer = makeListenSock("8000",log,&control);
+
+    int socketClient = aceptar_conexion(socketServer,log,&control);
+    header request;
+    void * buffer2 = getMessage(socketClient,&request,&control);
+
+    header response;
+    response.codigo = SUCCESS;
+    response.letra = 'M';
+    response.sizeData = size_buffer;
+
+    message * buffer3 = createMessage(&response,buffer);
+
+    enviar_message(socketClient,buffer3,log,&control);
+
+
+    t_list *lista_metadata_deserealizado = deserealizarListaMetaData(buffer, size_buffer);
+    showLista(lista_metadata_deserealizado);
+    //liberar memoria
+    destroyListaMetaData(lista_metadata_deserealizado);
+    destroyListaMetaData(listametadata);
+    free(buffer);
 }

@@ -28,7 +28,7 @@ extern t_configuracionMemoria * configMemoria;
 //    list_add(listaMetaData, metadata);
 //}
 
-void * atenderMensaje(int * fdClient){
+void atenderMensaje(int * fdClient){
     int control = 0;
     header request;
     size_t sizePaqueteRes = 0;
@@ -188,7 +188,7 @@ void * atenderMensaje(int * fdClient){
     free(paqueteDeRespuesta);
     close(*fdClient);
     free(fdClient);
-    pthread_exit(NULL);
+    //pthread_exit(NULL);
 }
 
 void * start_server() {
@@ -198,7 +198,6 @@ void * start_server() {
 		pthread_exit(NULL);
 	}
 	int  * fdClient;
-    pthread_t nuevoCliente;
 	while (true){
         fdClient = malloc(sizeof(int));
         *fdClient = aceptar_conexion(socketServer, file_log, &control);
@@ -206,8 +205,9 @@ void * start_server() {
             log_error(file_log, "No se puede aceptar la conexion");
             continue;
         }
-        pthread_create(&nuevoCliente,NULL,(void *)atenderMensaje,fdClient);
-        pthread_detach(nuevoCliente);
+        //pthread_create(&nuevoCliente,NULL,(void *)atenderMensaje,fdClient);
+        //pthread_detach(nuevoCliente);
+        atenderMensaje(fdClient);
         sleep(configMemoria->RETARDO_FS/1000);
 	}
 }

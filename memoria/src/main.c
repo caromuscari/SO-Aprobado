@@ -19,7 +19,7 @@ pthread_t gossiping;
 pthread_t journal;
 int fdFileSystem;
 int cantPaginas;
-int tamanioValue = 255; //esto me lo va a pasa fs
+int tamanioValue;
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
 pthread_mutex_t mutexListaSeg, mutexListaMarcos, mutexMemPrinc, mutex, mutexSeeds;

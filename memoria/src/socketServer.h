@@ -17,6 +17,7 @@
 #include "gossiping.h"
 #include "comandos.h"
 
+void atenderMensaje(int * fdClient);
 void * start_server();
 void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam);
 

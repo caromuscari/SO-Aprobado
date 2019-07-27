@@ -152,6 +152,7 @@ void console() {
         free(comando);
         comando = readline(">");
         string_trim(&comando);
+        sleep(configMemoria->RETARDO_MEM);
     }
     free(comando);
 }

@@ -151,9 +151,9 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		if(registro == NULL){
 			return NULL;
 		}
-        pthread_mutex_lock(&mutexListaMarcos);
+        //pthread_mutex_lock(&mutexListaMarcos);
 		int posMarcoLibre = buscarMarcoLibre();
-        pthread_mutex_unlock(&mutexListaMarcos);
+        //pthread_mutex_unlock(&mutexListaMarcos);
 		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 
 		pthread_mutex_lock(&mutexMemPrinc);
@@ -195,9 +195,9 @@ st_registro* comandoSelect(st_select* comandoSelect){
 
 	segmentoNuevo->nombreTabla = strdup(comandoSelect->nameTable);
 	segmentoNuevo->tablaDePaginas = list_create();
-    pthread_mutex_lock(&mutexListaMarcos);
+    //pthread_mutex_lock(&mutexListaMarcos);
 	int posMarcoLibre = buscarMarcoLibre();
-	pthread_mutex_unlock(&mutexListaMarcos);
+	//pthread_mutex_unlock(&mutexListaMarcos);
 	//creo la pagina
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
     pthread_mutex_lock(&mutexMemPrinc);

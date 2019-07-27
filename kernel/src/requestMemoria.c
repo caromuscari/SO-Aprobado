@@ -63,6 +63,7 @@ int atenderResultadoSelect(st_messageResponse *mensaje) {
             break;
         }
         case NOSUCCESS: {
+            resultado = SALIO_OK;
             printf("no se pudo encontra ese select\n");
             break;
         }

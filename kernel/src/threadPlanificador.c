@@ -8,8 +8,8 @@ t_list *listaDeScript;
 sem_t colaDeListos;
 sem_t procesadores;
 pthread_mutex_t mutex;
-//extern t_log *file_log;
 extern config *configuracion;
+extern t_log *file_log;
 
 st_instruccion *crearInstruccion(void *instruccion, enum OPERACION type) {
     st_instruccion *newInstruccion = malloc(sizeof(st_instruccion));
@@ -112,6 +112,7 @@ void ejecutarScript() {
         if (typeCriterio == NO_SE_ENCONTRO_TABLA) {
             hayError = true;
             printf("[Planificador] No se encontro tabla\n");
+            log_error(file_log,"[Planificador] No se encontro la tabla");
         }else {
             tag = generarTag(typeCriterio, instruccionScript->instruccion, instruccionScript->operacion);
             datomemoria = getMemoria(typeCriterio, tag);
@@ -135,6 +136,7 @@ void ejecutarScript() {
             free(tag);
         }
         if(hayError){
+            log_error(file_log,"[Planificador] Hubo un error en la Ejecuccion se cancela el script");
             if(historyRequest){
                 free(historyRequest);
             }
@@ -144,11 +146,16 @@ void ejecutarScript() {
     }
     printf("[Planificador] Fin Ejecucion de Script [%s]\n", script->id);
     //Evaluar resultado de Ejecucion
-    if (resultado == SALIO_OK) {
+    if (resultado == SALIO_OK || resultado == NO_HAY_RESULTADO_EN_SELECT) {
         if (script->listaDeInstrucciones->elements_count > 0) {
+            log_info(file_log,"[Planificador] agregando de nuevo el script");
             cargarNuevoScript(script);
+        }else{
+            log_info(file_log,"[Planificador] Se finalizo todo el script");
+            destroyScript(script);
         }
     } else {
+        log_info(file_log,"[Planificador] fallo la ejecuccion  [%d]",resultado);
         destroyScript(script);
     }
     destroyListaInstruciones(instrucciones);

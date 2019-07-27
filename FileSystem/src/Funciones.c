@@ -50,7 +50,7 @@ void inicializar(){
 	loop = 1;
 	clientes = dictionary_create();
 	memtable = dictionary_create();
-	alog = crear_archivo_log("File System", true, "/home/utnso/File/log.txt");
+	alog = crear_archivo_log("File System", true, "./fileSystem.log");
 
 	sem_init(&sMemtable,0,1);
 	sem_init(&sTablas,0,1);

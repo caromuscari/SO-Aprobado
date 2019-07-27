@@ -57,6 +57,9 @@ typedef struct {
     t_list *tags;
     t_list *tipos;
     t_list * history;
+    int countSC;
+    int countSHC;
+    int countEC;
     int count;
 } st_kernel_memoria;
 

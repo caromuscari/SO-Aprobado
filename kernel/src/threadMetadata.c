@@ -8,16 +8,16 @@
 
 t_list *listMetadata = NULL;
 extern config *configuracion;
-extern t_log *file_log;
+t_log *file_log_metada;
 pthread_mutex_t mutex;
 
 void logStatusListaMetadata() {
     st_metadata *metadata;
-    log_info(file_log, "----Estado de MetaData---");
+    log_info(file_log_metada, "----Estado de MetaData---");
     for (int i = 0; i < listMetadata->elements_count; ++i) {
         metadata = list_get(listMetadata, i);
-        log_info(file_log, "Nametable = [%s]", metadata->nameTable);
-        log_info(file_log, "Consistencia [%s]", metadata->consistency);
+        log_info(file_log_metada, "Nametable = [%s]", metadata->nameTable);
+        log_info(file_log_metada, "Consistencia [%s]", metadata->consistency);
     }
 }
 
@@ -49,7 +49,7 @@ int buscarNameTable(char *nameTable) {
 }
 
 void removeTablaByName(char *nameTable) {
-    log_info(file_log, "[MetaData] Eliminando metadata [%s]",nameTable);
+    log_info(file_log_metada, "[MetaData] Eliminando metadata [%s]",nameTable);
     st_metadata *metadata;
     pthread_mutex_lock(&mutex);
     int pos = buscarNameTable(nameTable);
@@ -61,14 +61,14 @@ void removeTablaByName(char *nameTable) {
 void addNuevaTabla(st_metadata *metadata) {
     pthread_mutex_lock(&mutex);
     if (buscarNameTable(metadata->nameTable) == -1) {
-        log_info(file_log, "[MetaData] Agregando nueva metadata [%s]",metadata->nameTable);
+        log_info(file_log_metada, "[MetaData] Agregando nueva metadata [%s]",metadata->nameTable);
         list_add(listMetadata, metadata);
     }
     pthread_mutex_unlock(&mutex);
 }
 
 void updateListaMetadata(t_list *nuevaLista) {
-    log_info(file_log, "[MetaData] Actulizando Lista");
+    log_info(file_log_metada, "[MetaData] Actulizando Lista");
     pthread_mutex_lock(&mutex);
     if (listMetadata != NULL) {
         destroyListaMetaData(listMetadata);
@@ -79,6 +79,7 @@ void updateListaMetadata(t_list *nuevaLista) {
 
 void *schedulerMetadata() {
     listMetadata = list_create();
+    file_log_metada = crear_archivo_log("Metadata", false, "./Metadata.log");
     st_messageResponse *respuestaMesanje = NULL;
     void *buffer = NULL;
     if (pthread_mutex_init(&mutex, NULL) != 0) {
@@ -86,7 +87,7 @@ void *schedulerMetadata() {
         pthread_exit(NULL);
     }
     while (1) {
-        log_info(file_log, "[MetaData] buscando metadata");
+        log_info(file_log_metada, "[MetaData] buscando metadata");
         buffer = strdup("1");
         respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA, DESCRIBEGLOBAL,
                                              buffer, 1);
@@ -99,18 +100,18 @@ void *schedulerMetadata() {
                     break;
                 }
                 case NOSUCCESS: {
-                    log_info(file_log, "[MetaData] no hay resultado");
+                    log_info(file_log_metada, "[MetaData] no hay resultado");
                     destroyStMessageResponse(respuestaMesanje);
                     break;
                 }
                 default: {
-                    log_info(file_log, "[MetaData] no entiendo el codigo re respuesta");
+                    log_info(file_log_metada, "[MetaData] no entiendo el codigo re respuesta");
                     destroyStMessageResponse(respuestaMesanje);
                     break;
                 }
             }
         } else {
-            log_error(file_log, "[MetaData] No hubo respuesta en el DESCRIBE GLOBAL");
+            log_error(file_log_metada, "[MetaData] No hubo respuesta en el DESCRIBE GLOBAL");
         }
         free(buffer);
         logStatusListaMetadata();

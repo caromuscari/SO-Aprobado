@@ -6,19 +6,19 @@
 
 t_list *poolMemoria;
 extern config *configuracion;
-extern t_log *file_log;
+t_log *file_log_poolMemoria;
 pthread_mutex_t mutex;
 
 void logStatusListaMemoria(){
     st_kernel_memoria * memoriaK;
-    log_info(file_log,"----Estado de Memoria---");
+    log_info(file_log_poolMemoria,"----Estado de Memoria---");
     for (int i = 0; i < poolMemoria->elements_count ; ++i) {
         memoriaK = list_get(poolMemoria,i);
         if(memoriaK->activo){
         	char * num = string_itoa(memoriaK->memoria->numero);
-            log_info(file_log,"Numero = [%s]",num);
-            log_info(file_log,"Puerto [%s]", memoriaK->memoria->puerto);
-            log_info(file_log,"IP [%s]",memoriaK->memoria->ip);
+            log_info(file_log_poolMemoria,"Numero = [%s]",num);
+            log_info(file_log_poolMemoria,"Puerto [%s]", memoriaK->memoria->puerto);
+            log_info(file_log_poolMemoria,"IP [%s]",memoriaK->memoria->ip);
             free(num);
         }
 
@@ -121,14 +121,15 @@ bool existeTag(t_list *tags, char *text) {
     return false;
 }
 
-st_memoria * getMemoriaSCHSC(char *text, TypeCriterio tipo) {
+st_memoria * getMemoriaSHC(char *text) {
     int i;
     st_kernel_memoria *memoria;
     for (i = 0; i < poolMemoria->elements_count; ++i) {
         memoria = list_get(poolMemoria, i);
-        if (memoria->activo && existeTipoDeCriterio(memoria->tipos, tipo)) {
+        if (memoria->activo && existeTipoDeCriterio(memoria->tipos, StrongHashConsistency)) {
             if (existeTag(memoria->tags, text)) {
                 memoria->count++;
+                memoria->countSHC++;
                 return clonarMemoria(memoria->memoria);
             }
         }
@@ -139,14 +140,14 @@ st_memoria * getMemoriaSCHSC(char *text, TypeCriterio tipo) {
     bool flagFirst = true;
     for (i = 0; i < poolMemoria->elements_count; ++i) {
         memoria = list_get(poolMemoria, i);
-        if (memoria->activo && existeTipoDeCriterio(memoria->tipos, tipo)) {
+        if (memoria->activo && existeTipoDeCriterio(memoria->tipos, StrongHashConsistency)) {
             if (flagFirst) {
-                countMinimo = memoria->count;
+                countMinimo = memoria->countSHC;
                 posicion = i;
                 flagFirst = false;
             } else {
-                if (memoria->count < countMinimo) {
-                    countMinimo = memoria->count;
+                if (memoria->countSHC < countMinimo) {
+                    countMinimo = memoria->countSHC;
                     posicion = i;
                 }
             }
@@ -157,6 +158,50 @@ st_memoria * getMemoriaSCHSC(char *text, TypeCriterio tipo) {
         memoria = list_get(poolMemoria, posicion);
         list_add(memoria->tags,strdup(text));
         memoria->count++;
+        memoria->countSHC++;
+        return clonarMemoria(memoria->memoria);
+    }
+    return NULL;
+}
+
+st_memoria * getMemoriaSC(char *text) {
+    int i;
+    st_kernel_memoria *memoria;
+    for (i = 0; i < poolMemoria->elements_count; ++i) {
+        memoria = list_get(poolMemoria, i);
+        if (memoria->activo && existeTipoDeCriterio(memoria->tipos, StrongConsistency)) {
+            if (existeTag(memoria->tags, text)) {
+                memoria->count++;
+                memoria->countSC++;
+                return clonarMemoria(memoria->memoria);
+            }
+        }
+    }
+    //buscar que memoria esta disponible tomamos al primero como posible minimo
+    int posicion = -1;
+    int countMinimo = 0;
+    bool flagFirst = true;
+    for (i = 0; i < poolMemoria->elements_count; ++i) {
+        memoria = list_get(poolMemoria, i);
+        if (memoria->activo && existeTipoDeCriterio(memoria->tipos, StrongConsistency)) {
+            if (flagFirst) {
+                countMinimo = memoria->countSC;
+                posicion = i;
+                flagFirst = false;
+            } else {
+                if (memoria->count < countMinimo) {
+                    countMinimo = memoria->countSC;
+                    posicion = i;
+                }
+            }
+        }
+    }
+    //cargamos un nuevo tag a la memoria elegida
+    if(posicion != -1){
+        memoria = list_get(poolMemoria, posicion);
+        list_add(memoria->tags,strdup(text));
+        memoria->count++;
+        memoria->countSC++;
         return clonarMemoria(memoria->memoria);
     }
     return NULL;
@@ -173,12 +218,12 @@ st_memoria * getMemoriaEventual(){
         if (memoria->activo && existeTipoDeCriterio(memoria->tipos, EventualConsistency)) {
             if(flagFisrt){
                 pos = i;
-                mini = memoria->count;
+                mini = memoria->countEC;
                 flagFisrt = false;
             }else{
                 if(memoria->count < mini){
                     pos = i;
-                    mini = memoria->count;
+                    mini = memoria->countEC;
                 }
             }
         }
@@ -186,6 +231,7 @@ st_memoria * getMemoriaEventual(){
     if(pos != -1){
         memoria = list_get(poolMemoria, pos);
         memoria->count++;
+        memoria->countEC++;
         return clonarMemoria(memoria->memoria);
     }
 
@@ -225,11 +271,11 @@ st_memoria *getMemoria(TypeCriterio tipo, char *text) {
     pthread_mutex_lock(&mutex);
     switch (tipo) {
         case StrongConsistency: {
-            memoria = getMemoriaSCHSC(text, StrongConsistency);
+            memoria = getMemoriaSC(text);
             break;
         }
         case StrongHashConsistency: {
-            memoria = getMemoriaSCHSC(text, StrongHashConsistency);
+            memoria = getMemoriaSHC(text);
             break;
         }
         case EventualConsistency: {
@@ -258,6 +304,9 @@ st_kernel_memoria *cargarNuevaKernelMemoria(st_memoria *data) {
     k_memoria->history = list_create();
     k_memoria->memoria = memoria;
     k_memoria->count = 0;
+    k_memoria->countEC = 0;
+    k_memoria->countSC = 0;
+    k_memoria->countSHC = 0;
 
     return k_memoria;
 }
@@ -303,7 +352,7 @@ bool setTipoConsistencia(int number, TypeCriterio tipo) {
         *auxTipo = tipo;
         list_add(memoria->tipos, auxTipo);
     } else {
-        log_info(file_log, "no se encontro esa memoria");
+        log_info(file_log_poolMemoria, "no se encontro esa memoria");
     }
     pthread_mutex_unlock(&mutex);
     return flagSolucion;
@@ -380,13 +429,13 @@ st_history_request * newHistory(enum OPERACION operacion, TypeCriterio criterio)
 }
 
 void addHistory(st_history_request * historyRequest, int numeroMemoria){
-    log_info(file_log,"[historyMemoria] agregando historial en memoria [%d]",numeroMemoria);
+    log_info(file_log_poolMemoria,"[historyMemoria] agregando historial en memoria [%d]",numeroMemoria);
     pthread_mutex_lock(&mutex);
     st_kernel_memoria * kernelMemoria = existeMemoria(poolMemoria,numeroMemoria);
     if(kernelMemoria){
         list_add(kernelMemoria->history,historyRequest);
     }else{
-        log_info(file_log,"[historyMemoria] no se encontro la memoria %d", numeroMemoria);
+        log_info(file_log_poolMemoria,"[historyMemoria] no se encontro la memoria %d", numeroMemoria);
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -450,7 +499,7 @@ int journalMemoria(st_memoria * memoria){
         return resultado;
     }else{
         free(buffer);
-        log_error(file_log,"[Journal] No hubo respuesta en el Journal");
+        log_error(file_log_poolMemoria,"[Journal] No hubo respuesta en el Journal");
         return SE_DESCONECTO_SOCKET;
     }
 
@@ -473,6 +522,7 @@ void hacerJournal(){
 void *loadPoolMemori() {
     //conectarse con la memoria y pelirle la lista
     poolMemoria = list_create();
+    file_log_poolMemoria = crear_archivo_log("PoolMemoria", false, "./PoolMemoria.log");
     st_messageResponse * respuestaMesanje = NULL;
     void *buffer = NULL;
     if (pthread_mutex_init(&mutex, NULL) != 0) {
@@ -482,7 +532,7 @@ void *loadPoolMemori() {
     while (1) {
         CleanListaMemoria();
         buffer = strdup("1");
-        log_info(file_log,"[gossiping] Haciendo Gossiping");
+        log_info(file_log_poolMemoria,"[gossiping] Haciendo Gossiping");
         respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA,BUSCARTABLAGOSSIPING,buffer,1);
         if(respuestaMesanje){
             switch (respuestaMesanje->cabezera.codigo){
@@ -494,12 +544,12 @@ void *loadPoolMemori() {
                     break;
                 }
                 default:{
-                    log_info(file_log,"[gossiping] no entiendo el codigo re respuesta\n");
+                    log_info(file_log_poolMemoria,"[gossiping] no entiendo el codigo re respuesta\n");
                     break;
                 }
             }
         }else{
-            log_error(file_log,"[gossiping] No hubo respuesta en el gossiping");
+            log_error(file_log_poolMemoria,"[gossiping] No hubo respuesta en el gossiping");
         }
         free(buffer);
         logStatusListaMemoria();

@@ -1,0 +1,263 @@
+[INFO] 15:04:23:852 Metadata/(12401:12404): Se crea el archivo de log
+[INFO] 15:04:23:852 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:04:23:854 Metadata/(12401:12404): [MetaData] no hay resultado
+[INFO] 15:04:23:854 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:04:53:854 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:04:53:856 Metadata/(12401:12404): [MetaData] no hay resultado
+[INFO] 15:04:53:856 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:05:05:948 Metadata/(12401:12410): [MetaData] Agregando nueva metadata [COLORS]
+[INFO] 15:05:23:857 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:05:23:858 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:05:23:858 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:05:23:858 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:05:23:858 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:05:53:859 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:05:53:860 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:05:53:860 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:05:53:860 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:05:53:860 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:06:23:861 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:06:23:861 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:06:23:861 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:06:23:861 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:06:23:861 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:06:53:546 Metadata/(12401:12416): [MetaData] Agregando nueva metadata [MARCAS]
+[INFO] 15:06:53:862 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:06:53:863 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:06:53:863 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:06:53:863 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:06:53:863 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:06:53:863 Metadata/(12401:12404): Nametable = [MARCAS]
+[INFO] 15:06:53:863 Metadata/(12401:12404): Consistencia [EC]
+[INFO] 15:07:23:864 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:07:23:865 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:07:23:865 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:07:23:865 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:07:23:865 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:07:23:865 Metadata/(12401:12404): Nametable = [MARCAS]
+[INFO] 15:07:23:865 Metadata/(12401:12404): Consistencia [EC]
+[INFO] 15:07:53:865 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:07:53:866 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:07:53:866 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:07:53:866 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:07:53:866 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:07:53:866 Metadata/(12401:12404): Nametable = [MARCAS]
+[INFO] 15:07:53:866 Metadata/(12401:12404): Consistencia [EC]
+[INFO] 15:08:23:867 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:08:23:867 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:08:23:867 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:08:23:867 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:08:23:867 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:08:23:867 Metadata/(12401:12404): Nametable = [MARCAS]
+[INFO] 15:08:23:867 Metadata/(12401:12404): Consistencia [EC]
+[INFO] 15:08:53:868 Metadata/(12401:12404): [MetaData] buscando metadata
+[INFO] 15:08:53:868 Metadata/(12401:12404): [MetaData] Actulizando Lista
+[INFO] 15:08:53:868 Metadata/(12401:12404): ----Estado de MetaData---
+[INFO] 15:08:53:868 Metadata/(12401:12404): Nametable = [COLORS]
+[INFO] 15:08:53:868 Metadata/(12401:12404): Consistencia [SC]
+[INFO] 15:08:53:868 Metadata/(12401:12404): Nametable = [MARCAS]
+[INFO] 15:08:53:868 Metadata/(12401:12404): Consistencia [EC]
+[INFO] 15:09:51:165 Metadata/(12493:12496): Se crea el archivo de log
+[INFO] 15:09:51:165 Metadata/(12493:12496): [MetaData] buscando metadata
+[INFO] 15:09:51:166 Metadata/(12493:12496): [MetaData] no hay resultado
+[INFO] 15:09:51:166 Metadata/(12493:12496): ----Estado de MetaData---
+[INFO] 15:10:15:606 Metadata/(12569:12572): Se crea el archivo de log
+[INFO] 15:10:15:606 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:10:15:609 Metadata/(12569:12572): [MetaData] no hay resultado
+[INFO] 15:10:15:609 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:10:37:878 Metadata/(12569:12574): [MetaData] Agregando nueva metadata [COLORS]
+[INFO] 15:10:45:613 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:10:45:614 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:10:45:614 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:10:45:614 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:10:45:614 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:11:15:614 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:11:15:614 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:11:15:614 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:11:15:614 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:11:15:614 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:11:16:796 Metadata/(12569:12580): [MetaData] Agregando nueva metadata [MARCAS]
+[INFO] 15:11:45:618 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:11:45:619 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:11:45:619 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:11:45:619 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:11:45:619 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:11:45:619 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:11:45:619 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:12:15:620 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:12:15:621 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:12:15:621 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:12:15:621 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:12:15:621 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:12:15:621 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:12:15:621 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:12:45:621 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:12:45:622 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:12:45:622 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:12:45:622 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:12:45:622 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:12:45:622 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:12:45:622 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:13:15:626 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:13:15:627 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:13:15:627 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:13:15:627 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:13:15:627 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:13:15:627 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:13:15:627 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:13:45:638 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:13:45:639 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:13:45:639 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:13:45:639 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:13:45:639 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:13:45:639 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:13:45:639 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:14:15:643 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:14:15:644 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:14:15:644 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:14:15:644 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:14:15:644 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:14:15:644 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:14:15:644 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:14:45:644 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:14:45:645 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:14:45:645 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:14:45:645 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:14:45:645 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:14:45:645 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:14:45:645 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:15:15:645 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:15:15:646 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:15:15:646 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:15:15:646 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:15:15:646 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:15:15:646 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:15:15:646 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:15:45:646 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:15:45:647 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:15:45:647 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:15:45:647 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:15:45:647 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:15:45:647 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:15:45:647 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:16:15:647 Metadata/(12569:12572): [MetaData] buscando metadata
+[INFO] 15:16:15:647 Metadata/(12569:12572): [MetaData] Actulizando Lista
+[INFO] 15:16:15:647 Metadata/(12569:12572): ----Estado de MetaData---
+[INFO] 15:16:15:647 Metadata/(12569:12572): Nametable = [COLORS]
+[INFO] 15:16:15:647 Metadata/(12569:12572): Consistencia [SC]
+[INFO] 15:16:15:647 Metadata/(12569:12572): Nametable = [MARCAS]
+[INFO] 15:16:15:647 Metadata/(12569:12572): Consistencia [EC]
+[INFO] 15:21:08:707 Metadata/(12744:12747): Se crea el archivo de log
+[INFO] 15:21:08:707 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:21:08:708 Metadata/(12744:12747): [MetaData] no hay resultado
+[INFO] 15:21:08:708 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:21:23:452 Metadata/(12744:12748): [MetaData] Agregando nueva metadata [COLORS]
+[INFO] 15:21:38:709 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:21:38:709 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:21:38:709 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:21:38:709 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:21:38:709 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:22:08:710 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:22:08:711 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:22:08:711 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:22:08:711 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:22:08:711 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:22:15:618 Metadata/(12744:12755): [MetaData] Agregando nueva metadata [MARCAS]
+[INFO] 15:22:38:712 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:22:38:713 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:22:38:713 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:22:38:713 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:22:38:713 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:22:38:713 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:22:38:713 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:23:08:713 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:23:08:714 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:23:08:714 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:23:08:714 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:23:08:714 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:23:08:714 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:23:08:714 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:23:38:714 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:23:38:715 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:23:38:715 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:23:38:715 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:23:38:715 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:23:38:715 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:23:38:715 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:24:08:716 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:24:08:716 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:24:08:716 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:24:08:716 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:24:08:716 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:24:08:716 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:24:08:716 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:24:38:717 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:24:38:717 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:24:38:717 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:24:38:717 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:24:38:717 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:24:38:717 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:24:38:717 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:25:08:719 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:25:08:720 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:25:08:720 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:25:08:720 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:25:08:720 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:25:08:720 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:25:08:720 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:25:38:720 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:25:38:721 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:25:38:721 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:25:38:721 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:25:38:721 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:25:38:721 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:25:38:721 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:26:08:722 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:26:08:722 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:26:08:722 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:26:08:722 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:26:08:722 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:26:08:722 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:26:08:722 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:26:38:722 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:26:38:723 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:26:38:723 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:26:38:723 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:26:38:723 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:26:38:723 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:26:38:723 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:27:08:723 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:27:08:723 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:27:08:723 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:27:08:723 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:27:08:723 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:27:08:723 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:27:08:723 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:27:38:724 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:27:38:726 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:27:38:726 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:27:38:726 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:27:38:726 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:27:38:726 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:27:38:726 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:28:08:733 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:28:08:734 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:28:08:734 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:28:08:734 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:28:08:734 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:28:08:734 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:28:08:734 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:28:38:744 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:28:38:744 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:28:38:744 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:28:38:744 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:28:38:744 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:28:38:744 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:28:38:744 Metadata/(12744:12747): Consistencia [EC]
+[INFO] 15:29:08:744 Metadata/(12744:12747): [MetaData] buscando metadata
+[INFO] 15:29:08:745 Metadata/(12744:12747): [MetaData] Actulizando Lista
+[INFO] 15:29:08:745 Metadata/(12744:12747): ----Estado de MetaData---
+[INFO] 15:29:08:745 Metadata/(12744:12747): Nametable = [COLORS]
+[INFO] 15:29:08:745 Metadata/(12744:12747): Consistencia [SC]
+[INFO] 15:29:08:745 Metadata/(12744:12747): Nametable = [MARCAS]
+[INFO] 15:29:08:745 Metadata/(12744:12747): Consistencia [EC]

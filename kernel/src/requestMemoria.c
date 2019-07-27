@@ -49,7 +49,9 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
 
 int atenderResultadoSelect(st_messageResponse *mensaje) {
     int resultado = NO_SALIO_OK;
+    log_info(file_log,"[Request] Evaluando respuesta de SELECT");
     if (mensaje == NULL) {
+        log_info(file_log,"[Request] Se Desconecto la Memoria");
         return SE_DESCONECTO_SOCKET;
     }
     switch (mensaje->cabezera.codigo) {
@@ -77,12 +79,16 @@ int atenderResultadoInsert(st_messageResponse *mensaje,
         st_memoria *datoMemoria,
         st_instruccion *laInstruccion) {
     int resultado = NO_SALIO_OK;
+    log_info(file_log,"[Request] Evaluando respuesta de INSERT");
     if (mensaje == NULL) {
+        log_info(file_log,"[Request] Se Desconecto la Memoria");
         return SE_DESCONECTO_SOCKET;
     }
     switch (mensaje->cabezera.codigo) {
         case MEMORIAFULL: {
+            log_info(file_log,"[Request] Full memoria haciendo journal");
             resultado = journalMemoria(datoMemoria);
+            log_info(file_log,"[Request] Evaluando resultado de journal");
             if (resultado == SALIO_OK) {
                 return enviarRequestMemoria(laInstruccion, datoMemoria);
             }
@@ -104,7 +110,9 @@ int atenderResultadoInsert(st_messageResponse *mensaje,
 
 int atenderResultadoSDrop(st_messageResponse *mensaje, char *nameTable) {
     int resultado = NO_SALIO_OK;
+    log_info(file_log,"[Request] Evaluando respuesta de DROP");
     if (mensaje == NULL) {
+        log_info(file_log,"[Request] Se Desconecto la Memoria");
         return SE_DESCONECTO_SOCKET;
     }
     switch (mensaje->cabezera.codigo) {
@@ -126,7 +134,9 @@ int atenderResultadoSDrop(st_messageResponse *mensaje, char *nameTable) {
 
 int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
     int resultado = NO_SALIO_OK;
+    log_info(file_log,"[Request] Evaluando respuesta de CREATE");
     if (mensaje == NULL) {
+        log_info(file_log,"[Request] Se Desconecto la Memoria");
         return SE_DESCONECTO_SOCKET;
     }
     switch (mensaje->cabezera.codigo) {
@@ -153,7 +163,9 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
 
 int atenderResultadoDescribe(st_messageResponse *mensaje) {
     int resultado = NO_SALIO_OK;
+    log_info(file_log,"[Request] Evaluando respuesta de DESCRIBE");
     if (mensaje == NULL) {
+        log_info(file_log,"[Request] Se Desconecto la Memoria");
         return SE_DESCONECTO_SOCKET;
     }
     switch (mensaje->cabezera.codigo) {
@@ -179,7 +191,10 @@ int atenderResultadoDescribe(st_messageResponse *mensaje) {
 
 int atenderResultadoDescribeGlobal(st_messageResponse *mensaje) {
     int resultado = NO_SALIO_OK;
+    log_info(file_log,"[Request] Evaluando respuesta de DESCRIBE GLOBAL");
+
     if (mensaje == NULL) {
+        log_info(file_log,"[Request] Se Desconecto la Memoria");
         return SE_DESCONECTO_SOCKET;
     }
     switch (mensaje->cabezera.codigo) {
@@ -213,14 +228,18 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
     int resultado = NO_SALIO_OK;
     switch (laInstruccion->operacion) {
         case SELECT: {
+            log_info(file_log,"[Request] Serealizando SELECT");
             buffer = serealizarSelect(laInstruccion->instruccion, &size_buffer);
+            log_info(file_log,"[Request] Enviando mensaje solicitando SELECT Memoria[%d]",datoMemoria->numero);
             resultado = atenderResultadoSelect(
                     consultarAMemoria(
                             datoMemoria->ip, datoMemoria->puerto, SELECT, buffer, size_buffer));
             break;
         }
         case INSERT: {
+            log_info(file_log,"[Request] Serealizando INSERT");
             buffer = serealizarInsert(laInstruccion->instruccion, &size_buffer);
+            log_info(file_log,"[Request] Enviando mensaje INSERT Memoria[%d]", datoMemoria->numero);
             resultado = atenderResultadoInsert(
                     consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, INSERT, buffer, size_buffer),
                     datoMemoria,
@@ -229,7 +248,9 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
             break;
         }
         case DROP: {
+            log_info(file_log,"[Request] Serealizando DROP");
             buffer = serealizarDrop(laInstruccion->instruccion, &size_buffer);
+            log_info(file_log,"[Request] Enviando mensaje DROP Memoria[%d]", datoMemoria->numero);
             resultado = atenderResultadoSDrop(
                     consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, DROP, buffer, size_buffer),
                     ((st_drop *) laInstruccion->instruccion)->nameTable
@@ -237,7 +258,9 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
             break;
         }
         case CREATE: {
+            log_info(file_log,"[Request] Serealizando CREATE");
             buffer = serealizarCreate(laInstruccion->instruccion, &size_buffer);
+            log_info(file_log,"[Request] Enviando mensaje CREATE Memoria[%d]",datoMemoria->numero);
             resultado = atenderResultadoCreate(
                     consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, CREATE, buffer, size_buffer),
                     laInstruccion->instruccion
@@ -245,7 +268,9 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
             break;
         }
         case DESCRIBE: {
+            log_info(file_log,"[Request] Serealizando DESCRIBE ");
             buffer = serealizarDescribe(laInstruccion->instruccion, &size_buffer);
+            log_info(file_log,"[Request] Enviando mensaje CREATE Memoria[%d]",datoMemoria->numero);
             resultado = atenderResultadoDescribe(
                     consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, DESCRIBE, buffer, size_buffer)
             );
@@ -254,12 +279,14 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
         case DESCRIBEGLOBAL: {
             buffer = strdup("1");
             size_buffer = strlen(buffer);
+            log_info(file_log,"[Request] Enviando mensaje DESCRIBEGLOBAL Memoria[%d]",datoMemoria->numero);
             resultado = atenderResultadoDescribeGlobal(
                     consultarAMemoria(datoMemoria->ip, datoMemoria->puerto, DESCRIBEGLOBAL, buffer, size_buffer)
             );
             break;
         }
         default: {
+            log_info(file_log,"[Request] NO se reconoce el API");
             break;
         }
     }

@@ -1,0 +1,657 @@
+[INFO] 11:33:19:474 File System/(6724:6724): Se crea el archivo de log
+[INFO] 11:33:19:475 File System/(6724:6724): Lee el archivo de configuracion
+[INFO] 11:33:19:475 File System/(6724:6724): Se lee la metadata del File System
+[INFO] 11:33:19:475 File System/(6724:6724): Creacion del archivo bitmap
+
+[INFO] 11:33:19:547 File System/(6724:6724): Abre el bitmap
+[INFO] 11:33:19:548 File System/(6724:6725): Inicializa hilo inotify
+[INFO] 11:33:19:548 File System/(6724:6726): Se creo el hilo servidor
+[INFO] 11:33:19:548 File System/(6724:6726): Se creo el socket server
+[INFO] 11:33:19:548 File System/(6724:6727): Se creo el hilo consola
+[INFO] 11:34:12:321 File System/(6724:6726): Se conecto un nuevo cliente
+[INFO] 11:34:12:321 File System/(6724:6726): Se creo el hilo del cliente
+[INFO] 11:34:19:152 File System/(6724:6809): se desconecto el socket client 6
+[INFO] 11:34:26:86 File System/(6724:6726): Se conecto un nuevo cliente
+[INFO] 11:34:26:86 File System/(6724:6726): Se creo el hilo del cliente
+[INFO] 11:34:31:961 File System/(6724:6726): Se conecto un nuevo cliente
+[INFO] 11:34:31:961 File System/(6724:6726): Se creo el hilo del cliente
+[INFO] 11:36:39:880 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:37:09:881 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:37:39:889 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:37:51:999 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:38:07:87 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:38:30:212 File System/(6724:6818): Recibi un Create
+[INFO] 11:38:37:89 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:39:07:91 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:39:25:249 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:39:33:602 File System/(6724:6818): Recibi un Create
+[INFO] 11:39:44:131 File System/(6724:6827): Recibi un Describe Global
+[INFO] 11:39:55:250 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:40:19:863 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:40:23:426 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:40:46:354 File System/(6724:6827): Recibi un Describe Global
+[INFO] 11:40:49:865 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:41:19:867 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:41:27:436 File System/(6724:6818): Recibi un Create
+[INFO] 11:42:10:571 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:42:26:202 File System/(6724:6818): Recibi un Insert
+[INFO] 11:42:38:923 File System/(6724:6818): Recibi un Describe
+[INFO] 11:43:07:800 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:43:37:801 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:44:26:211 File System/(6724:6818): Recibi un Insert
+[INFO] 11:44:42:662 File System/(6724:7307): Se desbloquea la compactacion
+[INFO] 11:49:18:984 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:49:53:734 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:50:23:851 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:50:57:426 File System/(6724:6818): Recibi un Describe Global
+[INFO] 11:51:26:216 File System/(6724:6818): Recibi un Insert
+[INFO] 11:51:27:444 File System/(6724:7406): Se desbloquea la compactacion
+[INFO] 12:05:38:20 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:05:42:985 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:06:56:152 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:12:27:809 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:12:57:810 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:14:48:368 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:15:20:878 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:15:59:799 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:16:34:544 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:17:20:68 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:17:56:775 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:19:34:131 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:19:53:702 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:20:24:831 File System/(6724:6818): Recibi un Describe Global
+[INFO] 12:22:16:766 File System/(6724:6818): se desconecto el socket client 7
+[INFO] 12:22:18:947 File System/(6724:6827): se desconecto el socket client 6
+[INFO] 12:22:22:766 File System/(8492:8492): Se crea el archivo de log
+[INFO] 12:22:22:766 File System/(8492:8492): Lee el archivo de configuracion
+[INFO] 12:22:22:766 File System/(8492:8492): Se lee la metadata del File System
+[INFO] 12:22:22:766 File System/(8492:8492): Abre el bitmap
+[INFO] 12:22:22:767 File System/(8492:8495): Inicializa hilo inotify
+[INFO] 12:22:22:767 File System/(8492:8496): Se creo el hilo servidor
+[INFO] 12:22:22:767 File System/(8492:8496): Se creo el socket server
+[INFO] 12:22:22:767 File System/(8492:8497): Se creo el hilo consola
+[INFO] 12:22:25:379 File System/(8492:8496): Se conecto un nuevo cliente
+[INFO] 12:22:25:379 File System/(8492:8496): Se creo el hilo del cliente
+[INFO] 12:22:26:769 File System/(8492:8493): Se desbloquea la compactacion
+[INFO] 12:22:28:736 File System/(8492:8496): Se conecto un nuevo cliente
+[INFO] 12:22:28:736 File System/(8492:8496): Se creo el hilo del cliente
+[INFO] 12:22:37:783 File System/(8492:8500): Recibi un Describe Global
+[INFO] 12:22:47:915 File System/(8492:8500): Recibi un Describe Global
+[INFO] 12:23:17:918 File System/(8492:8500): Recibi un Describe Global
+[INFO] 12:23:20:377 File System/(8492:8500): se desconecto el socket client 6
+[INFO] 12:23:30:60 File System/(8492:8496): Se conecto un nuevo cliente
+[INFO] 12:23:30:60 File System/(8492:8496): Se creo el hilo del cliente
+[INFO] 12:23:47:954 File System/(8553:8553): Se crea el archivo de log
+[INFO] 12:23:47:954 File System/(8553:8553): Lee el archivo de configuracion
+[INFO] 12:23:47:954 File System/(8553:8553): Se lee la metadata del File System
+[INFO] 12:23:47:954 File System/(8553:8553): Abre el bitmap
+[INFO] 12:25:35:724 File System/(8607:8607): Se crea el archivo de log
+[INFO] 12:25:35:725 File System/(8607:8607): Lee el archivo de configuracion
+[INFO] 12:25:35:725 File System/(8607:8607): Se lee la metadata del File System
+[INFO] 12:25:35:725 File System/(8607:8607): Creacion del archivo bitmap
+
+[INFO] 12:25:35:810 File System/(8607:8607): Abre el bitmap
+[INFO] 12:25:35:810 File System/(8607:8617): Inicializa hilo inotify
+[INFO] 12:25:35:810 File System/(8607:8619): Se creo el hilo consola
+[INFO] 12:25:35:810 File System/(8607:8618): Se creo el hilo servidor
+[INFO] 12:25:35:810 File System/(8607:8618): Se creo el socket server
+[INFO] 12:25:40:234 File System/(8607:8618): Se conecto un nuevo cliente
+[INFO] 12:25:40:234 File System/(8607:8618): Se creo el hilo del cliente
+[INFO] 12:25:42:331 File System/(8607:8618): Se conecto un nuevo cliente
+[INFO] 12:25:42:332 File System/(8607:8618): Se creo el hilo del cliente
+[INFO] 12:26:00:245 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:26:13:290 File System/(8607:8622): Recibi un Create
+[INFO] 12:26:30:247 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:27:11:959 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:27:41:960 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:27:42:337 File System/(8607:8629): Recibi un Insert
+[INFO] 12:27:57:355 File System/(8607:8665): Se desbloquea la compactacion
+[INFO] 12:28:11:963 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:28:16:461 File System/(8607:8629): Recibi un Select
+[INFO] 12:28:41:964 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:29:11:965 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:29:41:968 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:30:11:973 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:32:16:181 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:32:37:323 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:32:53:860 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:33:23:861 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:33:53:864 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:34:35:818 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:34:42:341 File System/(8607:8629): Recibi un Insert
+[INFO] 12:34:42:342 File System/(8607:8629): Recibi un Insert
+[INFO] 12:35:06:422 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:35:41:501 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:36:12:368 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:36:56:768 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:37:26:770 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:37:56:771 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:38:28:558 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:38:40:256 File System/(8607:8622): Recibi un Insert
+[INFO] 12:38:40:257 File System/(8607:8622): Recibi un Insert
+[INFO] 12:39:01:251 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:42:05:429 File System/(8607:8622): Recibi un Describe Global
+[INFO] 12:42:18:99 File System/(8607:8622): se desconecto el socket client 6
+[INFO] 12:42:19:384 File System/(8607:8629): se desconecto el socket client 7
+[INFO] 12:42:26:135 File System/(9266:9266): Se crea el archivo de log
+[INFO] 12:42:26:135 File System/(9266:9266): Lee el archivo de configuracion
+[INFO] 12:42:26:135 File System/(9266:9266): Se lee la metadata del File System
+[INFO] 12:42:26:135 File System/(9266:9266): Abre el bitmap
+[INFO] 12:42:26:136 File System/(9266:9268): Inicializa hilo inotify
+[INFO] 12:42:26:136 File System/(9266:9270): Se creo el hilo consola
+[INFO] 12:42:26:136 File System/(9266:9269): Se creo el hilo servidor
+[INFO] 12:42:26:136 File System/(9266:9269): Se creo el socket server
+[INFO] 12:42:28:138 File System/(9266:9267): Se desbloquea la compactacion
+[INFO] 12:42:28:674 File System/(9266:9269): Se conecto un nuevo cliente
+[INFO] 12:42:28:674 File System/(9266:9269): Se creo el hilo del cliente
+[INFO] 12:42:30:553 File System/(9266:9269): Se conecto un nuevo cliente
+[INFO] 12:42:30:553 File System/(9266:9269): Se creo el hilo del cliente
+[INFO] 12:42:42:537 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:43:15:996 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:43:28:676 File System/(9266:9273): Recibi un Insert
+[INFO] 12:43:28:676 File System/(9266:9273): Recibi un Insert
+[INFO] 12:43:46:283 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:44:25:341 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:44:55:617 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:45:25:744 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:45:55:745 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:46:25:746 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:46:55:781 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:47:33:542 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:48:13:394 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:49:16:547 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:49:39:678 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:50:09:681 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:50:28:686 File System/(9266:9273): Recibi un Insert
+[INFO] 12:50:28:686 File System/(9266:9273): Recibi un Insert
+[INFO] 12:50:36:340 File System/(9266:9273): Recibi un Select
+[INFO] 12:50:39:682 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:51:09:686 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:51:28:690 File System/(9266:9273): Recibi un Insert
+[INFO] 12:51:39:687 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:52:09:689 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:52:23:757 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:52:53:759 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:53:17:310 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:53:30:571 File System/(9266:9278): Recibi un Insert
+[INFO] 12:53:47:311 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:54:09:688 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:54:28:698 File System/(9266:9273): Recibi un Insert
+[INFO] 12:54:30:572 File System/(9266:9278): Recibi un Insert
+[INFO] 12:54:39:691 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:55:09:693 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:55:39:694 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:56:09:696 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:56:39:697 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:57:09:699 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:57:39:701 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:58:09:702 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:58:39:703 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:59:09:705 File System/(9266:9273): Recibi un Describe Global
+[INFO] 12:59:32:890 File System/(9266:9273): Recibi un Describe Global
+[INFO] 13:00:16:125 File System/(9806:9806): Se crea el archivo de log
+[INFO] 13:00:23:330 File System/(9812:9812): Se crea el archivo de log
+[INFO] 13:00:23:330 File System/(9812:9812): Lee el archivo de configuracion
+[INFO] 13:00:23:330 File System/(9812:9812): Se lee la metadata del File System
+[INFO] 13:00:23:330 File System/(9812:9812): Creacion del archivo bitmap
+
+[INFO] 13:00:23:384 File System/(9812:9812): Abre el bitmap
+[INFO] 13:00:23:385 File System/(9812:9813): Inicializa hilo inotify
+[INFO] 13:00:23:385 File System/(9812:9815): Se creo el hilo consola
+[INFO] 13:00:23:385 File System/(9812:9814): Se creo el hilo servidor
+[INFO] 13:00:23:385 File System/(9812:9814): Se creo el socket server
+[INFO] 13:00:26:271 File System/(9812:9814): Se conecto un nuevo cliente
+[INFO] 13:00:26:271 File System/(9812:9814): Se creo el hilo del cliente
+[INFO] 13:00:28:559 File System/(9812:9814): Se conecto un nuevo cliente
+[INFO] 13:00:28:559 File System/(9812:9814): Se creo el hilo del cliente
+[INFO] 13:00:36:380 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:01:02:151 File System/(9812:9818): Recibi un Create
+[INFO] 13:01:06:382 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:01:26:273 File System/(9812:9818): Recibi un Insert
+[INFO] 13:01:26:273 File System/(9812:9818): Recibi un Insert
+[INFO] 13:01:36:385 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:02:06:391 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:02:36:392 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:03:06:395 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:03:36:397 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:04:06:398 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:04:36:400 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:05:06:403 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:05:36:405 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:06:06:410 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:06:36:416 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:07:06:454 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:07:36:458 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:08:06:465 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:08:36:469 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:09:06:471 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:09:36:472 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:10:06:476 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:10:36:484 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:11:02:161 File System/(9812:9835): Se desbloquea la compactacion
+[INFO] 13:11:06:487 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:11:36:488 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:12:06:489 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:12:36:492 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:13:06:494 File System/(9812:9818): Recibi un Describe Global
+[INFO] 13:13:29:621 File System/(9950:9950): Se crea el archivo de log
+[INFO] 13:13:29:621 File System/(9950:9950): Lee el archivo de configuracion
+[INFO] 13:13:29:621 File System/(9950:9950): Se lee la metadata del File System
+[INFO] 13:13:29:621 File System/(9950:9950): Creacion del archivo bitmap
+
+[INFO] 13:13:29:686 File System/(9950:9950): Abre el bitmap
+[INFO] 13:13:29:687 File System/(9950:9951): Inicializa hilo inotify
+[INFO] 13:13:29:687 File System/(9950:9952): Se creo el hilo servidor
+[INFO] 13:13:29:687 File System/(9950:9952): Se creo el socket server
+[INFO] 13:13:29:687 File System/(9950:9953): Se creo el hilo consola
+[INFO] 13:13:32:724 File System/(9950:9952): Se conecto un nuevo cliente
+[INFO] 13:13:32:724 File System/(9950:9952): Se creo el hilo del cliente
+[INFO] 13:13:35:711 File System/(9950:9952): Se conecto un nuevo cliente
+[INFO] 13:13:35:711 File System/(9950:9952): Se creo el hilo del cliente
+[INFO] 13:13:47:630 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:14:06:701 File System/(9950:9956): Recibi un Create
+[INFO] 13:14:17:630 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:14:32:728 File System/(9950:9956): Recibi un Insert
+[INFO] 13:14:32:729 File System/(9950:9956): Recibi un Insert
+[INFO] 13:14:47:633 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:15:13:692 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:16:30:189 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:17:25:287 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:18:03:394 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:18:36:464 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:19:09:875 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:20:57:464 File System/(9950:9956): Recibi un Describe Global
+[INFO] 13:21:20:342 File System/(10242:10242): Se crea el archivo de log
+[INFO] 13:21:20:342 File System/(10242:10242): Lee el archivo de configuracion
+[INFO] 13:21:20:342 File System/(10242:10242): Se lee la metadata del File System
+[INFO] 13:21:20:342 File System/(10242:10242): Creacion del archivo bitmap
+
+[INFO] 13:21:20:396 File System/(10242:10242): Abre el bitmap
+[INFO] 13:21:20:398 File System/(10242:10243): Inicializa hilo inotify
+[INFO] 13:21:20:399 File System/(10242:10244): Se creo el hilo servidor
+[INFO] 13:21:20:399 File System/(10242:10244): Se creo el socket server
+[INFO] 13:21:20:399 File System/(10242:10245): Se creo el hilo consola
+[INFO] 13:21:23:410 File System/(10242:10244): Se conecto un nuevo cliente
+[INFO] 13:21:23:410 File System/(10242:10244): Se creo el hilo del cliente
+[INFO] 13:21:25:644 File System/(10242:10244): Se conecto un nuevo cliente
+[INFO] 13:21:25:644 File System/(10242:10244): Se creo el hilo del cliente
+[INFO] 13:21:29:699 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:21:56:666 File System/(10242:10248): Recibi un Create
+[INFO] 13:21:59:700 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:22:23:415 File System/(10242:10248): Recibi un Insert
+[INFO] 13:22:23:415 File System/(10242:10248): Recibi un Insert
+[INFO] 13:22:29:701 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:22:47:585 File System/(10242:10253): Recibi un Describe Global
+[INFO] 13:22:59:702 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:23:00:215 File System/(10242:10248): Recibi un Describe
+[INFO] 13:23:22:78 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:23:33:450 File System/(10242:10248): Recibi un Describe
+[INFO] 13:23:48:664 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:23:51:172 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:24:18:670 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:24:48:671 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:25:18:677 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:25:50:810 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:26:20:821 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:26:58:518 File System/(10242:10248): Recibi un Describe Global
+[INFO] 13:26:58:522 File System/(10242:10248): Recibi un Describe
+[INFO] 13:28:12:897 File System/(10242:10245): Request de tipo DESCRIBE
+[INFO] 13:28:12:897 File System/(10242:10245): Describe de tabla
+[INFO] 13:28:19:559 File System/(10242:10248): Recibi un Describe
+[INFO] 13:28:19:718 File System/(10242:10248): se desconecto el socket client 5
+[INFO] 13:29:10:337 File System/(10442:10442): Se crea el archivo de log
+[INFO] 13:29:10:337 File System/(10442:10442): Lee el archivo de configuracion
+[INFO] 13:29:10:337 File System/(10442:10442): Se lee la metadata del File System
+[INFO] 13:29:10:337 File System/(10442:10442): Creacion del archivo bitmap
+
+[INFO] 13:29:10:393 File System/(10442:10442): Abre el bitmap
+[INFO] 13:29:10:394 File System/(10442:10443): Inicializa hilo inotify
+[INFO] 13:29:10:394 File System/(10442:10444): Se creo el hilo servidor
+[INFO] 13:29:10:394 File System/(10442:10445): Se creo el hilo consola
+[INFO] 13:29:10:394 File System/(10442:10444): Se creo el socket server
+[INFO] 13:29:12:843 File System/(10442:10444): Se conecto un nuevo cliente
+[INFO] 13:29:12:843 File System/(10442:10444): Se creo el hilo del cliente
+[INFO] 13:29:21:475 File System/(10442:10444): Se conecto un nuevo cliente
+[INFO] 13:29:21:476 File System/(10442:10444): Se creo el hilo del cliente
+[INFO] 13:29:31:697 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:29:57:895 File System/(10442:10448): Recibi un Create
+[INFO] 13:30:01:698 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:30:12:854 File System/(10442:10448): Recibi un Insert
+[INFO] 13:30:12:854 File System/(10442:10448): Recibi un Insert
+[INFO] 13:30:31:730 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:31:01:732 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:31:31:733 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:31:47:127 File System/(10442:10453): Recibi un Create
+[INFO] 13:32:01:745 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:32:21:509 File System/(10442:10453): Recibi un Insert
+[INFO] 13:32:31:753 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:33:01:755 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:33:27:800 File System/(10442:10453): Recibi un Create
+[INFO] 13:33:31:756 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:34:01:760 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:34:10:542 File System/(10442:10448): Recibi un Insert
+[INFO] 13:34:10:542 File System/(10442:10453): Recibi un Insert
+[INFO] 13:34:31:763 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:35:01:768 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:35:31:774 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:36:01:775 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:36:31:776 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:37:01:778 File System/(10442:10448): Recibi un Describe Global
+[INFO] 13:37:45:359 File System/(10501:10501): Se crea el archivo de log
+[INFO] 13:37:45:359 File System/(10501:10501): Lee el archivo de configuracion
+[INFO] 13:37:45:359 File System/(10501:10501): Se lee la metadata del File System
+[INFO] 13:37:45:359 File System/(10501:10501): Creacion del archivo bitmap
+
+[INFO] 13:37:45:400 File System/(10501:10501): Abre el bitmap
+[INFO] 13:37:45:400 File System/(10501:10502): Inicializa hilo inotify
+[INFO] 13:37:45:400 File System/(10501:10504): Se creo el hilo consola
+[INFO] 13:37:45:400 File System/(10501:10503): Se creo el hilo servidor
+[INFO] 13:37:45:401 File System/(10501:10503): Se creo el socket server
+[INFO] 13:37:51:312 File System/(10501:10503): Se conecto un nuevo cliente
+[INFO] 13:37:51:312 File System/(10501:10503): Se creo el hilo del cliente
+[INFO] 13:37:55:363 File System/(10501:10503): Se conecto un nuevo cliente
+[INFO] 13:37:55:363 File System/(10501:10503): Se creo el hilo del cliente
+[INFO] 13:38:03:968 File System/(10501:10509): Recibi un Describe Global
+[INFO] 13:38:33:970 File System/(10501:10509): Recibi un Describe Global
+[INFO] 13:38:41:397 File System/(10501:10509): Recibi un Create
+[INFO] 13:38:43:408 File System/(10501:10509): Recibi un Select
+[INFO] 13:38:51:314 File System/(10501:10509): Recibi un Insert
+[INFO] 13:38:55:367 File System/(10501:10514): Recibi un Insert
+[INFO] 13:39:03:971 File System/(10501:10509): Recibi un Describe Global
+[INFO] 13:39:33:977 File System/(10501:10509): Recibi un Describe Global
+[INFO] 13:40:03:980 File System/(10501:10509): Recibi un Describe Global
+[INFO] 13:40:33:981 File System/(10501:10509): Recibi un Describe Global
+[INFO] 13:41:03:984 File System/(10501:10509): Recibi un Describe Global
+[INFO] 13:55:50:212 File System/(10989:10989): Se crea el archivo de log
+[INFO] 13:55:50:212 File System/(10989:10989): Lee el archivo de configuracion
+[INFO] 13:55:50:212 File System/(10989:10989): Se lee la metadata del File System
+[INFO] 13:55:50:212 File System/(10989:10989): Creacion del archivo bitmap
+
+[INFO] 13:55:50:265 File System/(10989:10989): Abre el bitmap
+[INFO] 13:55:50:265 File System/(10989:10991): Se creo el hilo servidor
+[INFO] 13:55:50:265 File System/(10989:10990): Inicializa hilo inotify
+[INFO] 13:55:50:266 File System/(10989:10992): Se creo el hilo consola
+[INFO] 13:55:50:265 File System/(10989:10991): Se creo el socket server
+[INFO] 13:55:52:772 File System/(10989:10991): Se conecto un nuevo cliente
+[INFO] 13:55:52:772 File System/(10989:10991): Se creo el hilo del cliente
+[INFO] 13:55:54:954 File System/(10989:10991): Se conecto un nuevo cliente
+[INFO] 13:55:54:954 File System/(10989:10991): Se creo el hilo del cliente
+[INFO] 13:56:15:340 File System/(10989:10997): Recibi un Describe Global
+[INFO] 13:56:44:366 File System/(10989:10997): Recibi un Create
+[INFO] 13:56:45:342 File System/(10989:10997): Recibi un Describe Global
+[INFO] 13:56:52:783 File System/(10989:10997): Recibi un Insert
+[INFO] 13:56:52:783 File System/(10989:10997): Recibi un Insert
+[INFO] 13:57:15:343 File System/(10989:10997): Recibi un Describe Global
+[INFO] 13:57:35:81 File System/(10989:11002): Recibi un Create
+[INFO] 13:57:38:86 File System/(10989:11002): Recibi un Select
+[INFO] 13:57:45:344 File System/(10989:10997): Recibi un Describe Global
+[INFO] 13:57:52:784 File System/(10989:10997): Recibi un Insert
+[INFO] 13:58:15:346 File System/(10989:10997): Recibi un Describe Global
+[INFO] 13:59:15:52 File System/(11124:11124): Se crea el archivo de log
+[INFO] 13:59:15:52 File System/(11124:11124): Lee el archivo de configuracion
+[INFO] 13:59:15:52 File System/(11124:11124): Se lee la metadata del File System
+[INFO] 13:59:15:52 File System/(11124:11124): Creacion del archivo bitmap
+
+[INFO] 13:59:15:109 File System/(11124:11124): Abre el bitmap
+[INFO] 13:59:15:109 File System/(11124:11125): Inicializa hilo inotify
+[INFO] 13:59:15:109 File System/(11124:11127): Se creo el hilo consola
+[INFO] 13:59:15:109 File System/(11124:11126): Se creo el hilo servidor
+[INFO] 13:59:15:109 File System/(11124:11126): Se creo el socket server
+[INFO] 13:59:16:580 File System/(11124:11126): Se conecto un nuevo cliente
+[INFO] 13:59:16:580 File System/(11124:11126): Se creo el hilo del cliente
+[INFO] 13:59:19:537 File System/(11124:11126): Se conecto un nuevo cliente
+[INFO] 13:59:19:538 File System/(11124:11126): Se creo el hilo del cliente
+[INFO] 13:59:28:609 File System/(11124:11130): Recibi un Describe Global
+[INFO] 13:59:57:377 File System/(11124:11130): Recibi un Create
+[INFO] 13:59:58:609 File System/(11124:11130): Recibi un Describe Global
+[INFO] 13:59:59:379 File System/(11124:11135): Recibi un Select
+[INFO] 14:00:16:581 File System/(11124:11130): Recibi un Insert
+[INFO] 14:00:19:539 File System/(11124:11135): Recibi un Insert
+[INFO] 14:00:28:611 File System/(11124:11130): Recibi un Describe Global
+[INFO] 14:09:57:378 File System/(11124:11184): Se desbloquea la compactacion
+[INFO] 14:13:54:953 File System/(11124:11130): se desconecto el socket client 6
+[INFO] 14:13:56:127 File System/(11124:11135): se desconecto el socket client 7
+[INFO] 14:14:10:683 File System/(11307:11307): Se crea el archivo de log
+[INFO] 14:14:10:683 File System/(11307:11307): Lee el archivo de configuracion
+[INFO] 14:14:10:683 File System/(11307:11307): Se lee la metadata del File System
+[INFO] 14:14:10:683 File System/(11307:11307): Creacion del archivo bitmap
+
+[INFO] 14:14:10:737 File System/(11307:11307): Abre el bitmap
+[INFO] 14:14:10:738 File System/(11307:11308): Inicializa hilo inotify
+[INFO] 14:14:10:738 File System/(11307:11310): Se creo el hilo consola
+[INFO] 14:14:10:738 File System/(11307:11309): Se creo el hilo servidor
+[INFO] 14:14:10:738 File System/(11307:11309): Se creo el socket server
+[INFO] 14:14:12:479 File System/(11307:11309): Se conecto un nuevo cliente
+[INFO] 14:14:12:479 File System/(11307:11309): Se creo el hilo del cliente
+[INFO] 14:14:14:249 File System/(11307:11309): Se conecto un nuevo cliente
+[INFO] 14:14:14:250 File System/(11307:11309): Se creo el hilo del cliente
+[INFO] 14:14:22:759 File System/(11307:11313): Recibi un Describe Global
+[INFO] 14:14:39:713 File System/(11307:11313): Recibi un Create
+[INFO] 14:14:52:761 File System/(11307:11313): Recibi un Describe Global
+[INFO] 14:15:12:483 File System/(11307:11313): Recibi un Insert
+[INFO] 14:15:12:484 File System/(11307:11313): Recibi un Insert
+[INFO] 14:15:20:624 File System/(11307:11318): Recibi un Create
+[INFO] 14:15:22:762 File System/(11307:11313): Recibi un Describe Global
+[INFO] 14:15:23:630 File System/(11307:11318): Recibi un Select
+[INFO] 14:15:52:764 File System/(11307:11313): Recibi un Describe Global
+[INFO] 14:16:08:226 File System/(11307:11318): Recibi un Describe Global
+[INFO] 14:16:12:485 File System/(11307:11313): Recibi un Insert
+[INFO] 14:16:22:767 File System/(11307:11313): Recibi un Describe Global
+[INFO] 14:16:41:58 File System/(11307:11313): Recibi un Select
+[INFO] 14:39:57:30 File System/(11540:11540): Se crea el archivo de log
+[INFO] 14:39:57:30 File System/(11540:11540): Lee el archivo de configuracion
+[INFO] 14:39:57:30 File System/(11540:11540): Se lee la metadata del File System
+[INFO] 14:39:57:30 File System/(11540:11540): Creacion del archivo bitmap
+
+[INFO] 14:39:57:82 File System/(11540:11540): Abre el bitmap
+[INFO] 14:39:57:82 File System/(11540:11541): Inicializa hilo inotify
+[INFO] 14:39:57:83 File System/(11540:11543): Se creo el hilo consola
+[INFO] 14:39:57:83 File System/(11540:11542): Se creo el hilo servidor
+[INFO] 14:39:57:83 File System/(11540:11542): Se creo el socket server
+[INFO] 14:39:59:586 File System/(11540:11542): Se conecto un nuevo cliente
+[INFO] 14:39:59:586 File System/(11540:11542): Se creo el hilo del cliente
+[INFO] 14:40:02:18 File System/(11540:11542): Se conecto un nuevo cliente
+[INFO] 14:40:02:18 File System/(11540:11542): Se creo el hilo del cliente
+[INFO] 14:40:14:619 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:40:40:321 File System/(11540:11546): Recibi un Create
+[INFO] 14:40:44:625 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:40:59:587 File System/(11540:11546): Recibi un Insert
+[INFO] 14:40:59:587 File System/(11540:11546): Recibi un Insert
+[INFO] 14:41:14:627 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:41:44:632 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:41:45:373 File System/(11540:11551): Recibi un Create
+[INFO] 14:41:48:387 File System/(11540:11551): Recibi un Select
+[INFO] 14:41:59:592 File System/(11540:11546): Recibi un Insert
+[INFO] 14:42:14:636 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:42:44:648 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:43:14:651 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:43:44:651 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:44:14:653 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:44:44:657 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:45:14:658 File System/(11540:11546): Recibi un Describe Global
+[INFO] 14:52:04:921 File System/(11836:11836): Se crea el archivo de log
+[INFO] 14:52:04:921 File System/(11836:11836): Lee el archivo de configuracion
+[INFO] 14:52:04:922 File System/(11836:11836): Se lee la metadata del File System
+[INFO] 14:52:04:922 File System/(11836:11836): Creacion del archivo bitmap
+
+[INFO] 14:52:04:973 File System/(11836:11836): Abre el bitmap
+[INFO] 14:52:04:974 File System/(11836:11837): Inicializa hilo inotify
+[INFO] 14:52:04:974 File System/(11836:11838): Se creo el hilo servidor
+[INFO] 14:52:04:974 File System/(11836:11838): Se creo el socket server
+[INFO] 14:52:04:974 File System/(11836:11839): Se creo el hilo consola
+[INFO] 14:52:07:102 File System/(11836:11838): Se conecto un nuevo cliente
+[INFO] 14:52:07:102 File System/(11836:11838): Se creo el hilo del cliente
+[INFO] 14:52:08:970 File System/(11836:11838): Se conecto un nuevo cliente
+[INFO] 14:52:08:970 File System/(11836:11838): Se creo el hilo del cliente
+[INFO] 14:52:19:667 File System/(11836:11842): Recibi un Describe Global
+[INFO] 14:52:49:548 File System/(11836:11842): Recibi un Create
+[INFO] 14:52:49:669 File System/(11836:11842): Recibi un Describe Global
+[INFO] 14:53:07:109 File System/(11836:11842): Recibi un Insert
+[INFO] 14:53:07:109 File System/(11836:11842): Recibi un Insert
+[INFO] 14:53:19:675 File System/(11836:11842): Recibi un Describe Global
+[INFO] 14:53:49:676 File System/(11836:11842): Recibi un Describe Global
+[INFO] 14:54:19:678 File System/(11836:11842): Recibi un Describe Global
+[INFO] 14:55:07:952 File System/(11957:11957): Se crea el archivo de log
+[INFO] 14:55:07:952 File System/(11957:11957): Lee el archivo de configuracion
+[INFO] 14:55:07:952 File System/(11957:11957): Se lee la metadata del File System
+[INFO] 14:55:07:952 File System/(11957:11957): Creacion del archivo bitmap
+
+[INFO] 14:55:07:997 File System/(11957:11957): Abre el bitmap
+[INFO] 14:55:07:998 File System/(11957:11959): Se creo el hilo servidor
+[INFO] 14:55:07:998 File System/(11957:11958): Inicializa hilo inotify
+[INFO] 14:55:07:998 File System/(11957:11960): Se creo el hilo consola
+[INFO] 14:55:07:998 File System/(11957:11959): Se creo el socket server
+[INFO] 14:55:09:838 File System/(11957:11959): Se conecto un nuevo cliente
+[INFO] 14:55:09:838 File System/(11957:11959): Se creo el hilo del cliente
+[INFO] 14:55:11:449 File System/(11957:11959): Se conecto un nuevo cliente
+[INFO] 14:55:11:449 File System/(11957:11959): Se creo el hilo del cliente
+[INFO] 14:55:19:3 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:55:39:617 File System/(11957:11963): Recibi un Create
+[INFO] 14:55:50:10 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:56:09:840 File System/(11957:11963): Recibi un Insert
+[INFO] 14:56:09:840 File System/(11957:11963): Recibi un Insert
+[INFO] 14:56:20:11 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:56:50:12 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:57:20:14 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:57:50:15 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:58:20:19 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:58:50:21 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:59:20:24 File System/(11957:11963): Recibi un Describe Global
+[INFO] 14:59:50:148 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:00:20:150 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:00:50:154 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:01:20:155 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:01:50:156 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:02:20:157 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:02:50:158 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:03:20:158 File System/(11957:11963): Recibi un Describe Global
+[INFO] 15:04:07:286 File System/(12359:12359): Se crea el archivo de log
+[INFO] 15:04:07:287 File System/(12359:12359): Lee el archivo de configuracion
+[INFO] 15:04:07:287 File System/(12359:12359): Se lee la metadata del File System
+[INFO] 15:04:07:287 File System/(12359:12359): Creacion del archivo bitmap
+
+[INFO] 15:04:07:338 File System/(12359:12359): Abre el bitmap
+[INFO] 15:04:07:339 File System/(12359:12360): Inicializa hilo inotify
+[INFO] 15:04:07:339 File System/(12359:12362): Se creo el hilo consola
+[INFO] 15:04:07:339 File System/(12359:12361): Se creo el hilo servidor
+[INFO] 15:04:07:339 File System/(12359:12361): Se creo el socket server
+[INFO] 15:04:09:305 File System/(12359:12361): Se conecto un nuevo cliente
+[INFO] 15:04:09:305 File System/(12359:12361): Se creo el hilo del cliente
+[INFO] 15:04:11:471 File System/(12359:12361): Se conecto un nuevo cliente
+[INFO] 15:04:11:472 File System/(12359:12361): Se creo el hilo del cliente
+[INFO] 15:04:23:852 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:04:53:855 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:05:05:947 File System/(12359:12365): Recibi un Create
+[INFO] 15:05:09:307 File System/(12359:12365): Recibi un Insert
+[INFO] 15:05:09:307 File System/(12359:12365): Recibi un Insert
+[INFO] 15:05:09:960 File System/(12359:12365): Recibi un Select
+[INFO] 15:05:12:59 File System/(12359:12365): Recibi un Select
+[INFO] 15:05:23:857 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:05:53:859 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:06:09:308 File System/(12359:12365): Recibi un Insert
+[INFO] 15:06:23:861 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:06:53:545 File System/(12359:12370): Recibi un Create
+[INFO] 15:06:53:863 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:06:56:557 File System/(12359:12370): Recibi un Select
+[INFO] 15:07:09:308 File System/(12359:12365): Recibi un Insert
+[INFO] 15:07:23:865 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:07:53:866 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:08:23:867 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:08:53:868 File System/(12359:12365): Recibi un Describe Global
+[INFO] 15:09:30:201 File System/(12477:12477): Se crea el archivo de log
+[INFO] 15:09:30:201 File System/(12477:12477): Lee el archivo de configuracion
+[INFO] 15:09:30:201 File System/(12477:12477): Se lee la metadata del File System
+[INFO] 15:09:30:201 File System/(12477:12477): Creacion del archivo bitmap
+
+[INFO] 15:09:30:254 File System/(12477:12477): Abre el bitmap
+[INFO] 15:09:30:254 File System/(12477:12478): Inicializa hilo inotify
+[INFO] 15:09:30:255 File System/(12477:12480): Se creo el hilo consola
+[INFO] 15:09:30:255 File System/(12477:12479): Se creo el hilo servidor
+[INFO] 15:09:30:255 File System/(12477:12479): Se creo el socket server
+[INFO] 15:09:33:129 File System/(12477:12479): Se conecto un nuevo cliente
+[INFO] 15:09:33:129 File System/(12477:12479): Se creo el hilo del cliente
+[INFO] 15:09:36:537 File System/(12477:12479): Se conecto un nuevo cliente
+[INFO] 15:09:36:537 File System/(12477:12479): Se creo el hilo del cliente
+[INFO] 15:09:51:165 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:10:15:606 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:10:37:877 File System/(12477:12483): Recibi un Create
+[INFO] 15:10:45:613 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:11:15:614 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:11:16:795 File System/(12477:12488): Recibi un Create
+[INFO] 15:11:19:805 File System/(12477:12488): Recibi un Select
+[INFO] 15:11:21:808 File System/(12477:12488): Recibi un Select
+[INFO] 15:11:33:133 File System/(12477:12483): Recibi un Insert
+[INFO] 15:11:33:133 File System/(12477:12483): Recibi un Insert
+[INFO] 15:11:45:618 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:12:15:620 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:12:33:142 File System/(12477:12483): Recibi un Insert
+[INFO] 15:12:45:621 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:13:15:626 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:13:45:638 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:14:15:643 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:14:45:644 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:15:15:645 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:15:45:646 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:16:15:647 File System/(12477:12483): Recibi un Describe Global
+[INFO] 15:20:53:137 File System/(12701:12701): Se crea el archivo de log
+[INFO] 15:20:53:138 File System/(12701:12701): Lee el archivo de configuracion
+[INFO] 15:20:53:138 File System/(12701:12701): Se lee la metadata del File System
+[INFO] 15:20:53:138 File System/(12701:12701): Creacion del archivo bitmap
+
+[INFO] 15:20:53:199 File System/(12701:12701): Abre el bitmap
+[INFO] 15:20:53:199 File System/(12701:12702): Inicializa hilo inotify
+[INFO] 15:20:53:199 File System/(12701:12703): Se creo el hilo servidor
+[INFO] 15:20:53:199 File System/(12701:12703): Se creo el socket server
+[INFO] 15:20:53:199 File System/(12701:12704): Se creo el hilo consola
+[INFO] 15:20:56:76 File System/(12701:12703): Se conecto un nuevo cliente
+[INFO] 15:20:56:76 File System/(12701:12703): Se creo el hilo del cliente
+[INFO] 15:20:58:586 File System/(12701:12703): Se conecto un nuevo cliente
+[INFO] 15:20:58:587 File System/(12701:12703): Se creo el hilo del cliente
+[INFO] 15:21:08:708 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:21:23:452 File System/(12701:12707): Recibi un Create
+[INFO] 15:21:38:709 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:21:56:78 File System/(12701:12707): Recibi un Insert
+[INFO] 15:21:56:78 File System/(12701:12707): Recibi un Insert
+[INFO] 15:22:08:711 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:22:15:618 File System/(12701:12712): Recibi un Create
+[INFO] 15:22:18:624 File System/(12701:12712): Recibi un Select
+[INFO] 15:22:20:627 File System/(12701:12712): Recibi un Select
+[INFO] 15:22:38:712 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:22:56:79 File System/(12701:12707): Recibi un Insert
+[INFO] 15:23:08:714 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:23:38:715 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:24:08:716 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:24:38:717 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:25:08:719 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:25:38:721 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:26:08:722 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:26:38:723 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:27:08:723 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:27:38:725 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:28:08:734 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:28:38:744 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:29:08:744 File System/(12701:12707): Recibi un Describe Global
+[INFO] 15:30:08:387 File System/(12818:12818): Se crea el archivo de log
+[INFO] 15:30:08:387 File System/(12818:12818): Lee el archivo de configuracion
+[INFO] 15:30:08:387 File System/(12818:12818): Se lee la metadata del File System
+[INFO] 15:30:08:387 File System/(12818:12818): Creacion del archivo bitmap
+
+[INFO] 15:30:08:438 File System/(12818:12818): Abre el bitmap
+[INFO] 15:30:08:439 File System/(12818:12819): Inicializa hilo inotify
+[INFO] 15:30:08:439 File System/(12818:12821): Se creo el hilo consola
+[INFO] 15:30:08:439 File System/(12818:12820): Se creo el hilo servidor
+[INFO] 15:30:08:439 File System/(12818:12820): Se creo el socket server
+[INFO] 15:30:11:807 File System/(12818:12820): Se conecto un nuevo cliente
+[INFO] 15:30:11:807 File System/(12818:12820): Se creo el hilo del cliente
+[INFO] 15:30:15:623 File System/(12818:12820): Se conecto un nuevo cliente
+[INFO] 15:30:15:623 File System/(12818:12820): Se creo el hilo del cliente
+[INFO] 15:31:00:250 File System/(12818:12824): Recibi un Describe Global
+[INFO] 15:31:30:252 File System/(12818:12824): Recibi un Describe Global
+[INFO] 15:33:11:992 File System/(12818:12824): Recibi un Describe Global
+[INFO] 15:33:27:667 File System/(12818:12824): Recibi un Create
+[INFO] 15:33:41:996 File System/(12818:12824): Recibi un Describe Global
+[INFO] 15:34:11:812 File System/(12818:12824): Recibi un Insert
+[INFO] 15:34:11:812 File System/(12818:12824): Recibi un Insert
+[INFO] 15:34:11:997 File System/(12818:12824): Recibi un Describe Global
+[INFO] 15:35:13:368 File System/(12818:12824): Recibi un Describe Global
+[INFO] 15:35:25:829 File System/(12818:12829): Recibi un Create

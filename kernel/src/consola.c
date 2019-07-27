@@ -247,6 +247,8 @@ void armarComando(char *comando) {
             break;
         }
         case METRICS: {
+            log_info(file_log,"[Console] Operacion METRICA");
+            calcularMetricas();
             break;
         }
         case ADD: {

@@ -94,40 +94,55 @@ void cargarNuevoScript(st_script *newScript) {
 
 void ejecutarScript() {
     int i, resultado = NO_SALIO_OK;
-    st_instruccion *instruccionScript;//Hay que liberar?
-    st_memoria *datomemoria;
+    st_instruccion *instruccionScript = NULL;//Hay que liberar?
+    st_memoria *datomemoria = NULL;
     st_script *script = tomarScript();
     char *tag;
+    bool hayError;
     TypeCriterio typeCriterio;
-    printf("Ejecutando Script ----- [%s]\n", script->id);
+    st_history_request * historyRequest = NULL;
+    printf("\n[Planificador] Ejecutando Script [%s]\n", script->id);
     t_list *instrucciones = tomarInstrucciones(script->listaDeInstrucciones);
     //ejecutamos instruciones tomadas
     for (i = 0; i < instrucciones->elements_count; ++i) {
+        hayError = false;
+        historyRequest = NULL;
         instruccionScript = list_get(instrucciones, i);
         typeCriterio = getCriterioBYInstruccion(instruccionScript->instruccion, instruccionScript->operacion);
         if (typeCriterio == NO_SE_ENCONTRO_TABLA) {
-            printf("No se encontro tabla\n");
-            sleep(configuracion->SLEEP_EJECUCION);
-            break;
-        }
-        tag = generarTag(typeCriterio, instruccionScript->instruccion, instruccionScript->operacion);
-        datomemoria = getMemoria(typeCriterio, tag);
-        if (datomemoria) {
-            resultado = enviarRequestMemoria(instruccionScript, datomemoria);
-            if (resultado == NO_SALIO_OK || resultado == SE_DESCONECTO_SOCKET) {
-                sleep(configuracion->SLEEP_EJECUCION);
-                break;
+            hayError = true;
+            printf("[Planificador] No se encontro tabla\n");
+        }else {
+            tag = generarTag(typeCriterio, instruccionScript->instruccion, instruccionScript->operacion);
+            datomemoria = getMemoria(typeCriterio, tag);
+            if (datomemoria) {
+                if(instruccionScript->operacion == INSERT || instruccionScript->operacion == SELECT){
+                    historyRequest = newHistory(instruccionScript->operacion,typeCriterio);
+                }
+                resultado = enviarRequestMemoria(instruccionScript, datomemoria);
+                if (resultado == NO_SALIO_OK || resultado == SE_DESCONECTO_SOCKET) {
+                    hayError = true;
+                }
+                if(historyRequest && resultado == SALIO_OK){
+                    historyRequest->endTime = obtenerMilisegundosDeHoy() + configuracion->SLEEP_EJECUCION;
+                    addHistory(historyRequest,datomemoria->numero);
+                }
+            } else {
+                printf("[Planificador] No hay memoria disponible\n");
+                resultado = MEMORIA_NO_DISPONIBLE;
+                hayError = true;
             }
-        } else {
-            printf("no hay memoria disponible\n");
-            resultado = MEMORIA_NO_DISPONIBLE;
-            sleep(configuracion->SLEEP_EJECUCION);
+            free(tag);
+        }
+        if(hayError){
+            if(historyRequest){
+                free(historyRequest);
+            }
             break;
         }
-        sleep(configuracion->SLEEP_EJECUCION);
-        free(tag);
+        sleep(configuracion->SLEEP_EJECUCION / 1000);
     }
-    printf("Fin Ejecucion de Script ----- [%s]\n", script->id);
+    printf("[Planificador] Fin Ejecucion de Script [%s]\n", script->id);
     //Evaluar resultado de Ejecucion
     if (resultado == SALIO_OK) {
         if (script->listaDeInstrucciones->elements_count > 0) {

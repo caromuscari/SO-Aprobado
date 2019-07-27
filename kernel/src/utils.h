@@ -13,4 +13,6 @@
 TypeCriterio getTipoCriterioByString(char * criterioString);
 char * generarTag(TypeCriterio tipo, void *st_intrucion, enum OPERACION type);
 TypeCriterio getCriterioBYInstruccion(void *st_intrucion, enum OPERACION type);
+char * getTipoCriterioBYEnum(TypeCriterio criterio);
+char * getOperacionBYEnum(enum OPERACION type);
 #endif //KERNEL_UTILS_H

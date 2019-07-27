@@ -17,6 +17,37 @@ TypeCriterio getTipoCriterioByString(char * criterioString){
     return CriterioNoDefinido;
 }
 
+char * getTipoCriterioBYEnum(TypeCriterio criterio){
+    switch (criterio){
+        case StrongConsistency:{
+            return "SC";
+        }
+        case StrongHashConsistency:{
+            return  "SHC";
+        }
+        case EventualConsistency:{
+            return  "EC";
+        }
+        default:{
+            return "No Definido";
+        }
+    }
+}
+
+char * getOperacionBYEnum(enum OPERACION type){
+    switch (type){
+        case INSERT:{
+            return "INSERT";
+        }
+        case SELECT:{
+            return "SELECT";
+        }
+        default: {
+            return "NO Definido";
+        }
+    }
+}
+
 char * getNameTable(void * st_intrucion, enum OPERACION type){
     switch (type){
         case INSERT:{

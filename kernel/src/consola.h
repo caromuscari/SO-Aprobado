@@ -14,6 +14,7 @@
 #include "threadPlanificador.h"
 #include "threadMetadata.h"
 #include "threadPoolMemoria.h"
+#include "metricas.h"
 
 typedef struct {
     int numero;

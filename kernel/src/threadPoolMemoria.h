@@ -17,6 +17,7 @@
 #include "threadPoolMemoria.h"
 #include "requestMemoria.h"
 #include "contracts.h"
+#include <funcionesCompartidas/time.h>
 
 void *loadPoolMemori();
 void updateListaMemorias(st_data_memoria * nuevaLista);
@@ -25,5 +26,8 @@ void hacerJournal();
 void eliminarMemoria(int numberMemoria);
 st_memoria *getMemoria(TypeCriterio tipo, char *text);
 int journalMemoria(st_memoria * memoria);
+void addHistory(st_history_request * historyRequest, int numeroMemoria);
+st_history_request * newHistory(enum OPERACION operacion, TypeCriterio criterio);
+t_list * getHistoryByRange(double start, double end);
 
 #endif //KERNEL_THREADPOOLMEMORIA_H

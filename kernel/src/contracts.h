@@ -10,6 +10,7 @@
 #include <funcionesCompartidas/funcionesNET.h>
 #include <funcionesCompartidas/listaMemoria.h>
 #include <funcionesCompartidas/listaMetadata.h>
+#include "../../funcionesCompartidas/funcionesCompartidas/API.h"
 
 typedef enum {
     CriterioNoDefinido = -1,
@@ -23,7 +24,8 @@ typedef enum {
     NO_SALIO_OK = 2,
     SE_DESCONECTO_SOCKET = 3,
     MEMORIA_NO_DISPONIBLE = 4,
-    NO_SE_ENCONTRO_TABLA = 5
+    NO_SE_ENCONTRO_TABLA = 5,
+    NO_HAY_RESULTADO_EN_SELECT = 6,
 } Respuestas;
 
 typedef struct {
@@ -43,11 +45,25 @@ typedef struct {
 } st_messageResponse;
 
 typedef struct {
+    enum OPERACION operacion;
+    double startTime;
+    double endTime;
+    TypeCriterio tipoCriterio;
+} st_history_request;
+
+typedef struct {
     st_memoria *memoria;
     bool activo;
     t_list *tags;
     t_list *tipos;
+    t_list * history;
     int count;
 } st_kernel_memoria;
+
+typedef struct {
+    int numeroMemoria;
+    t_list * history;
+    t_list * tipos;
+} st_metrica_memoria;
 
 #endif //KERNEL_CONTRACTS_H

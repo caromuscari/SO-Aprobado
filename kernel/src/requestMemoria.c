@@ -55,27 +55,27 @@ int atenderResultadoSelect(st_messageResponse *mensaje) {
     switch (mensaje->cabezera.codigo) {
         case SUCCESS: {
             st_registro *registro = deserealizarRegistro(mensaje->buffer);
-            printf("********----resultado de consulta-------******\n");
-            printf("key [%d]\n", registro->key),
-                    printf("value [%s]\n", registro->value);
+            printf("[SELECT] key=[%d] value=[%s] \n",registro->key,registro->value);
             destroyRegistro(registro);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
-            resultado = SALIO_OK;
-            printf("no se pudo encontra ese select\n");
+            resultado = NO_HAY_RESULTADO_EN_SELECT;
+            printf("[SELECT] no se pudo encontra ese select\n");
             break;
         }
         default: {
-            printf("no entiendo el codigo de respuesta\n");
+            printf("[SELECT] no entiendo el codigo de respuesta\n");
         }
     }
     destroyStMessageResponse(mensaje);
     return resultado;
 }
 
-int atenderResultadoInsert(st_messageResponse *mensaje, st_memoria *datoMemoria, st_instruccion *laInstruccion) {
+int atenderResultadoInsert(st_messageResponse *mensaje,
+        st_memoria *datoMemoria,
+        st_instruccion *laInstruccion) {
     int resultado = NO_SALIO_OK;
     if (mensaje == NULL) {
         return SE_DESCONECTO_SOCKET;
@@ -89,12 +89,12 @@ int atenderResultadoInsert(st_messageResponse *mensaje, st_memoria *datoMemoria,
             break;
         }
         case SUCCESS: {
-            printf("se relizo el insert todo ok\n");
+            printf("[INSERT] se inserto correctamente\n");
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
-            printf("no se puedo relizar el insert\n");
+            printf("[INSERT] no se pudo realizer el insert\n");
             break;
         }
     }
@@ -109,13 +109,13 @@ int atenderResultadoSDrop(st_messageResponse *mensaje, char *nameTable) {
     }
     switch (mensaje->cabezera.codigo) {
         case SUCCESS: {
-            printf("se puedo eliminar la tabla sin problemas\n");
+            printf("[DROP] se puedo eliminar la tabla sin problemas\n");
             removeTablaByName(nameTable);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
-            printf("no se puedo eliminar la tabla\n");
+            printf("[DROP] no se puedo eliminar la tabla\n");
             break;
         }
 
@@ -131,7 +131,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
     }
     switch (mensaje->cabezera.codigo) {
         case SUCCESS: {
-            printf("se creo la tabla sin problemas\n");
+            printf("[CREATE] se creo la tabla sin problemas\n");
             st_metadata *newMetadata = malloc(sizeof(st_metadata));
             newMetadata->nameTable = strdup(_create->nameTable);
             newMetadata->consistency = strdup(_create->tipoConsistencia);
@@ -142,7 +142,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
             break;
         }
         case NOSUCCESS: {
-            printf("no se pudo crear la tabla\n");
+            printf("[CREATE] no se pudo crear la tabla\n");
             break;
         }
 
@@ -160,19 +160,17 @@ int atenderResultadoDescribe(st_messageResponse *mensaje) {
         case SUCCESS: {
             size_t size;
             st_metadata *metadata = deserealizarMetaData(mensaje->buffer, &size);
-            printf("********----resultado de Describe -------******\n");
-            printf("nameTable [%s]\n", metadata->nameTable),
-            printf("Consistencia [%s]\n", metadata->consistency);
+            printf("[DESCRIBE] tabla = [%s]; Consistencia = [%s] \n",metadata->nameTable,metadata->consistency);
             addNuevaTabla(metadata);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
-            printf("no hay respuesta para esta tabla\n");
+            printf("[DESCRIBE] no hay respuesta para esta tabla\n");
             break;
         }
         default: {
-            printf("no entiendo el codigo de respuesta\n");
+            printf("[DESCRIBE] no entiendo el codigo de respuesta\n");
         }
     }
     destroyStMessageResponse(mensaje);
@@ -191,20 +189,18 @@ int atenderResultadoDescribeGlobal(st_messageResponse *mensaje) {
             t_list * listMetadata = deserealizarListaMetaData(mensaje->buffer, mensaje->cabezera.sizeData);
             for (i = 0; i < listMetadata->elements_count; ++i) {
                 metadata = list_get(listMetadata, i);
-                printf("********----resultado de Describe -------******\n");
-                printf("nameTable [%s]\n", metadata->nameTable),
-                printf("Consistencia [%s]\n", metadata->consistency);
+                printf("[DESCRIBE GLOBAL] tabla = [%s]; Consistencia = [%s] \n",metadata->nameTable,metadata->consistency);
             }
             updateListaMetadata(listMetadata);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
-            printf("no hay respuesta para describe global \n");
+            printf("DESCRIBE GLOBAL] no hay respuesta para describe global \n");
             break;
         }
         default: {
-            printf("no entiendo el codigo de respuesta\n");
+            printf("DESCRIBE GLOBAL] no entiendo el codigo de respuesta\n");
         }
     }
     destroyStMessageResponse(mensaje);

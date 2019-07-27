@@ -17,7 +17,7 @@ void logStatusListaMemoria(){
         if(memoriaK->activo){
         	char * num = string_itoa(memoriaK->memoria->numero);
             log_info(file_log,"Numero = [%s]",num);
-            log_info(file_log,"Puerto [%s]", memoriaK->memoria->ip);
+            log_info(file_log,"Puerto [%s]", memoriaK->memoria->puerto);
             log_info(file_log,"IP [%s]",memoriaK->memoria->ip);
             free(num);
         }
@@ -28,8 +28,13 @@ void logStatusListaMemoria(){
 void destroyKernelMemoria(st_kernel_memoria * kernelMemoria){
     //clean tags
     list_iterate(kernelMemoria->tags, free);
+    list_destroy(kernelMemoria->tags);
     //clean tipos
     list_iterate(kernelMemoria->tipos, free);
+    list_destroy(kernelMemoria->tipos);
+    //clean hitory
+    list_iterate(kernelMemoria->history, free);
+    list_destroy(kernelMemoria->history);
     destroyMemoria(kernelMemoria->memoria);
     free(kernelMemoria);
 }
@@ -45,9 +50,8 @@ st_memoria * clonarMemoria(st_memoria * memoriaAclonar){
 void destroyPoolMemory(t_list * listaMemoria){//revisar
     int i;
     st_kernel_memoria * kernelMemoria;
-    //char * tag;
     for (i = 0; i < listaMemoria->elements_count ; ++i) {
-        kernelMemoria = list_remove(listaMemoria,i);
+        kernelMemoria = list_get(listaMemoria,i);
         destroyKernelMemoria(kernelMemoria);
     }
 }
@@ -86,6 +90,7 @@ t_list * clonarPool(){
             list_add(newKernelMemoria->tags,newCriterio);
         }
         //add item a la lista clonada
+        newKernelMemoria->history = list_create();
         list_add(poolClone,newKernelMemoria);
     }
     pthread_mutex_unlock(&mutex);
@@ -250,6 +255,7 @@ st_kernel_memoria *cargarNuevaKernelMemoria(st_memoria *data) {
     k_memoria->tipos = list_create();
     k_memoria->activo = true;
     k_memoria->tags = list_create();
+    k_memoria->history = list_create();
     k_memoria->memoria = memoria;
     k_memoria->count = 0;
 
@@ -319,7 +325,7 @@ void updateMemoria(st_kernel_memoria *kernelMemoria, st_memoria *stMemoria) {
 
 void updateListaMemorias(st_data_memoria *dataMemoria) {
     //crear la memoria que consulto
-    log_info(file_log,"[gossiping] Actulizando lista de memorias");
+    //log_info(file_log,"[gossiping] Actulizando lista de memorias");
     st_kernel_memoria *newKernelMemoria;
     st_memoria *stMemoria;
     pthread_mutex_lock(&mutex);
@@ -350,10 +356,8 @@ void updateListaMemorias(st_data_memoria *dataMemoria) {
             //update
             updateMemoria(newKernelMemoria, stMemoria);
         }
-        //destroyMemoria(stMemoria);
     }
     pthread_mutex_unlock(&mutex);
-    //logStatusListaMemoria();
 }
 
 void CleanListaMemoria() {
@@ -365,6 +369,60 @@ void CleanListaMemoria() {
         kernelMemoria->activo = false;
     }
     pthread_mutex_unlock(&mutex);
+}
+
+st_history_request * newHistory(enum OPERACION operacion, TypeCriterio criterio){
+    st_history_request * history = malloc(sizeof(st_history_request));
+    history->startTime = obtenerMilisegundosDeHoy();
+    history->operacion = operacion;
+    history->tipoCriterio = criterio;
+    return history;
+}
+
+void addHistory(st_history_request * historyRequest, int numeroMemoria){
+    log_info(file_log,"[historyMemoria] agregando historial en memoria [%d]",numeroMemoria);
+    pthread_mutex_lock(&mutex);
+    st_kernel_memoria * kernelMemoria = existeMemoria(poolMemoria,numeroMemoria);
+    if(kernelMemoria){
+        list_add(kernelMemoria->history,historyRequest);
+    }else{
+        log_info(file_log,"[historyMemoria] no se encontro la memoria %d", numeroMemoria);
+    }
+    pthread_mutex_unlock(&mutex);
+}
+
+t_list * getHistoryByRange(double start, double end){
+    int i,j;
+    st_kernel_memoria * kernelMemoria = NULL;
+    st_metrica_memoria * metricaMemoria = NULL;
+    st_history_request * historyRequest = NULL;
+    t_list * listaMemoriaHistory = list_create();
+    TypeCriterio * criterio = NULL;
+    TypeCriterio * newCriterio = NULL;
+    pthread_mutex_lock(&mutex);
+    for (i = 0; i < poolMemoria->elements_count ; ++i) {
+        kernelMemoria = list_get(poolMemoria, i);
+        metricaMemoria = malloc(sizeof(st_metrica_memoria));
+        metricaMemoria->numeroMemoria = kernelMemoria->memoria->numero;
+        metricaMemoria->history = list_create();
+        metricaMemoria->tipos = list_create();
+        //copiar tipos
+        for (j = 0; j < kernelMemoria->tipos->elements_count; ++j) {
+            criterio = list_get(kernelMemoria->tipos,j);
+            newCriterio = malloc(sizeof(TypeCriterio));
+            *newCriterio = *criterio;
+            list_add(metricaMemoria->tipos,newCriterio);
+        }
+        for (j = 0; j < kernelMemoria->history->elements_count ; ++j) {
+            historyRequest = list_get(kernelMemoria->history,j);
+            if(historyRequest->startTime >= start && historyRequest->endTime <= end){
+                list_add(metricaMemoria->history,historyRequest);
+            }
+        }
+        list_add(listaMemoriaHistory,metricaMemoria);
+    }
+    pthread_mutex_unlock(&mutex);
+    return listaMemoriaHistory;
 }
 
 int journalMemoria(st_memoria * memoria){

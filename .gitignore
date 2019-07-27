@@ -70,3 +70,4 @@ logS
 .settings/
 .cproject
 FileSystem/FileSystem
+*.log

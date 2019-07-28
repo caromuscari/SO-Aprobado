@@ -37,7 +37,8 @@ void atenderMensaje(int * fdClient){
     if (paqueteDeRespuesta == NULL) {
         log_error(file_log, "Fallo la conexion con el kernel");
         close(*fdClient);
-        pthread_exit(NULL);
+        free(fdClient);
+        //pthread_exit(NULL);
     }
     switch (request.codigo) {
     	case INSERT: {

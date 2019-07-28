@@ -3,6 +3,7 @@
 extern t_list* listaDeMarcos;
 extern t_list* listaDeSegmentos;
 extern pthread_mutex_t mutexListaMarcos, mutexListaSeg;
+extern t_log *file_log;
 
 
 /*void mostrarPaginasCargadas(){
@@ -41,6 +42,7 @@ st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 
 int buscarMarcoLibre(){
 	st_marco* marco;
+	log_info(file_log, "Buscando marco libre");
 	pthread_mutex_lock(&mutexListaMarcos);
 	for(int i = 0; i < listaDeMarcos->elements_count; i++){
 		marco = list_get(listaDeMarcos, i);
@@ -54,9 +56,9 @@ int buscarMarcoLibre(){
 }
 
 int algoritmoLRU(){
-	pthread_mutex_lock(&mutexListaSeg);
+	//pthread_mutex_lock(&mutexListaSeg);
 	st_tablaDePaginas* paginaAReemplazar = list_fold(listaDeSegmentos, listaDeSegmentos->head->data, (void*)paginaConMenorTiempoPorSegmento);
-	pthread_mutex_unlock(&mutexListaSeg);
+	//pthread_mutex_unlock(&mutexListaSeg);
 	if(paginaAReemplazar){
         return paginaAReemplazar->nroDePagina;
 	}else{

@@ -28,7 +28,7 @@ void makeCommand(char *command) {
                     printf("Se realizo correctamente el Insert\n");
                 }
             } else {
-                printf("Verifique los parametros\n");
+                printf("Verificar datos\n");
                 log_error(file_log, "No se pudo cargar el comando Insert");
             }
             if (insert) {
@@ -50,6 +50,7 @@ void makeCommand(char *command) {
                 }
                 destoySelect(select);
             } else {
+            	printf("Verificar datos\n");
                 log_error(file_log, "Error en datos de Select");
             }
 
@@ -66,7 +67,10 @@ void makeCommand(char *command) {
 
                 }
                 destroyCreate(create);
-            } else log_info(file_log, "Error en datos de Create");
+            } else {
+            	printf("Verificar datos\n");
+            	log_info(file_log, "Error en datos de Create");
+            }
 
             break;
         case DROP:
@@ -85,7 +89,10 @@ void makeCommand(char *command) {
 			      printf("No se pudo relizar el drop\n");
                 }
                 destroyDrop(drop);
-            } else log_error(file_log, "Error en datos de DROP");
+            } else {
+            	printf("Verificar datos\n");
+            	log_error(file_log, "Error en datos de DROP");
+            }
 
             break;
         case DESCRIBE: {
@@ -131,9 +138,12 @@ void makeCommand(char *command) {
             log_info(file_log, "Ejecutando Journal");
             comandoJournal();
             break;
-        case EXIT:
+        case EXIT:{
+        	return;
             break;
+        }
         default: {
+        	printf("Verificar datos\n");
             log_info(file_log, "No se reconoce el comando");
         }
     }

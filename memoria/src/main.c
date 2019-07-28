@@ -2,6 +2,7 @@
 #include <funcionesCompartidas/log.h>
 #include "console.h"
 #include <commons/collections/list.h>
+#include <commons/string.h>
 #include <pthread.h>
 #include "segmentacionPaginada.h"
 #include "configuracionMemoria.h"
@@ -73,15 +74,19 @@ void liberarConfig(t_configuracionMemoria * config){
 
 int inicializar(char *pathConfig){
     int i;
-    file_log = crear_archivo_log("Memoria", false, "./logMemoria");
-    log_info(file_log, "Cargando el archivo de configuracion");
     configMemoria = leerConfiguracion(pathConfig);
+    char* nombreLog = strdup("./logMemoria");
+    string_append(&nombreLog, string_itoa(configMemoria->NRO_MEMORIA));
+    file_log = crear_archivo_log("Memoria", false, nombreLog);
+    log_info(file_log, "Archivo de configuracion cargado");
     if (!configMemoria) {
         log_error(file_log, "No se pudo cargar el archivo de configuracion");
         log_destroy(file_log);
         return -1;
     }
     if(!buscarValueMaximo()){
+    	printf("No me pude conectar al FileSystem\n");
+    	log_info(file_log, "No me pude conectar al FileSystem");
         return -1;
     }
     log_info(file_log, "Inicializando Memoria");

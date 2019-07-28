@@ -1,11 +1,9 @@
 #include "configuracionMemoria.h"
 
-extern t_log *file_log;
-
 t_configuracionMemoria * leerConfiguracion(char* path){
     t_config *bufferConfig = config_create(path);
     if (!bufferConfig) {
-        log_error(file_log," ");
+    	printf("No se pudo abrir el archivo de configuracion \n ");
         return NULL;
     }
     t_configuracionMemoria *configuracion = malloc(sizeof(t_configuracionMemoria));

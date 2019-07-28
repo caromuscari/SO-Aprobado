@@ -41,6 +41,7 @@ int comandoInsert(st_insert* comandoInsert){
 		log_info(file_log, "No se encontro la pagina con esa Key");
 		int posMarcoLibre = buscarMarcoLibre();
 		if(posMarcoLibre == -1){
+			log_info(file_log, "Memoria full");
 			pthread_mutex_unlock(&mutexListaSeg);
             return FULLMEMORY;
 		}
@@ -72,7 +73,7 @@ int comandoInsert(st_insert* comandoInsert){
         sleep(configMemoria->RETARDO_MEM/1000);
 		return OK;
 	}
-	pthread_mutex_unlock(&mutexListaSeg);
+
 	log_info(file_log, "No se encontro el segmento de esa tabla");
 	//creo el segmento
 	st_segmento* segmentoNuevo= malloc(sizeof(st_segmento));
@@ -82,8 +83,11 @@ int comandoInsert(st_insert* comandoInsert){
 
 	int posMarcoLibre = buscarMarcoLibre();
 	if(posMarcoLibre == -1){
+		log_info(file_log, "Memoria full");
+		pthread_mutex_unlock(&mutexListaSeg);
         return FULLMEMORY;
 	}
+	pthread_mutex_unlock(&mutexListaSeg);
 	//creo la pagina
 	pthread_mutex_lock(&mutexMemPrinc);
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
@@ -139,7 +143,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 			memcpy(&registro->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
 			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), tamanioValue);
 
-			printf("%s \n", registro->value);
+			printf("El value es [%s] (tengo segmento y pag) \n", registro->value);
             pthread_mutex_unlock(&mutexMemPrinc);
             sleep(configMemoria->RETARDO_MEM/1000);
 			return registro;
@@ -151,9 +155,9 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		if(registro == NULL){
 			return NULL;
 		}
-        //pthread_mutex_lock(&mutexListaMarcos);
+        pthread_mutex_lock(&mutexListaSeg);
 		int posMarcoLibre = buscarMarcoLibre();
-        //pthread_mutex_unlock(&mutexListaMarcos);
+        pthread_mutex_unlock(&mutexListaSeg);
 		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 
 		pthread_mutex_lock(&mutexMemPrinc);
@@ -180,7 +184,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		pthread_mutex_unlock(&mutexListaMarcos);
         sleep(configMemoria->RETARDO_MEM/1000);
 
-        printf("el value es %s\n", registro->value);
+        printf("El value es [%s] (tengo el seg, pido a file)\n", registro->value);
 
 		return registro;
 	}
@@ -195,9 +199,9 @@ st_registro* comandoSelect(st_select* comandoSelect){
 
 	segmentoNuevo->nombreTabla = strdup(comandoSelect->nameTable);
 	segmentoNuevo->tablaDePaginas = list_create();
-    //pthread_mutex_lock(&mutexListaMarcos);
+    pthread_mutex_lock(&mutexListaSeg);
 	int posMarcoLibre = buscarMarcoLibre();
-	//pthread_mutex_unlock(&mutexListaMarcos);
+	pthread_mutex_unlock(&mutexListaSeg);
 	//creo la pagina
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
     pthread_mutex_lock(&mutexMemPrinc);
@@ -229,7 +233,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
     pthread_mutex_unlock(&mutexListaMarcos);
     sleep(configMemoria->RETARDO_MEM/1000);
 
-    printf("el value es %s\n", registro->value);
+    printf("El value es [%s] (no tengo nada, pido a file)\n", registro->value);
 
 	return registro;
 }
@@ -243,32 +247,24 @@ bool enviarSegmentoAFS(st_segmento* segmento){
             st_marco *marco = list_get(listaDeMarcos, pagina->nroDePagina);
 
             st_insert *insert = malloc(sizeof(st_insert));
-            //insert->value = malloc(pagina->desplazamiento);
+            insert->value = malloc(tamanioValue);
 
             pthread_mutex_lock(&mutexMemPrinc);
             memcpy(&insert->timestamp, pagina->pagina, sizeof(double));
             memcpy(&insert->key, pagina->pagina + sizeof(double), sizeof(uint16_t));
+        	memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), tamanioValue);
+
             pthread_mutex_unlock(&mutexMemPrinc);
 
-            st_select* comandoSelec = malloc(sizeof(st_select));
-            comandoSelec->nameTable = strdup(segmento->nombreTabla);
-            comandoSelec->key = insert->key;
-            comandoSelec->operacion= SELECT;
-            st_registro* elSelect = comandoSelect(comandoSelec);
-
-
-            insert->value = strdup(elSelect->value);
-            //memcpy(insert->value, pagina->pagina + sizeof(double) + sizeof(uint16_t), pagina->desplazamiento);
             insert->operacion = INSERT;
             insert->nameTable = strdup(segmento->nombreTabla);
-            destoySelect(comandoSelec);
 
             if(mandarInsert(insert) == 5){
                 //BORRO DE MEMORIA
                 marco->condicion = LIBRE;
                 free(pagina);
             }else{
-             log_error(file_log, string_from_format("El Filesystem rechazó el registro \nTabla:%s | Key:%d | Value:%s", insert->nameTable, insert->key, insert->value));
+             log_error(file_log, string_from_format("El Filesystem rechazó el registro \nTabla:%s | Key:%d | Value:%s \n", insert->nameTable, insert->key, insert->value));
              huboError = true;
             }
             pthread_mutex_unlock(&mutexListaMarcos);

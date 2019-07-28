@@ -530,7 +530,6 @@ void *loadPoolMemori() {
         pthread_exit(NULL);
     }
     while (1) {
-        CleanListaMemoria();
         buffer = strdup("1");
         log_info(file_log_poolMemoria,"[gossiping] Haciendo Gossiping");
         respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA,BUSCARTABLAGOSSIPING,buffer,1);

@@ -118,7 +118,7 @@ void destroyListaMetaData(t_list *lista_metadata) {
     st_metadata *metadata;
     int i;
     for (i = 0; i < lista_metadata->elements_count; ++i) {
-        metadata = list_remove(lista_metadata, i);
+        metadata = list_get(lista_metadata, i);
         destroyMetaData(metadata);
     }
     list_destroy(lista_metadata);

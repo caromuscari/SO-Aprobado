@@ -128,6 +128,7 @@ void ejecutarScript() {
                     historyRequest->endTime = obtenerMilisegundosDeHoy() + configuracion->SLEEP_EJECUCION;
                     addHistory(historyRequest,datomemoria->numero);
                 }
+                destroyMemoria(datomemoria);
             } else {
                 printf("[Planificador] No hay memoria disponible\n");
                 resultado = MEMORIA_NO_DISPONIBLE;

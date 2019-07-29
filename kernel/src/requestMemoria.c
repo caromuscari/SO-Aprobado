@@ -294,6 +294,5 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
         eliminarMemoria(datoMemoria->numero);
     }
     free(buffer);
-    destroyMemoria(datoMemoria);
     return resultado;
 }

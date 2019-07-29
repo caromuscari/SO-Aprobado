@@ -11,6 +11,7 @@ t_configuracionMemoria * leerConfiguracion(char* path){
     configuracion->TIEMPO_GOSSIPING = atoi(config_get_string_value(bufferConfig, "TIEMPO_GOSSIPING"));
     //Hay una funcion para ints
     configuracion->NRO_MEMORIA = atoi(config_get_string_value(bufferConfig, "NRO_MEMORIA"));
+    configuracion->IP_MEMORIA = strdup(config_get_string_value(bufferConfig, "IP_MEMORIA"));
     configuracion->IP_FS = strdup(config_get_string_value(bufferConfig, "IP_FS"));
     configuracion->PUERTO_FS = strdup(config_get_string_value(bufferConfig, "PUERTO_FS"));
     configuracion->RETARDO_FS = atoi(config_get_string_value(bufferConfig, "RETARDO_FS"));

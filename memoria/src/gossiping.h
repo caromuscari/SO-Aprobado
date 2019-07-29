@@ -14,5 +14,6 @@
 
 void *devolverListaMemoria(size_t *size_paquetes);
 void *pthreadGossping();
+void actualizarListaMemorias(st_data_memoria * dataMemoria);
 
 #endif //MEMORIA_GOSSIPING_H

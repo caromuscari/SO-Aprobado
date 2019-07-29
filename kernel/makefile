@@ -1,2 +1,2 @@
 compiler:
-	gcc -o "kernel" ./src/*.c -lreadline -lcommons -lcompartidas -lpthread
+	gcc -o "kernel.o" ./src/*.c -lreadline -lcommons -lcompartidas -lpthread

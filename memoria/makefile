@@ -1,2 +1,2 @@
 compiler: 
-	gcc -o "Memoria" ./src/*.c -lpthread -lcommons -lcompartidas -lreadline
+	gcc -o "Memoria.o" ./src/*.c -lpthread -lcommons -lcompartidas -lreadline

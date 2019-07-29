@@ -6,27 +6,6 @@ extern t_configuracionMemoria * configMemoria;
 #include <funcionesCompartidas/API.h>
 #include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/list.h>
-//
-//void cargarLista(t_list *listaMetaData) {
-//    st_metadata *metadata = malloc(sizeof(st_metadata));
-//    metadata->nameTable = strdup("TABLA_A");
-//    metadata->consistency = strdup("SC");
-//    metadata->partitions = 4;
-//    metadata->compaction_time = 5000;
-//    list_add(listaMetaData, metadata);
-//    metadata = malloc(sizeof(st_metadata));
-//    metadata->nameTable = strdup("TABLA_B");
-//    metadata->consistency = strdup("EC");
-//    metadata->partitions = 3;
-//    metadata->compaction_time = 6000;
-//    list_add(listaMetaData, metadata);
-//    metadata = malloc(sizeof(st_metadata));
-//    metadata->nameTable = strdup("TABLA_C");
-//    metadata->consistency = strdup("SHC");
-//    metadata->partitions = 5;
-//    metadata->compaction_time = 10000;
-//    list_add(listaMetaData, metadata);
-//}
 
 void atenderMensaje(int * fdClient){
     int control = 0;
@@ -141,13 +120,6 @@ void atenderMensaje(int * fdClient){
     	case DESCRIBEGLOBAL:{
     		st_messageResponse* respuesta;
     		printf("El comando es un Describe Global\n");
-    		//mock
-//            t_list *listametadata = list_create();
-//            cargarLista(listametadata);
-//    		size_t size;
-//            buffer = serealizarListaMetaData(listametadata, &size);
-//            enviarRespuesta(SUCCESS, buffer, *fdClient, &control, size);
-
     		respuesta = mandarDescribeGlobal();
     		if(respuesta){
     			if(respuesta->cabezera.codigo == 13){
@@ -166,6 +138,10 @@ void atenderMensaje(int * fdClient){
     		break;
     	}
         case BUSCARTABLAGOSSIPING: {
+            st_data_memoria * dataMemoria = deserealizarMemoria(paqueteDeRespuesta, request.sizeData);
+            actualizarListaMemorias(dataMemoria);
+            list_destroy(dataMemoria->listaMemorias);
+            free(dataMemoria);
             void *paqueteLista = devolverListaMemoria(&sizePaqueteRes);
             enviarRespuesta(SUCCESS,paqueteLista,*fdClient,&control,sizePaqueteRes);
             log_info(file_log,"Realizando gossiping");

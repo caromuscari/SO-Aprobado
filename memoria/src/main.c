@@ -8,7 +8,6 @@
 #include "configuracionMemoria.h"
 #include "socketServer.h"
 #include <funcionesCompartidas/funcionesNET.h>
-#include "comandos.h"
 #include "journal.h"
 
 t_log *file_log;
@@ -75,8 +74,9 @@ void liberarConfig(t_configuracionMemoria * config){
 int inicializar(char *pathConfig){
     int i;
     configMemoria = leerConfiguracion(pathConfig);
-    char* nombreLog = strdup("./logMemoria");
+    char* nombreLog = strdup("./logMemoria-");
     string_append(&nombreLog, string_itoa(configMemoria->NRO_MEMORIA));
+    string_append(&nombreLog, ".log");
     file_log = crear_archivo_log("Memoria", false, nombreLog);
     log_info(file_log, "Archivo de configuracion cargado");
     if (!configMemoria) {

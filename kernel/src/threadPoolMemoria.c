@@ -374,25 +374,10 @@ void updateMemoria(st_kernel_memoria *kernelMemoria, st_memoria *stMemoria) {
 
 void updateListaMemorias(st_data_memoria *dataMemoria) {
     //crear la memoria que consulto
-    //log_info(file_log,"[gossiping] Actulizando lista de memorias");
+    log_info(file_log_poolMemoria,"[gossiping] Actulizando lista de memorias");
     st_kernel_memoria *newKernelMemoria;
     st_memoria *stMemoria;
     pthread_mutex_lock(&mutex);
-    newKernelMemoria = existeMemoria(poolMemoria,dataMemoria->numero);
-    if (newKernelMemoria == NULL) {
-        //agregar
-        stMemoria = malloc(sizeof(st_memoria));
-        stMemoria->numero = dataMemoria->numero;
-        stMemoria->puerto = strdup(configuracion->PUERTO_MEMORIA);
-        stMemoria->ip = strdup(configuracion->IP_MEMORIA);
-        newKernelMemoria = cargarNuevaKernelMemoria(stMemoria);
-        agregarMemoria(newKernelMemoria);
-        destroyMemoria(stMemoria);
-    } else {
-        //update
-        newKernelMemoria->memoria->numero = dataMemoria->numero;
-        newKernelMemoria->activo = true;
-    }
     int i;
     for (i = 0; i < dataMemoria->listaMemorias->elements_count; ++i) {
         stMemoria = list_get(dataMemoria->listaMemorias, i);
@@ -405,17 +390,6 @@ void updateListaMemorias(st_data_memoria *dataMemoria) {
             //update
             updateMemoria(newKernelMemoria, stMemoria);
         }
-    }
-    pthread_mutex_unlock(&mutex);
-}
-
-void CleanListaMemoria() {
-    int i;
-    st_kernel_memoria *kernelMemoria;
-    pthread_mutex_lock(&mutex);
-    for (i = 0; i < poolMemoria->elements_count; ++i) {
-        kernelMemoria = list_get(poolMemoria, i);
-        kernelMemoria->activo = false;
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -519,6 +493,18 @@ void hacerJournal(){
     destroyPoolMemory(listaMemoria);
 }
 
+void *devolverListaMemoria(size_t *size_paquetes) {
+    st_data_memoria *memoria = malloc(sizeof(st_data_memoria));
+    memoria->numero = -1;
+    memoria->listaMemorias = list_create();
+    pthread_mutex_lock(&mutex);
+    void * buffer = serealizarMemoria(memoria, size_paquetes);
+    pthread_mutex_unlock(&mutex);
+    list_destroy(memoria->listaMemorias);
+    free(memoria);
+    return buffer;
+}
+
 void *loadPoolMemori() {
     //conectarse con la memoria y pelirle la lista
     poolMemoria = list_create();
@@ -530,9 +516,10 @@ void *loadPoolMemori() {
         pthread_exit(NULL);
     }
     while (1) {
-        buffer = strdup("1");
+        size_t  size;
+        buffer = devolverListaMemoria(&size);
         log_info(file_log_poolMemoria,"[gossiping] Haciendo Gossiping");
-        respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA,BUSCARTABLAGOSSIPING,buffer,1);
+        respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA,BUSCARTABLAGOSSIPING,buffer,size);
         if(respuestaMesanje){
             switch (respuestaMesanje->cabezera.codigo){
                 case SUCCESS:{

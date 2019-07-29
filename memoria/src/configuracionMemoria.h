@@ -18,6 +18,7 @@
 
 typedef struct{
 	char* PUERTO;
+	char* IP_MEMORIA;
 	char* IP_FS;
 	char* PUERTO_FS;
 	t_list* IP_SEEDS;

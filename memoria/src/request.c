@@ -236,6 +236,7 @@ int mandarInsert(st_insert * insert){
     free(buffer);
 
     if(controlador != 0){
+    	printf("No se pudo enviar el mensaje al File System\n");
         log_error(file_log, "No se pudo enviar el mensaje al File System");
         return -1;
     }
@@ -243,6 +244,7 @@ int mandarInsert(st_insert * insert){
     buffer = getMessage(fdFileSystem,&head2,&controlador);
     if(controlador < 0){
     	free(buffer);
+    	printf("No se pudo recibir el mensaje\n");
         log_error(file_log, "No se pudo recibir el mensaje");
         return -1;
     }

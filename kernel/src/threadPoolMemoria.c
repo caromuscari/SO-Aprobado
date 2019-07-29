@@ -189,7 +189,7 @@ st_memoria * getMemoriaSC(char *text) {
                 posicion = i;
                 flagFirst = false;
             } else {
-                if (memoria->count < countMinimo) {
+                if (memoria->countSC < countMinimo) {
                     countMinimo = memoria->countSC;
                     posicion = i;
                 }
@@ -221,7 +221,7 @@ st_memoria * getMemoriaEventual(){
                 mini = memoria->countEC;
                 flagFisrt = false;
             }else{
-                if(memoria->count < mini){
+                if(memoria->countEC < mini){
                     pos = i;
                     mini = memoria->countEC;
                 }

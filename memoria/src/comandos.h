@@ -15,10 +15,9 @@
 #include "pthread.h"
 
 void inicializarSemaforos();
-st_registro* comandoSelect(st_select* comandoSelect);
+st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado);
 
 int comandoInsert(st_insert* comandoInsert);
-st_registro* comandoSelect(st_select* comandoSelect);
 int comandoJournal();
 int removerSegmentoPorNombrePagina(char* nombreTabla);
 

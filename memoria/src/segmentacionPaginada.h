@@ -52,7 +52,7 @@ int buscarMarcoLibre();
 
 int algoritmoLRU();
 
-st_tablaDePaginas* paginaConMenorTiempoPorSegmento(st_segmento * stSegmento);
+bool tieneFlagEnCero(st_tablaDePaginas* pag);
 
 st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tablaDePaginas* paginaAComparar);
 

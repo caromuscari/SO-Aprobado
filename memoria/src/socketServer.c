@@ -46,15 +46,26 @@ void atenderMensaje(int * fdClient){
         case SELECT: {
             st_select * select = deserealizarSelect(paqueteDeRespuesta);
             printf("El comando es un Select\n");
+            enum_resultados resultado = NOOK;
 
-            st_registro* registro = comandoSelect(select);
-            if(registro){
-            	buffer = serealizarRegistro(registro, &sizePaqueteRes);
-            	enviarRespuesta(SUCCESS, buffer, *fdClient, &control, sizePaqueteRes);
-            } else {
-            	buffer = strdup("1");
-            	 enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
-            }
+            st_registro* registro = comandoSelect(select, &resultado);
+            switch (resultado){
+				case OK:{
+					buffer = serealizarRegistro(registro, &sizePaqueteRes);
+					enviarRespuesta(SUCCESS, buffer, *fdClient, &control, sizePaqueteRes);
+					break;
+				}
+				case NOOK:{
+					buffer = strdup("1");
+					enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
+					break;
+				}
+				case FULLMEMORY: {
+					buffer = strdup("1");
+					enviarRespuesta(MEMORIAFULL, buffer, *fdClient, &control, strlen(buffer));
+					break;
+				}
+			}
             destoySelect(select);
             free(buffer);
             break;

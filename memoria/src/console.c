@@ -21,8 +21,10 @@ void makeCommand(char *command) {
                     printf("El value es mayor al tamaño maximo\n");
                 }
                 if (codigoInsert == FULLMEMORY) {
-                    printf("No hay espacio en las paginas\n");
+                    printf("No hay espacio en las paginas, realizando Journal\n");
                     log_error(file_log, "No hay espacio en las paginas");
+                    comandoJournal();
+                    printf("Journal terminado, realice el Insert nuevamente\n");
                 }
                 if (codigoInsert == OK) {
                     printf("Se realizo correctamente el Insert\n");
@@ -38,16 +40,29 @@ void makeCommand(char *command) {
         case SELECT:
             log_info(file_log, "Ejecutando Select");
             st_select *select;
+            enum_resultados resultado = NOOK;
             st_registro *registro;
             if ((select = cargarSelect(command))) {
-                registro = comandoSelect(select);
-                if (registro) {
-                    printf("value [%s]\n", registro->value);
-                    destroyRegistro(registro);
-                } else {
-                    printf("No hay resultados para este select\n");
-                    log_info(file_log, "No hay resultados para este select");
+                registro = comandoSelect(select, &resultado);
+                switch (resultado){
+                	case OK:{
+                		printf("value [%s]\n", registro->value);
+                		destroyRegistro(registro);
+                		break;
+                	}
+                	case NOOK:{
+                		printf("No hay resultados para este select\n");
+                		log_info(file_log, "No hay resultados para este select");
+                		break;
+                	}
+                	case FULLMEMORY: {
+                		printf("Memoria llena, realizando Journal \n");
+                		comandoJournal();
+                		printf("Journal terminado, realice el Select nuevamente\n");
+                		break;
+                	}
                 }
+
                 destoySelect(select);
             } else {
             	printf("Verificar datos\n");

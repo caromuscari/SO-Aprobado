@@ -41,7 +41,7 @@ int comandoInsert(st_insert* comandoInsert){
 		log_info(file_log, "No se encontro la pagina con esa Key");
 		int posMarcoLibre = buscarMarcoLibre();
 		if(posMarcoLibre == -1){
-			log_info(file_log, "Memoria full");
+			log_info(file_log, "Memoria full por insert");
 			pthread_mutex_unlock(&mutexListaSeg);
             return FULLMEMORY;
 		}
@@ -83,7 +83,7 @@ int comandoInsert(st_insert* comandoInsert){
 
 	int posMarcoLibre = buscarMarcoLibre();
 	if(posMarcoLibre == -1){
-		log_info(file_log, "Memoria full");
+		log_info(file_log, "Memoria full insert");
 		pthread_mutex_unlock(&mutexListaSeg);
         return FULLMEMORY;
 	}
@@ -123,7 +123,7 @@ int comandoInsert(st_insert* comandoInsert){
 }
 
 // COMANDO SELECT
-st_registro* comandoSelect(st_select* comandoSelect){
+st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado){
 	st_segmento* segmentoEncontrado;
 	st_registro* registro;
     pthread_mutex_lock(&mutexListaSeg);
@@ -146,6 +146,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 			printf("El value es [%s] (tengo segmento y pag) \n", registro->value);
             pthread_mutex_unlock(&mutexMemPrinc);
             sleep(configMemoria->RETARDO_MEM/1000);
+            *resultado = OK;
 			return registro;
 		}
 		log_info(file_log, "No se encontro la pagina con esa Key");
@@ -153,11 +154,19 @@ st_registro* comandoSelect(st_select* comandoSelect){
 		registro = obtenerSelect(comandoSelect);
 
 		if(registro == NULL){
+			*resultado = NOOK;
 			return NULL;
 		}
         pthread_mutex_lock(&mutexListaSeg);
 		int posMarcoLibre = buscarMarcoLibre();
         pthread_mutex_unlock(&mutexListaSeg);
+
+    	if(posMarcoLibre == -1){
+    		log_info(file_log, "Memoria full por Select");
+    		*resultado = FULLMEMORY;
+            return NULL;
+    	}
+
 		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 
 		pthread_mutex_lock(&mutexMemPrinc);
@@ -186,12 +195,14 @@ st_registro* comandoSelect(st_select* comandoSelect){
 
         printf("El value es [%s] (tengo el seg, pido a file)\n", registro->value);
 
+        *resultado = OK;
 		return registro;
 	}
 	log_info(file_log, "No se encontro el segmento de la tabla pedida por Select");
 	registro = obtenerSelect(comandoSelect);
 
 	if(registro == NULL){
+		*resultado = NOOK;
 		return NULL;
 	}
 
@@ -202,6 +213,14 @@ st_registro* comandoSelect(st_select* comandoSelect){
     pthread_mutex_lock(&mutexListaSeg);
 	int posMarcoLibre = buscarMarcoLibre();
 	pthread_mutex_unlock(&mutexListaSeg);
+
+	if(posMarcoLibre == -1){
+		log_info(file_log, "Memoria full por Select");
+		pthread_mutex_unlock(&mutexListaSeg);
+		*resultado = FULLMEMORY;
+        return NULL;
+	}
+
 	//creo la pagina
 	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
     pthread_mutex_lock(&mutexMemPrinc);
@@ -235,6 +254,7 @@ st_registro* comandoSelect(st_select* comandoSelect){
 
     printf("El value es [%s] (no tengo nada, pido a file)\n", registro->value);
 
+    *resultado = OK;
 	return registro;
 }
 

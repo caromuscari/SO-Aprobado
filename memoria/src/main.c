@@ -47,14 +47,16 @@ bool buscarValueMaximo(){
 
     log_info(file_log,"Esperando respuesta del valor maximo");
     header response;
-    void * paqueteDeRespuesta = getMessage(fdFileSystem,&response,&control);
+    char * paqueteDeRespuesta = getMessage(fdFileSystem,&response,&control);
     if(paqueteDeRespuesta == NULL){
         log_error(file_log,"Error al recibir la respuesta");
         return  false;
     }
+    char* intermedia = strdup(paqueteDeRespuesta);
     //verificar como enviar el mensaje
-    tamanioValue = atoi(paqueteDeRespuesta);
+    tamanioValue = atoi(intermedia);
 
+    free(intermedia);
     free(paqueteDeRespuesta);
     printf("Tamanio del value: %d\n",tamanioValue);
     return true;
@@ -132,8 +134,8 @@ int main(int argc, char *argv[]){
         return -1;
     }
     log_info(file_log, "La memoria se inicio correctamente");
-    pthread_create(&journal, NULL, hiloJournal, NULL);
-    pthread_detach(journal);
+    //pthread_create(&journal, NULL, hiloJournal, NULL);
+    //pthread_detach(journal);
     pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);
     pthread_create(&gossiping, NULL,pthreadGossping, NULL);

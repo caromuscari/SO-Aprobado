@@ -2,7 +2,7 @@
 
 extern t_list* listaDeMarcos;
 extern t_list* listaDeSegmentos;
-extern pthread_mutex_t mutexListaMarcos, mutexListaSeg;
+extern pthread_mutex_t mutexListaMarcos;
 extern t_log *file_log;
 
 
@@ -48,34 +48,37 @@ int buscarMarcoLibre(){
 		marco = list_get(listaDeMarcos, i);
 		if(marco->condicion == LIBRE){
 			pthread_mutex_unlock(&mutexListaMarcos);
+			log_info(file_log, "Retornando marco libre %d", i);
 			return i;
 		}
 	} pthread_mutex_unlock(&mutexListaMarcos);
+	log_info(file_log, "No se encontro marco libre");
 	int posMarcoLibre = algoritmoLRU(); //encuentro el marco de la pagina que puedo reemplazar porque se uso hace mas tiempo
 	return posMarcoLibre;
 }
 
 int algoritmoLRU(){
-	//pthread_mutex_lock(&mutexListaSeg);
-	st_tablaDePaginas* paginaAReemplazar = list_fold(listaDeSegmentos, listaDeSegmentos->head->data, (void*)paginaConMenorTiempoPorSegmento);
-	//pthread_mutex_unlock(&mutexListaSeg);
-	if(paginaAReemplazar){
-        return paginaAReemplazar->nroDePagina;
+	log_info(file_log, "Iniciando LRU, size listaSegmento %d", listaDeSegmentos->elements_count);
+	t_list* paginasConFlagEnCero = list_create();
+	for(int i = 0; i < listaDeSegmentos->elements_count; i++){
+		st_segmento* segmento = list_get(listaDeSegmentos, i);
+		t_list * pagsAUnir = list_filter(segmento->tablaDePaginas, (void*)tieneFlagEnCero);
+		list_add_all(paginasConFlagEnCero, pagsAUnir);
+		list_destroy(pagsAUnir);
+	}
+	if(!list_is_empty(paginasConFlagEnCero)){
+		st_tablaDePaginas* paginaAReemplazar = list_fold(paginasConFlagEnCero, paginasConFlagEnCero->head->data, (void*)paginaConMenorTiempo);
+		list_destroy(paginasConFlagEnCero);
+		return paginaAReemplazar->nroDePagina;
+
 	}else{
+		log_info(file_log, "No se encontro pagina a reemplazar MEMORIA LLENA");
         return -1;
 	}
 }
 
-st_tablaDePaginas* paginaConMenorTiempoPorSegmento(st_segmento * stSegmento){
-	bool tieneFlagEnCero(st_tablaDePaginas* pagina){
-		return 0 == pagina->flagModificado;
-	}
-	t_list* listaPaginasConFlagEnCero = list_filter(stSegmento->tablaDePaginas, (void*)tieneFlagEnCero);
-
-	if(!list_is_empty(listaPaginasConFlagEnCero)){
-        return list_fold(listaPaginasConFlagEnCero, listaPaginasConFlagEnCero->head->data, (void*)paginaConMenorTiempo);
-	}
-    return NULL;
+bool tieneFlagEnCero(st_tablaDePaginas* pag){
+	return 0 == pag->flagModificado;
 }
 
 st_tablaDePaginas* paginaConMenorTiempo(st_tablaDePaginas* paginaSemilla, st_tablaDePaginas* paginaAComparar){

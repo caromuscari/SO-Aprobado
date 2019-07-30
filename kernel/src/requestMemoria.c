@@ -47,7 +47,9 @@ st_messageResponse *consultarAMemoria(char *ip, char *puerto, int codigo, void *
     return messageResponse;
 }
 
-int atenderResultadoSelect(st_messageResponse *mensaje) {
+int atenderResultadoSelect(st_messageResponse *mensaje,
+        st_memoria *datoMemoria,
+        st_instruccion *laInstruccion) {
     int resultado = NO_SALIO_OK;
     log_info(file_log,"[Request] Evaluando respuesta de SELECT");
     if (mensaje == NULL) {
@@ -55,6 +57,15 @@ int atenderResultadoSelect(st_messageResponse *mensaje) {
         return SE_DESCONECTO_SOCKET;
     }
     switch (mensaje->cabezera.codigo) {
+        case MEMORIAFULL: {
+            log_info(file_log,"[Request] Full memoria haciendo journal");
+            resultado = journalMemoria(datoMemoria);
+            log_info(file_log,"[Request] Evaluando resultado de journal");
+            if (resultado == SALIO_OK) {
+                return enviarRequestMemoria(laInstruccion, datoMemoria);
+            }
+            break;
+        }
         case SUCCESS: {
             st_registro *registro = deserealizarRegistro(mensaje->buffer);
             printf("[SELECT] key=[%d] value=[%s] \n",registro->key,registro->value);
@@ -233,7 +244,8 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
             log_info(file_log,"[Request] Enviando mensaje solicitando SELECT Memoria[%d]",datoMemoria->numero);
             resultado = atenderResultadoSelect(
                     consultarAMemoria(
-                            datoMemoria->ip, datoMemoria->puerto, SELECT, buffer, size_buffer));
+                            datoMemoria->ip, datoMemoria->puerto, SELECT, buffer, size_buffer),
+                            datoMemoria,laInstruccion);
             break;
         }
         case INSERT: {

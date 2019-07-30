@@ -8,6 +8,8 @@
 #include "threadPoolMemoria.h"
 #include "contracts.h"
 #include <funcionesCompartidas/API.h>
+#include <funcionesCompartidas/log.h>
 
-void calcularMetricas();
+void calcularMetricas(bool printConsole);
+void pthreadLogMetricas();
 #endif //KERNEL_METRICAS_H

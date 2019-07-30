@@ -22,7 +22,7 @@ int cantPaginas;
 int tamanioValue;
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
-pthread_mutex_t mutexListaSeg, mutexListaMarcos, mutexMemPrinc, mutex, mutexSeeds;
+pthread_mutex_t mutexMemPrinc, mutex, mutexSeeds;
 
 bool buscarValueMaximo(){
     int control = 0;
@@ -103,9 +103,7 @@ int inicializar(char *pathConfig){
         marco->timestamp = 0;
         list_add(listaDeMarcos, marco);
     }
-    pthread_mutex_init(&mutexListaMarcos, NULL);
     pthread_mutex_init(&mutexMemPrinc, NULL);
-    pthread_mutex_init(&mutexListaSeg, NULL);
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutexSeeds, NULL);
     return 0;
@@ -134,8 +132,8 @@ int main(int argc, char *argv[]){
         return -1;
     }
     log_info(file_log, "La memoria se inicio correctamente");
-    //pthread_create(&journal, NULL, hiloJournal, NULL);
-    //pthread_detach(journal);
+    pthread_create(&journal, NULL, hiloJournal, NULL);
+    pthread_detach(journal);
     pthread_create(&server, NULL,start_server, NULL);
     pthread_detach(server);
     pthread_create(&gossiping, NULL,pthreadGossping, NULL);

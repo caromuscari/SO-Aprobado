@@ -97,7 +97,10 @@ void atenderMensaje(int * fdClient){
             respuesta = mandarDrop(drop);
             buffer = strdup("1");
 
-            if(respuesta == 9) enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
+            if(respuesta == 9){
+            	enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
+            	removerSegmentoPorNombrePagina(drop->nameTable);
+            }
             else enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
 
             destroyDrop(drop);

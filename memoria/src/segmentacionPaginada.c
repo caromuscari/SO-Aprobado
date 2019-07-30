@@ -2,7 +2,6 @@
 
 extern t_list* listaDeMarcos;
 extern t_list* listaDeSegmentos;
-extern pthread_mutex_t mutexListaMarcos;
 extern t_log *file_log;
 
 
@@ -43,15 +42,13 @@ st_tablaDePaginas* buscarPaginaPorKey(t_list* tablaDePaginas, uint16_t key){
 int buscarMarcoLibre(){
 	st_marco* marco;
 	log_info(file_log, "Buscando marco libre");
-	pthread_mutex_lock(&mutexListaMarcos);
 	for(int i = 0; i < listaDeMarcos->elements_count; i++){
 		marco = list_get(listaDeMarcos, i);
 		if(marco->condicion == LIBRE){
-			pthread_mutex_unlock(&mutexListaMarcos);
 			log_info(file_log, "Retornando marco libre %d", i);
 			return i;
 		}
-	} pthread_mutex_unlock(&mutexListaMarcos);
+	}
 	log_info(file_log, "No se encontro marco libre");
 	int posMarcoLibre = algoritmoLRU(); //encuentro el marco de la pagina que puedo reemplazar porque se uso hace mas tiempo
 	return posMarcoLibre;

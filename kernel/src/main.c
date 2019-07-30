@@ -7,6 +7,7 @@
 #include "threadPlanificador.h"
 #include <commons/collections/list.h>
 #include <pthread.h>
+#include "metricas.h"
 
 
 t_log *file_log;
@@ -14,6 +15,8 @@ config *configuracion;
 pthread_t plafinifcador;
 pthread_t pthreadMemoria;
 pthread_t pthreadMetadata;
+pthread_t pthreadMetricas;
+
 
 
 int inicializar(char *pathConfig) {
@@ -38,10 +41,13 @@ int main(int argc, char **argv) {
     pthread_detach(pthreadMemoria);
     pthread_create(&pthreadMetadata, NULL, (void*)schedulerMetadata, NULL);
     pthread_detach(pthreadMetadata);
+    pthread_create(&pthreadMetricas, NULL, (void*)pthreadLogMetricas, NULL);
+    pthread_detach(pthreadMetricas);
     consola();
     pthread_cancel(plafinifcador);
     pthread_cancel(pthreadMemoria);
     pthread_cancel(pthreadMetadata);
+    pthread_cancel(pthreadMetricas);
     free(configuracion->IP_MEMORIA);
     free(configuracion->PUERTO_MEMORIA);
     free(configuracion);

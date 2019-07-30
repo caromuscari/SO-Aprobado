@@ -3,6 +3,7 @@
 //
 
 #include "metricas.h"
+extern t_log *file_log;
 
 t_list * getHistoryByCriterio(t_list * listHistory, TypeCriterio criterio){
     t_list * listMemoria = list_create();
@@ -64,27 +65,44 @@ void destroyMetricaMemoria(st_metrica_memoria * metricaMemoria){
     free(metricaMemoria);
 }
 
-void calcularMetricas(){
+void calcularMetricas(bool printConsole){
     double now = obtenerMilisegundosDeHoy();
     int i,j,k;
     st_metrica_memoria * metricaMemoria = NULL;
     TypeCriterio * criterio;
     enum OPERACION arrayOperacion[] = {INSERT,SELECT};
     t_list * listaMemorias = getHistoryByRange((now-30000),now);
-    printf("Memoria -- Type -- Operacion -- promedio -- total \n");
+    double promerio = 0;
+    int total = 0;
+    if(printConsole){
+        printf("Memoria -- Type -- Operacion -- promedio -- total \n");
+    }
+    log_info(file_log,"Memoria -- Type -- Operacion -- promedio -- total");
     for (i = 0; i < listaMemorias->elements_count ; ++i) {
         metricaMemoria = list_get(listaMemorias,i);
         for (k = 0; k < 2 ; ++k) {
             for (j = 0; j < metricaMemoria->tipos->elements_count; ++j) {
-                printf("   %d   ",metricaMemoria->numeroMemoria);
                 criterio = list_get(metricaMemoria->tipos, j);
-                printf("     %s   ", getTipoCriterioBYEnum(*criterio));
-                printf("   %s   ", getOperacionBYEnum(arrayOperacion[k]));
-                printf("     %.2f   ",promedioBYOperation(metricaMemoria->history,*criterio,arrayOperacion[k]));
-                printf("     %d   \n", getTotalBYOperacion(metricaMemoria->history,*criterio,arrayOperacion[k]));
+                promerio = promedioBYOperation(metricaMemoria->history,*criterio,arrayOperacion[k]);
+                total = getTotalBYOperacion(metricaMemoria->history,*criterio,arrayOperacion[k]);
+                if(printConsole){
+                    printf("   %d   ",metricaMemoria->numeroMemoria);
+                    printf("     %s   ", getTipoCriterioBYEnum(*criterio));
+                    printf("   %s   ", getOperacionBYEnum(arrayOperacion[k]));
+                    printf("     %.2f   ", promerio);
+                    printf("     %d   \n", total);
+                }
+                log_info(file_log,"   %d        %s      %s        %.2f        %d   ",metricaMemoria->numeroMemoria,getTipoCriterioBYEnum(*criterio),getOperacionBYEnum(arrayOperacion[k]),promerio,total);
             }
         }
         destroyMetricaMemoria(metricaMemoria);
     }
     list_destroy(listaMemorias);
+}
+
+void pthreadLogMetricas(){
+    while (1){
+        calcularMetricas(false);
+        sleep(30);
+    }
 }

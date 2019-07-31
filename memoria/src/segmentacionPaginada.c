@@ -4,25 +4,6 @@ extern t_list* listaDeMarcos;
 extern t_list* listaDeSegmentos;
 extern t_log *file_log;
 
-
-/*void mostrarPaginasCargadas(){
-    int i,offset = 0;
-    uint16_t key;
-    double timeStamp;
-    char * value = malloc(tamanioValue);
-    for (i = 0; i < cantPaginas; ++i) {
-        offset = tamanioTotalDePagina * i;
-        memcpy(&timeStamp, (memoriaPrincipal + offset), sizeof(double));
-        memcpy(&key,(memoriaPrincipal + offset + sizeof(double)), sizeof(uint16_t));
-        memcpy(value,(memoriaPrincipal + offset + sizeof(double) + sizeof(uint16_t)), tamanioValue);
-        printf("pagina [%d]-------\n",i);
-        printf("%f\n",timeStamp);
-        printf("%d\n",key);
-        printf("%s\n",value);
-    }
-    free(value);
-}*/
-
 st_segmento* buscarSegmentoPorNombreTabla(char* nombreTabla){
 	bool mismoNombreTabla(st_segmento* segmento){
 		return 0 == strcmp(segmento->nombreTabla, nombreTabla);

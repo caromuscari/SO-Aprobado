@@ -118,10 +118,10 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
 	segmentoEncontrado = buscarSegmentoPorNombreTabla(comandoSelect->nameTable);//devuelve el segmento con ese nombre de tabla
 
 	if(segmentoEncontrado){
-		log_info(file_log, "Segmento encontrado por comando Select");
+		log_info(file_log, "[proces Select] Segmento encontrado");
 		st_tablaDePaginas* paginaDeTablaEncontrada = buscarPaginaPorKey(segmentoEncontrado->tablaDePaginas, comandoSelect->key);
 		if(paginaDeTablaEncontrada){
-			log_info(file_log, "Pagina encontrada por comando Select");
+			log_info(file_log, "[proces Select] Se Encontro Pagina");
 			registro = malloc(sizeof(st_registro));
             registro->value = malloc(tamanioValue);
 			st_marco* marco = list_get(listaDeMarcos, paginaDeTablaEncontrada->nroDePagina);
@@ -129,32 +129,31 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
 			memcpy(&registro->timestamp, paginaDeTablaEncontrada->pagina, sizeof(double));
 			memcpy(&registro->key, paginaDeTablaEncontrada->pagina+sizeof(double), sizeof(uint16_t));
 			memcpy(registro->value, paginaDeTablaEncontrada->pagina+sizeof(double)+sizeof(uint16_t), tamanioValue);
-
-			printf("El value es [%s] (tengo segmento y pag) \n", registro->value);
-            sleep(configMemoria->RETARDO_MEM/1000);
+			sleep(configMemoria->RETARDO_MEM/1000);
             *resultado = OK;
             pthread_mutex_unlock(&mutexMemPrinc);
 			return registro;
 		}
-		log_info(file_log, "No se encontro la pagina con esa Key");
-
+        log_info(file_log, "[proces Select] No se Encontro Pagina");
+        log_info(file_log, "[proces Select] Buscar dato al FileSystem");
 		registro = obtenerSelect(comandoSelect);
-
 		if(registro == NULL){
-			*resultado = NOOK;
+            log_info(file_log, "[proces Select] No se encontro dato en el FileSystem");
+            *resultado = NOOK;
 			pthread_mutex_unlock(&mutexMemPrinc);
 			return NULL;
 		}
+        log_info(file_log, "[proces Select] Buscando Disponibilidad en la memoria");
 		int posMarcoLibre = buscarMarcoLibre();
 
     	if(posMarcoLibre == -1){
-    		log_info(file_log, "Memoria full por Select");
+    		log_info(file_log, "[proces Select] Memoria full");
     		*resultado = FULLMEMORY;
     		pthread_mutex_unlock(&mutexMemPrinc);
             return NULL;
     	}
-
-		void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
+        log_info(file_log, "[proces Select] Cargando Nueva Pagina");
+        void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 
 		memcpy(paginaLibre, &registro->timestamp, sizeof(double));
 		memcpy(paginaLibre + sizeof(double), &registro->key, sizeof(uint16_t));
@@ -168,44 +167,43 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
 		paginaDeTabla->pagina = paginaLibre;
 		//paginaDeTabla->desplazamiento = string_length(registro->value);
 		paginaDeTabla->flagModificado = 0;
-
+        log_info(file_log, "[proces Select] Agregando la nueva pagina al segmento");
 		list_add(segmentoEncontrado->tablaDePaginas, paginaDeTabla);
 
 		st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 		marco->condicion = OCUPADO;
 		marco->timestamp = obtenerMilisegundosDeHoy();
         sleep(configMemoria->RETARDO_MEM/1000);
-
-        printf("El value es [%s] (tengo el seg, pido a file)\n", registro->value);
-
         *resultado = OK;
         pthread_mutex_unlock(&mutexMemPrinc);
 		return registro;
 	}
-	log_info(file_log, "No se encontro el segmento de la tabla pedida por Select");
-	registro = obtenerSelect(comandoSelect);
+    log_info(file_log, "[proces Select] Segmento no encontrado");
+    log_info(file_log, "[proces Select] Buscando Disponibilidad en la memoria");
+    registro = obtenerSelect(comandoSelect);
 
 	if(registro == NULL){
-		*resultado = NOOK;
+        log_info(file_log, "[proces Select] No se encontro dato en el FileSystem");
+        *resultado = NOOK;
 		pthread_mutex_unlock(&mutexMemPrinc);
 		return NULL;
 	}
 
-	st_segmento* segmentoNuevo= malloc(sizeof(st_segmento));
-
+    log_info(file_log, "[proces Select] Buscando Disponibilidad en la memoria");
+    int posMarcoLibre = buscarMarcoLibre();
+    if(posMarcoLibre == -1){
+        log_info(file_log, "[proces Select] Memoria Full");
+        *resultado = FULLMEMORY;
+        pthread_mutex_unlock(&mutexMemPrinc);
+        return NULL;
+    }
+    log_info(file_log, "[proces Select] Creando Nuevo segmento");
+    st_segmento* segmentoNuevo= malloc(sizeof(st_segmento));
 	segmentoNuevo->nombreTabla = strdup(comandoSelect->nameTable);
 	segmentoNuevo->tablaDePaginas = list_create();
-	int posMarcoLibre = buscarMarcoLibre();
 
-	if(posMarcoLibre == -1){
-		log_info(file_log, "Memoria full por Select");
-		*resultado = FULLMEMORY;
-		pthread_mutex_unlock(&mutexMemPrinc);
-        return NULL;
-	}
-
-	//creo la pagina
-	void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
+    log_info(file_log, "[proces Select] Cargando Nueva Pagina");
+    void* paginaLibre = memoriaPrincipal + (posMarcoLibre * (sizeof(double) + sizeof(uint16_t) + tamanioValue));
 	memcpy(paginaLibre, &registro->timestamp, sizeof(double));
 	memcpy(paginaLibre + sizeof(double), &registro->key, sizeof(uint16_t));
 
@@ -219,18 +217,15 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
     //paginaDeTabla->desplazamiento = string_length(registro->value);
 	paginaDeTabla->flagModificado = 0;
 
-	list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
-	//agrego el segmento a la lista de segmentos en el ultimo lugar
-	segmentoNuevo->nroSegmento = list_size(listaDeSegmentos);
+    log_info(file_log, "[proces Select] Agregando la nueva pagina al segmento");
+    list_add(segmentoNuevo->tablaDePaginas, paginaDeTabla);
+    log_info(file_log, "[proces Select] Agregando la nueva segmento a la lista de segmentos");
+    segmentoNuevo->nroSegmento = list_size(listaDeSegmentos);
 	list_add_in_index(listaDeSegmentos, segmentoNuevo->nroSegmento, segmentoNuevo);
-
 	st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
 	marco->condicion = OCUPADO;
 	marco->timestamp = obtenerMilisegundosDeHoy();
     sleep(configMemoria->RETARDO_MEM/1000);
-
-    printf("El value es [%s] (no tengo nada, pido a file)\n", registro->value);
-
     *resultado = OK;
     pthread_mutex_unlock(&mutexMemPrinc);
 	return registro;
@@ -284,7 +279,7 @@ int comandoJournal(){
 	bool resultado = true;
 	st_segmento * segmento;
 
-	pthread_mutex_unlock(&mutexMemPrinc);
+    pthread_mutex_lock(&mutexMemPrinc);
 	for (int i = 0; i < list_size(listaDeSegmentos); i++){
     	segmento = list_get(listaDeSegmentos, i);
     	if(!enviarSegmentoAFS(segmento)){

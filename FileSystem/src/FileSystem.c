@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
 	if(!(metadata ==-1 || bitm ==-1)){
 
-		tablas = listarDirectorio();
+		/*tablas =*/ listarDirectorio();
 
         pthread_create(&hiloInotify, NULL, (void*)hiloinotify,argv[1]);
 		pthread_create(&hiloSelect, NULL, (void*)hiloselect,NULL);

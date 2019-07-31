@@ -103,7 +103,7 @@ void* hiloconsola(){
 
 				if(create != NULL){
 					respuesta = realizarCreate(create);
-					actualizar_bitmap();
+					//actualizar_bitmap();
 					mostrarRespuesta(respuesta);
 
 					destroyCreate(create);
@@ -120,7 +120,7 @@ void* hiloconsola(){
 
 				if(drop != NULL){
 					respuesta = realizarDrop(drop);
-					actualizar_bitmap();
+					//actualizar_bitmap();
 					mostrarRespuesta(respuesta);
 
 					destroyDrop(drop);
@@ -143,8 +143,9 @@ void* hiloconsola(){
 					mostrarRespuesta(respuesta);
 					if(respuesta == 13){
 						list_iterate(lista,(void*)mostrarTabla);
-						list_destroy(lista);
-					}else list_destroy(lista);
+						destroyListaMetaData(lista);
+						//list_destroy(lista);
+					}
 
 				}else{
 					respuesta = realizarDescribe(describe,&meta);
@@ -234,8 +235,8 @@ void mostrarRespuesta(int respuesta){
 			printf("No se pudo realizar el Insert\n");
 			break;
 		case 12:
-			log_error(alog, "No se pudo realizar la request");
-			printf("No se pudo realizar la request\n");
+			log_error(alog, "No se encontraron tablas");
+			printf("No se encontraron tablas\n");
 			break;
 		case 13:
 			log_info(alog, "Describe de tablas encontradas");

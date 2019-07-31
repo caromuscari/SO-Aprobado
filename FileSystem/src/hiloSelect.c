@@ -69,7 +69,7 @@ void * hiloselect(){
 
 				char * value = string_itoa(getValue());
 
-				enviarRespuesta(0,value, nuevo_socket, &controlador, string_length(value));
+				enviarRespuesta(0,value, nuevo_socket, &controlador, string_length(value)+1);
 
 				free(value);
 

@@ -24,6 +24,8 @@ void* hilodump();
 void crearTemporal(char * key, st_tabla* data);
 char* armarStrLista(char *strLista, structRegistro *registro);
 char* buscarNombreProximoTemporal(char* nombreTabla);
+void limpiarMemtable(st_tabla * tabla);
+void limpiarLista(structRegistro * reg);
 
 
 #endif /* SRC_HILODUMP_H_ */

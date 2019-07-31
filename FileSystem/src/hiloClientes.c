@@ -77,7 +77,7 @@ void tratarCliente(cliente_t * cliente){
 					reg = cargarRegistro(registro);
 					free(buffer);
 					buffer = serealizarRegistro(reg,&size);
-				}else size = 0;
+				}else size = 1;
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
 				destoySelect(selectt);
@@ -94,7 +94,7 @@ void tratarCliente(cliente_t * cliente){
 				create = deserealizarCreate(recibido->buffer);
 
 				respuesta = realizarCreate(create);
-				actualizar_bitmap();
+				//actualizar_bitmap();
 
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
 
@@ -108,7 +108,7 @@ void tratarCliente(cliente_t * cliente){
 				drop = deserealizarDrop(recibido->buffer);
 
 				respuesta = realizarDrop(drop);
-				actualizar_bitmap();
+				//actualizar_bitmap();
 
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
 
@@ -127,7 +127,7 @@ void tratarCliente(cliente_t * cliente){
 				if(respuesta == 15){
 					free(buffer);
 					buffer = serealizarMetaData(meta, &size);
-				}else size = 0;
+				}else size = 1;
 
 				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
@@ -143,7 +143,7 @@ void tratarCliente(cliente_t * cliente){
 
 				if(respuesta == 13){
 					free(buffer);
-					mostrarTabla(list_get(lista,0));
+					//mostrarTabla(list_get(lista,0));
 					buffer = serealizarListaMetaData(lista,&size);
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
 					destroyListaMetaData(lista);

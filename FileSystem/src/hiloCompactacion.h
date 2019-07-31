@@ -10,6 +10,8 @@
 
 
 void hilocompactacion();
+void limpiarList(t_list * list);
+void limpiarReg(structRegistro * reg);
 void desbloquear(sem_t *semaforo);
 t_list * llenarTabla(char * path);
 void leerTemporal(char * path, t_dictionary * lista, int totalPart);

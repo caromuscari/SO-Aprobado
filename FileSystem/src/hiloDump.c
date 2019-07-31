@@ -12,7 +12,7 @@ extern t_dictionary *memtable;
 extern int tBloques;
 extern int loop;
 extern sem_t sMemtable;
-extern t_log* alog;
+//extern t_log* alog;
 
 void crearTemporal(char * key, st_tabla* data){
 	sem_wait(&data->semaforo);
@@ -22,7 +22,7 @@ void crearTemporal(char * key, st_tabla* data){
     t_list* bloques = crearArchivoTemporal(nombreArchivo, string_length(str) * 4);
 
 
-    int tamanioRestante = (int) string_length(str) * 4, iElem = 0;
+    int tamanioRestante = string_length(str) * 4, iElem = 0;
 
     if(bloques->elements_count > 0){
         //ITERAR POR EL TAMANIO Y PONER DATA
@@ -37,7 +37,9 @@ void crearTemporal(char * key, st_tabla* data){
 
             write_ptr = fopen(path,"w");
             char* strBloque = string_substring(str, iElem * caracteresPorString, caracteresPorString);
-            fwrite(strBloque,sizeof(strBloque),string_length(strBloque),write_ptr);
+            write(1, strBloque, strlen(strBloque)+1);
+            //fwrite(strBloque,sizeof(strBloque),string_length(strBloque),write_ptr);
+            fputs(strBloque, write_ptr);
             fclose(write_ptr);
 
             free(path);
@@ -56,11 +58,10 @@ void crearTemporal(char * key, st_tabla* data){
 	free(nombreArchivo);
 	list_destroy(bloques);
     sem_post(&data->semaforo);
-    free(dictionary_remove(memtable,key));
 }
 
 char* armarStrLista(char * strLista, structRegistro *registro){
-   string_append_with_format(&strLista, "%f;%d;%s\n", registro->time, registro->key, registro->value);
+   string_append_with_format(&strLista, "%.0f;%d;%s\n", registro->time, registro->key, registro->value);
    return strLista;
 }
 
@@ -83,9 +84,9 @@ void* hilodump(){
 
 	while(loop){
 		sleep(getDump());
-		//Hacer copia y ver si existe la tablas
 		sem_wait(&sMemtable);
 		dictionary_iterator(memtable,(void*)crearTemporal);
+		dictionary_clean_and_destroy_elements(memtable, (void*)limpiarMemtable);
 		sem_post(&sMemtable);
 
 	}
@@ -93,5 +94,15 @@ void* hilodump(){
 	pthread_exit(NULL);
 }
 
+void limpiarMemtable(st_tabla * tabla){
+	sem_destroy(&tabla->semaforo);
+	list_destroy_and_destroy_elements(tabla->lista, (void*)limpiarLista);
+	free(tabla);
+}
+
+void limpiarLista(structRegistro * reg){
+	free(reg->value);
+	free(reg);
+}
 
 

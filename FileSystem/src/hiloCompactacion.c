@@ -22,24 +22,27 @@
 
 extern int tBloques;
 extern t_log* alog;
-extern t_queue * nombre;
-extern sem_t sNombre;
+//extern t_queue * nombre;
+//extern sem_t sNombre;
 extern int loop;
 
-void hilocompactacion(){
+void hilocompactacion(char * table){
 
 	FILE* archivo;
 	int i = 1, valor;
-	sem_wait(&sNombre);
-	char * nomTabla = queue_pop(nombre);
-	sem_post(&sNombre);
+	//sem_wait(&sNombre);
+	//char * nomTabla = queue_pop(nombre);
+	//sem_post(&sNombre);
 	printf("Hilo compactacion\n");
-	printf("Nombre de tabla: %s\n", nomTabla);
+	printf("Nombre de tabla: %s\n", table);
+	//char * nomTabla = strdup(table);
 	char * pathTabla;
 	char * path, *new;
 	t_dictionary * lista;
-	st_tablaCompac * tabla = leerDeTablas(nomTabla);
+	st_tablaCompac * tabla = leerDeTablas(table);
 
+	free(table);
+	//free(nomTabla);
 
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
@@ -47,12 +50,15 @@ void hilocompactacion(){
 
 		sleep((tabla->meta->compaction_time)/1000);
 
-		pathTabla = armar_path(nomTabla);
+		printf("I=%d", i);
+
+		pathTabla = armar_path(tabla->meta->nameTable);
 
 		path = string_from_format("%s/%d.tmp", pathTabla, i);
 		archivo = fopen(path,"r");
 
 		while(archivo != NULL){
+			fclose(archivo);
 			new = string_from_format("%s/%d.tmpc", pathTabla, i);
 			rename(path, new);
 			free(new);
@@ -68,14 +74,16 @@ void hilocompactacion(){
 			lista = dictionary_create();
 			for(int j=0;j<tabla->meta->partitions;j++){
 				path = string_from_format("%s/%d.bin", pathTabla, j);
-				dictionary_put(lista,string_itoa(j),llenarTabla(path));
+				char * stpart = string_itoa(j);
+				dictionary_put(lista,stpart,llenarTabla(path));
 				free(path);
+				free(stpart);
 			}
 
 			for(int j=1;j<i;j++){
-				char * path = string_from_format("%s/%d.tmpc", pathTabla, j);
-				leerTemporal(path,lista, tabla->meta->partitions);
-				free(path);
+				char * path2 = string_from_format("%s/%d.tmpc", pathTabla, j);
+				leerTemporal(path2,lista, tabla->meta->partitions);
+				free(path2);
 			}
 
 			//Bloquear la tabla
@@ -90,7 +98,7 @@ void hilocompactacion(){
 			sem_wait(&tabla->compactacion);
 			if(tabla->contador != 0) sem_wait(&tabla->opcional);
 
-			eliminarTemporales(pathTabla);
+			eliminarTemporalesC(pathTabla);
 			for(int j=0;j<tabla->meta->partitions;j++){
 				eliminarParticion(pathTabla,j);
 				generarParticion(pathTabla,j,lista);
@@ -98,19 +106,35 @@ void hilocompactacion(){
 			//Desbloquear la tabla
 			log_info(alog, "Se desbloquea la compactacion");
 			sem_post(&tabla->compactacion);
-			/*list_iterate(tabla->sem, (void*)desbloquear);
-			list_clean(tabla->sem);*/
 
-			sem_getvalue(&tabla->opcional, &valor);
+			sem_getvalue(&tabla->compactacion, &valor);
+
+			log_info(alog, string_itoa(valor));
 			while(valor != 1){
 				sem_post(&tabla->compactacion);
+				sem_getvalue(&tabla->compactacion, &valor);
 			}
+
+			dictionary_destroy_and_destroy_elements(lista, (void*)limpiarList);
 		}
+
+		free(pathTabla);
+		i=1;
 	}
 
-	free(nomTabla);
+
 
 	pthread_exit(NULL);
+}
+
+void limpiarList(t_list * list){
+	list_iterate(list, (void*)limpiarReg);
+	list_destroy(list);
+}
+
+void limpiarReg(structRegistro * reg){
+	free(reg->value);
+	free(reg);
 }
 
 void desbloquear(sem_t *semaforo){
@@ -136,11 +160,11 @@ t_list * llenarTabla(char * path){
 		archivo = fopen(bloque,"r");
 		linea = malloc(sizeof(char) * tamBuffer);
 		while(getline(&linea, &tamBuffer, archivo) != -1){
-			//if(linea != NULL){
 
 			structRegistro * reg;
 			if(flag != NULL){
 				char * value = string_from_format("%s%s",flag,linea);
+				free(flag);
 				//string_append(&flag, linea);
 				split = string_split(value,";");
 				if(split[0] != NULL){
@@ -153,7 +177,7 @@ t_list * llenarTabla(char * path){
 
 						list_add(lista, reg);
 
-						free(flag);
+						//free(flag);
 						flag = NULL;
 					}else flag = strdup(value);
 				}else flag = strdup(value);
@@ -182,6 +206,7 @@ t_list * llenarTabla(char * path){
 			linea = malloc(sizeof(char) * tamBuffer);
 		}
 		i++;
+		free(linea);
 		fclose(archivo);
 		free(bloque);
 	}
@@ -209,14 +234,16 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 		while(getline(&linea, &tamBuffer, archivo) != -1){
 			if(flag != NULL){
 				char * value = string_from_format("%s%s",flag, linea);
-				//string_append(&flag, linea);
+				//free(flag);
 				split = string_split(value,";");
 				if(split[0] != NULL){
 					if(split[1] == NULL) flag = strdup(value);
 					else if(split[2] != NULL && string_contains(split[2], "\n")){
 
 						part = atoi(split[1]) % totalPart;
-						t_list * listPart = dictionary_get(lista,string_itoa(part));
+						char * stpart = string_itoa(part);
+						t_list * listPart = dictionary_get(lista,stpart);
+						free(stpart);
 
 						while(j<list_size(listPart)){
 							structRegistro * reg = list_get(listPart, j);
@@ -238,7 +265,7 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 
 							list_add(listPart,reg2);
 						}
-						free(flag);
+						//free(flag);
 					}else flag = strdup(value);
 				}else flag = strdup(value);
 
@@ -250,7 +277,9 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 					if(split[1] == NULL) flag = strdup(linea);
 					else if(split[2] != NULL && string_contains(split[2], "\n")){
 						part = atoi(split[1]) % totalPart;
-						t_list * listPart = dictionary_get(lista,string_itoa(part));
+						char * stpart = string_itoa(part);
+						t_list * listPart = dictionary_get(lista,stpart);
+						free(stpart);
 
 						while(j<list_size(listPart)){
 							structRegistro * reg = list_get(listPart, j);
@@ -303,15 +332,18 @@ void generarParticion(char * path, int part, t_dictionary * lista){
     FILE * archivo;
     int* bit, i=0,sizeRestante;
     char * contenido,* registro, * bloque;
-    t_list * listPart = dictionary_get(lista, string_itoa(part));
+    char * stpart = string_itoa(part);
+    t_list * listPart = dictionary_get(lista, stpart);
+    free(stpart);
     t_list * listBits = list_create();
 
     char* strParticion = strdup("");
     while(i<list_size(listPart)) {
         structRegistro *reg = list_remove(listPart, i);
-        registro = string_from_format("%f;%d;%s\n", reg->time, reg->key, reg->value);
+        registro = string_from_format("%.0f;%d;%s\n", reg->time, reg->key, reg->value);
         string_append(&strParticion, registro);
 
+        free(registro);
         free(reg->value);
         free(reg);
     }
@@ -319,48 +351,66 @@ void generarParticion(char * path, int part, t_dictionary * lista){
     sizeRestante = string_length(strParticion);
     int cantidadCaracteresPorString = tBloques/4;
     int huboError = 0;
-    while (sizeRestante > 0){
-        bit = malloc(sizeof(int));
-        *bit = verificar_bloque();
-        if(*bit != -1){
-            list_add(listBits, bit);
-        }else{
+    if(sizeRestante != 0){
+    	while (sizeRestante > 0){
+    		bit = malloc(sizeof(int));
+    		*bit = verificar_bloque();
+    		if(*bit != -1){
+    			list_add(listBits, bit);
+    		}else{
             huboError = 1;
-        }
-        sizeRestante -= cantidadCaracteresPorString;
-    }
+    		}
+    		sizeRestante -= cantidadCaracteresPorString;
+    	}
 
-    if(huboError == 0){
-        sizeRestante = string_length(strParticion);
-        char * stringBits = list_fold(listBits, strdup(""), (void*)armarStrBloques);
-        contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", string_length(strParticion)*4, stringBits);
-        archivo = fopen(pathPart, "a+");
-        fputs(contenido,archivo);
-        fclose(archivo);
-        free(contenido);
-        free(stringBits);
+    	if(huboError == 0){
+    		sizeRestante = string_length(strParticion);
+    		char * stringBits = list_fold(listBits, strdup(""), (void*)armarStrBloques);
+    		contenido = string_from_format("SIZE=%d\nBLOQUES=[%s]", string_length(strParticion)*4, stringBits);
+    		archivo = fopen(pathPart, "a+");
+    		fputs(contenido,archivo);
+    		fclose(archivo);
+    		free(contenido);
+    		free(stringBits);
 
-        int * siguienteBloque = list_get(listBits, 0);
-        int iBloque = 0;
-        while(sizeRestante > 0 && siguienteBloque != NULL){
-            char* strBloque = string_substring(strParticion, cantidadCaracteresPorString * iBloque, cantidadCaracteresPorString);
-            bloque = armar_PathBloque(string_itoa(*siguienteBloque));
-            archivo = fopen(bloque,"w");
-            fputs(strBloque, archivo);
-            fclose(archivo);
+    		int * siguienteBloque = list_get(listBits, 0);
+    		int iBloque = 0;
+    		while(sizeRestante > 0 && siguienteBloque != NULL){
+    			char* strBloque = string_substring(strParticion, cantidadCaracteresPorString * iBloque, cantidadCaracteresPorString);
+    			char * next = string_itoa(*siguienteBloque);
+    			bloque = armar_PathBloque(next);
+    			archivo = fopen(bloque,"w");
+    			fputs(strBloque, archivo);
+    			fclose(archivo);
             
-            sizeRestante -= cantidadCaracteresPorString;
-            free(strBloque);
-            iBloque++;
-            siguienteBloque = list_get(listBits, iBloque);
-        }
+    			free(next);
+    			free(bloque);
+
+    			sizeRestante -= cantidadCaracteresPorString;
+    			free(strBloque);
+    			iBloque++;
+    			siguienteBloque = list_get(listBits, iBloque);
+    		}
+    	}else{
+    		list_iterate(listBits, (void*)liberarBit);
+    	}
     }else{
-        list_iterate(listBits, (void*)liberarBit);
+    	int bit2 = verificar_bloque();
+    	char * stbit = string_itoa(bit2);
+    	contenido = string_from_format("SIZE=0\nBLOQUES=[%s]", stbit);
+    	free(stbit);
+
+   		archivo = fopen(pathPart, "a+");
+
+    	fputs(contenido,archivo);
+
+    	fclose(archivo);
+    	free(contenido);
     }
 
     free(strParticion);
     free(pathPart);
     list_iterate(listBits, free);
     list_destroy(listBits);
-    list_destroy(dictionary_remove(lista, string_itoa(part)));
+    //list_destroy(dictionary_remove(lista, string_itoa(part)));
 }

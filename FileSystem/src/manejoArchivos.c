@@ -24,8 +24,8 @@
 #include "Semaforos.h"
 
 extern t_dictionary * tablas;
-extern t_queue * nombre;
-extern sem_t sNombre, sTablas;
+//extern t_queue * nombre;
+extern sem_t /*sNombre,*/ sTablas;
 
 
 int realizarInsert(st_insert * insert){
@@ -161,13 +161,13 @@ int realizarCreate(st_create * create){
 			sem_init(&tabla->opcional,0,0);
 			tabla->contador = 0;
 
-			sem_wait(&sNombre);
-			queue_push(nombre, name);
-			sem_post(&sNombre);
+			//sem_wait(&sNombre);
+			//queue_push(nombre, name);
+			//sem_post(&sNombre);
 
-			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
-			pthread_detach(tabla->hilo);
 			agregarATablas(tabla,create->nameTable);
+			pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,name);
+			pthread_detach(tabla->hilo);
 
 			free(path);
 
@@ -218,6 +218,8 @@ int realizarDrop(st_drop * drop){
 		}
 
 		eliminarTemporales(path);
+
+		eliminarTemporalesC(path);
 
 		eliminarDirectorio(path);
 

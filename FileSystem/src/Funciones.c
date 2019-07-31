@@ -46,10 +46,11 @@ void inicializar(){
 	config = malloc(sizeof(structConfig));
 	magic_number = strdup("");
 	config->puerto = strdup("");
-	nombre = queue_create();
+	//nombre = queue_create();
 	loop = 1;
 	clientes = dictionary_create();
 	memtable = dictionary_create();
+	tablas = dictionary_create();
 	alog = crear_archivo_log("File System", true, "/home/utnso/File/log.txt");
 
 	sem_init(&sMemtable,0,1);
@@ -144,7 +145,10 @@ int abrir_bitmap()
 			free(file);
 		}
 
-		write(fdbitmap,"  ",tamBitmap);
+		ftruncate(fdbitmap, tamBitmap);
+		//char * escribe = malloc(tamBitmap);
+		//write(fdbitmap,escribe,tamBitmap);
+		//free(escribe);
 
 		bytes = (char *)mmap(0,tamBitmap,PROT_READ|PROT_WRITE,MAP_SHARED,fdbitmap,0);
 		if(bytes == MAP_FAILED){
@@ -181,7 +185,7 @@ int abrir_bitmap()
 
 	close(fdbitmap);
 
-	posicion = malloc(mystat.st_size);
+	//posicion = malloc(mystat.st_size);
 
 	log_info(alog, "Abre el bitmap");
 
@@ -208,20 +212,20 @@ void finalizar(){
 	sem_destroy(&sClientes);
 
 	if(bitm != -1){
-		memcpy(posicion,bitmap,mystat.st_size);
+		//memcpy(posicion,bitmap,mystat.st_size);
 		msync(posicion,mystat.st_size,MS_SYNC);
 		munmap(posicion,mystat.st_size);
 		bitarray_destroy(bitmap);
-		free(posicion);
+		//free(posicion);
 
-		queue_clean_and_destroy_elements(nombre, free);
+		//queue_clean_and_destroy_elements(nombre, free);
 
 		dictionary_clean_and_destroy_elements(tablas,(void*)liberarTablas);
 		dictionary_destroy(tablas);
 
-		dictionary_clean(clientes);
+		dictionary_clean_and_destroy_elements(clientes,(void*)free);
 
-		dictionary_clean(memtable);
+		dictionary_clean_and_destroy_elements(memtable, (void*)limpiarMem);
 	}
 
 	queue_destroy(nombre);
@@ -238,5 +242,10 @@ void liberarTablas(st_tablaCompac * tabla){
 	sem_destroy(&tabla->opcional);
 	//list_destroy(tabla->sem);
 	free(tabla);
+}
+
+void limpiarMem(st_tabla * tabla){
+	sem_destroy(&tabla->semaforo);
+	list_destroy_and_destroy_elements(tabla->lista, (void*)limpiarReg);
 }
 

@@ -65,7 +65,11 @@ char * buscarKey(char * name, int key, int particion){
 	}
 
 	free(path);
-	if(time != 0) return string_from_format("%f;%d;%s", time, key, value);
+	if(time != 0){
+		char * devolver = string_from_format("%.0f;%d;%s", time, key, value);
+		free(value);
+		return devolver;
+	}
 	else return NULL;
 }
 

@@ -24,8 +24,8 @@
 extern t_bitarray* bitmap;
 extern int cantBloques;
 extern int tBloques;
-extern t_queue * nombre;
-extern sem_t sBitmap, sNombre;
+//extern t_queue * nombre;
+extern sem_t sBitmap;//, sNombre;
 
 extern char* posicion;
 extern struct stat mystat;
@@ -143,7 +143,9 @@ int crearParticiones(st_create * c, char * path){
 				flag = i;
 
 			}else{
-				contenido = string_from_format("SIZE=0\nBLOQUES=[%d]", bit);
+				char * stbit = string_itoa(bit);
+				contenido = string_from_format("SIZE=0\nBLOQUES=[%s]", stbit);
+				free(stbit);
 
 				completo = string_from_format("%s/%d.bin", path, i);
 				archivo = fopen(completo, "a+");
@@ -161,6 +163,42 @@ int crearParticiones(st_create * c, char * path){
 }
 
 void eliminarTemporales(char * path){
+	FILE * archivo;
+	structParticion * contenido;
+	int i = 0, j=1;
+	char * temp = string_from_format("%s/%d.tmp",path,j);
+
+	archivo = fopen(temp, "r");
+
+	while(archivo != NULL){
+		fclose(archivo);
+
+		contenido = leerParticion(temp);
+		while(contenido->bloques[i] != NULL)
+		{
+			sem_wait(&sBitmap);
+			bitarray_clean_bit(bitmap,atoi(contenido->bloques[i]));
+			sem_post(&sBitmap);
+			i++;
+		}
+		remove(temp);
+
+		free(temp);
+		string_iterate_lines(contenido->bloques, (void*)free);
+		free(contenido->bloques);
+		free(contenido);
+
+
+		j++;
+		i=0;
+		temp = string_from_format("%s/%d.tmp",path,j);
+		archivo = fopen(temp, "r");
+	}
+
+	free(temp);
+}
+
+void eliminarTemporalesC(char * path){
 	FILE * archivo;
 	structParticion * contenido;
 	int i = 0, j=1;
@@ -274,15 +312,15 @@ void actualizar_size(char * path,int size){
 	config_destroy(configuracion);
 }
 
-t_dictionary * listarDirectorio(){
+/*t_dictionary **/void listarDirectorio(){
 	DIR *d;
 	struct dirent *dir;
-	t_dictionary * tablas;
+	//t_dictionary * tablas;
 	char * nombreTabla = string_from_format("%s/Tables", getMontaje());
     d = opendir(nombreTabla);
     if (d)
     {
-    	tablas = dictionary_create();
+    	//tablas = dictionary_create();
         while ((dir = readdir(d)) != NULL)
         {
         	char * name = strdup(dir->d_name);
@@ -297,11 +335,12 @@ t_dictionary * listarDirectorio(){
         		//tabla->sem = list_create();
 
         		char * table = strdup(name);
-        		sem_wait(&sNombre);
-        		queue_push(nombre, table);
-        		sem_post(&sNombre);
-        		dictionary_put(tablas, name, tabla);
-        		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,NULL);
+        		//sem_wait(&sNombre);
+        		//queue_push(nombre, table);
+        		//sem_post(&sNombre);
+        		//dictionary_put(tablas, table, tabla);
+        		agregarATablas(tabla,table);
+        		pthread_create(&tabla->hilo, NULL, (void*)hilocompactacion,table);
         		pthread_detach(tabla->hilo);
 
         	}
@@ -312,7 +351,7 @@ t_dictionary * listarDirectorio(){
     }
     free(nombreTabla);
 
-    return tablas;
+    //return tablas;
 }
 
 structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
@@ -334,6 +373,7 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 		linea = malloc(sizeof(char) * tamBuffer);
 		getline(&linea, &tamBuffer, fbloque);
 		value = string_from_format("%s%s", *exep, linea);
+		//free(*exep);
 
 		split = string_split(value,";");
 		if(split[0] != NULL){
@@ -346,7 +386,7 @@ structRegistro * leerBloque(char* bloque, uint16_t key, char ** exep){
 					reg->value = strdup(strtok(split[2], "\n"));
 
 					flag = 1;
-					free(*exep);
+					//free(*exep);
 				}
 			}else *exep = strdup(value);
 		}else if(!string_is_empty(value)){

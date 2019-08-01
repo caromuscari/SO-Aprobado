@@ -22,7 +22,7 @@ int cantPaginas;
 int tamanioValue;
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
-pthread_mutex_t mutexMemPrinc, mutex, mutexSeeds;
+pthread_mutex_t mutexMemPrinc, mutex, mutexSeeds, mutexConfig;
 
 bool buscarValueMaximo(){
     int control = 0;
@@ -106,6 +106,7 @@ int inicializar(char *pathConfig){
     pthread_mutex_init(&mutexMemPrinc, NULL);
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutexSeeds, NULL);
+    pthread_mutex_init(&mutexConfig, NULL);
     return 0;
 }
 

@@ -282,6 +282,7 @@ int comandoJournal(){
     }
     log_info(file_log, "[proceso Journal]Finalizando el Journal");
     pthread_mutex_unlock(&mutexMemPrinc);
+    list_destroy(list_clone_segmento);
     return OK;
 }
 

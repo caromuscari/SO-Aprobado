@@ -20,5 +20,4 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
 int comandoInsert(st_insert* comandoInsert);
 int comandoJournal();
 int removerSegmentoPorNombrePagina(char* nombreTabla);
-
 #endif /* SRC_COMANDOS_H_ */

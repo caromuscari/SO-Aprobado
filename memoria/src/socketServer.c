@@ -99,7 +99,7 @@ void atenderMensaje(int * fdClient){
 
             if(respuesta == 9){
             	enviarRespuesta(SUCCESS, buffer, *fdClient, &control, strlen(buffer));
-            	removerSegmentoPorNombrePagina(drop->nameTable);
+                removerSegmentoPorNombrePagina(drop->nameTable);
             }
             else enviarRespuesta(NOSUCCESS, buffer, *fdClient, &control, strlen(buffer));
 

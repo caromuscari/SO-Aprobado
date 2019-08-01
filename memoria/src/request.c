@@ -242,15 +242,11 @@ int mandarInsert(st_insert * insert){
     }
 
     buffer = getMessage(fdFileSystem,&head2,&controlador);
-    if(controlador < 0){
-    	free(buffer);
-    	printf("No se pudo recibir el mensaje\n");
-        log_error(file_log, "No se pudo recibir el mensaje");
+    if(buffer == NULL){
+        log_error(file_log, "Se desconecto file system");
         return -1;
     }
-
     free(buffer);
-
     return head2.codigo;
 }
 

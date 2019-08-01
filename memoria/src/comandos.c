@@ -331,3 +331,87 @@ int removerSegmentoPorNombrePagina(char* nombreTabla){
 	    }
 }
 
+void enviarPaginas(t_list * list_Paginas, char * nameTable){
+    t_list * lista_paginas_filtradas;
+    st_tablaDePaginas * auxPagina;
+    st_insert * stInsert;
+    st_marco * stMarco;
+    bool getSoloInsert(st_tablaDePaginas * stTablaDePaginas){
+        return stTablaDePaginas->flagModificado == 1;
+    }
+    lista_paginas_filtradas = list_remove_by_condition(list_Paginas,getSoloInsert);
+    while (lista_paginas_filtradas->elements_count > 0){
+        auxPagina = list_remove(lista_paginas_filtradas,0);
+        stMarco = list_get(listaDeMarcos, auxPagina->nroDePagina);
+
+        stInsert = malloc(sizeof(st_insert));
+        stInsert->value = malloc(tamanioValue);
+        memcpy(&stInsert->timestamp, auxPagina->pagina, sizeof(double));
+        memcpy(&stInsert->key, auxPagina->pagina + sizeof(double), sizeof(uint16_t));
+        memcpy(stInsert->value, auxPagina->pagina + sizeof(double) + sizeof(uint16_t), tamanioValue);
+        stInsert->operacion = INSERT;
+        stInsert->nameTable = strdup(nameTable);
+
+        if(mandarInsert(stInsert) == 5){
+            stMarco->condicion = LIBRE;
+            free(auxPagina);
+        }else{
+            list_add(list_Paginas, auxPagina);
+        }
+        destroyInsert(stInsert);
+    }
+}
+
+int comandoJournalv2(){
+    t_list * list_clone_segmento = list_create();
+    st_segmento * auxSegmento = NULL;
+    pthread_mutex_lock(&mutexMemPrinc);
+    list_add_all(list_clone_segmento,listaDeSegmentos);
+    list_clean(listaDeSegmentos);
+    while (list_clone_segmento->elements_count > 0){
+        auxSegmento = list_remove(list_clone_segmento,0);
+        enviarPaginas(auxSegmento->tablaDePaginas, auxSegmento->nombreTabla);
+        if(auxSegmento->tablaDePaginas->elements_count > 0){
+            free(auxSegmento->nombreTabla);
+            list_destroy(auxSegmento->tablaDePaginas);
+            free(auxSegmento);
+        }else{
+            list_add(listaDeSegmentos,auxSegmento);
+        }
+    }
+    pthread_mutex_unlock(&mutexMemPrinc);
+}
+
+int removerSegmentoPorNombrePaginav2(char * nameTable){
+    log_info(file_log, "[proceso Drop] Iniciando");
+    st_segmento * stSegmento = NULL;
+    st_tablaDePaginas * stTablaDePaginas;
+    pthread_mutex_lock(&mutexMemPrinc);
+    bool getSegmento(st_segmento * segmentoAux){
+        return strcmp(segmentoAux->nombreTabla, nameTable) == 0;
+    }
+    log_info(file_log, "[proceso Drop] Buscando segmento");
+    stSegmento = list_remove_by_condition(listaDeSegmentos, getSegmento);
+    if(stSegmento){
+        log_info(file_log, "[proceso Drop] Eliminando segmento");
+        while (stSegmento->tablaDePaginas->elements_count > 0){
+            stTablaDePaginas = list_remove(stSegmento->tablaDePaginas, 0);
+            st_marco* marco = list_get(listaDeMarcos, stTablaDePaginas->nroDePagina);
+            free(stTablaDePaginas);
+            marco->condicion = LIBRE;
+        }
+        list_destroy(stSegmento->tablaDePaginas);
+        free(stSegmento->nombreTabla);
+        free(stSegmento);
+        sleep(configMemoria->RETARDO_MEM/1000);
+        pthread_mutex_unlock(&mutexMemPrinc);
+        log_info(file_log, "[proceso Drop] Finalizando");
+        return OK;
+    }else{
+        log_info(file_log, "[proceso Drop] No se encontro el segmento");
+        pthread_mutex_unlock(&mutexMemPrinc);
+        log_info(file_log, "[proceso Drop] Finalizando");
+        return NOOK;
+    }
+}
+

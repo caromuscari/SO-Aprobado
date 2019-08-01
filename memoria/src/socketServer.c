@@ -179,7 +179,7 @@ void atenderMensaje(int * fdClient){
     free(paqueteDeRespuesta);
     close(*fdClient);
     free(fdClient);
-    //pthread_exit(NULL);
+//    pthread_exit(NULL);
 }
 
 void * start_server() {
@@ -201,6 +201,7 @@ void * start_server() {
         atenderMensaje(fdClient);
         sleep(configMemoria->RETARDO_FS/1000);
 	}
+	pthread_exit(NULL);
 }
 
 void enviarRespuesta(int codigo, char * buffer, int socketC, int * status, size_t tam){

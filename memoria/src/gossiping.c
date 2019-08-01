@@ -16,7 +16,7 @@ t_list * clonadoListad(){
     st_memoria * memoria = NULL;
     st_memoria * cloneMemoria = NULL;
     pthread_mutex_lock(&mutex);
-    for (i = 0; i < listaTablas->elements_count; ++i) {
+    for (i = 0; i < listaTablas->elements_count; i++) {
         memoria = list_get(listaTablas,i);
         cloneMemoria = malloc(sizeof(st_memoria));
         cloneMemoria->numero = memoria->numero;
@@ -169,7 +169,6 @@ void consultarEstadoMemoria(char *ip, char *puerto) {
 }
 
 void cleanListaMemorias(t_list * lista){
-    log_info(file_log, "[gossiping] Limpiando lista de seed fallidas");
     int i;
     st_memoria * memoria;
     for (i = 0; i < lista->elements_count; ++i) {
@@ -210,9 +209,15 @@ void *pthreadGossping() {
             memoria = list_get(seedFallidas,i);
             removeMemoriaFallida(memoria);
         }
+
+
+        log_info(file_log, "[gossiping] Limpiando lista de seed fallidas");
         cleanListaMemorias(seedFallidas);
         logStatusListaMemoria(listaTablas);
         log_info(file_log, "[gossiping] Finalizando --> busqueda de data de otras memorias");
         sleep(configMemoria->TIEMPO_GOSSIPING/1000);
+        log_info(file_log, "[gossiping] Limpiando memorias");
+        cleanListaMemorias(listaCloneTabla);
     }
+    pthread_exit(NULL);
 }

@@ -55,10 +55,10 @@ void tratarCliente(cliente_t * cliente){
 				if(string_length(insert->value) <= getValue())
 				{
 					respuesta = realizarInsert(insert);
-					enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer)+1);
 
 				}else{
-					enviarRespuesta(3, buffer, cliente->socket, &status, string_length(buffer));
+					enviarRespuesta(3, buffer, cliente->socket, &status, string_length(buffer)+1);
 				}
 
 				destroyInsert(insert);
@@ -77,8 +77,8 @@ void tratarCliente(cliente_t * cliente){
 					reg = cargarRegistro(registro);
 					free(buffer);
 					buffer = serealizarRegistro(reg,&size);
-				}else size = 1;
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
+				}
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer)+1);
 
 				destoySelect(selectt);
 				if(registro != NULL){
@@ -96,7 +96,7 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarCreate(create);
 				//actualizar_bitmap();
 
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer)+1);
 
 				destroyCreate(create);
 				free(buffer);
@@ -110,7 +110,7 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarDrop(drop);
 				//actualizar_bitmap();
 
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer));
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer)+1);
 
 				destroyDrop(drop);
 				free(buffer);
@@ -127,9 +127,9 @@ void tratarCliente(cliente_t * cliente){
 				if(respuesta == 15){
 					free(buffer);
 					buffer = serealizarMetaData(meta, &size);
-				}else size = 1;
+				}//else size = 1;
 
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer)+1);
 
 				destroyDescribe(describe);
 				free(buffer);
@@ -149,7 +149,7 @@ void tratarCliente(cliente_t * cliente){
 					destroyListaMetaData(lista);
 					//list_destroy(lista);
 				}else{
-					enviarRespuesta(respuesta, buffer, cliente->socket, &status,string_length(buffer));
+					enviarRespuesta(respuesta, buffer, cliente->socket, &status,string_length(buffer)+1);
 				}
 
 				free(buffer);

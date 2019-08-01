@@ -9,6 +9,7 @@
 #define FILE_SYSTEM_SRC_FUNCIONES_H_
 
 #include "hiloClientes.h"
+#include "hiloCompactacion.h"
 #include "buscar.h"
 
 typedef struct {
@@ -28,6 +29,7 @@ int abrir_bitmap();
 void finalizar();
 void liberarTablas(st_tablaCompac * tabla);
 char * obtenerMontaje(char * mont);
+void limpiarMem(st_tabla * tabla);
 
 
 #endif /* FILE_SYSTEM_SRC_FUNCIONES_H_ */

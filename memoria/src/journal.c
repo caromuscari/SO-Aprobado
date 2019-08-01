@@ -11,5 +11,6 @@ void * hiloJournal(){
 		log_info(file_log, "[theadJournal]Termino hilo Journal");
 		sleep(configMemoria->TIEMPO_JOURNAL/1000);
  	}
+	pthread_exit(NULL);
 }
 

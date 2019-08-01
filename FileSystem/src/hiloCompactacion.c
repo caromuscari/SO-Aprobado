@@ -12,6 +12,7 @@
 #include "Funciones.h"
 #include <unistd.h>
 #include <commons/collections/dictionary.h>
+#include <commons/collections/list.h>
 #include <commons/collections/queue.h>
 #include "operaciones.h"
 #include "hiloCompactacion.h"

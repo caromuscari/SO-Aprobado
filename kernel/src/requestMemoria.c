@@ -250,6 +250,7 @@ int enviarRequestMemoria(st_instruccion *laInstruccion, st_memoria *datoMemoria)
         }
         case INSERT: {
             log_info(file_log,"[Request] Serealizando INSERT");
+            ((st_insert *)laInstruccion->instruccion)->timestamp = obtenerMilisegundosDeHoy();
             buffer = serealizarInsert(laInstruccion->instruccion, &size_buffer);
             log_info(file_log,"[Request] Enviando mensaje INSERT Memoria[%d]", datoMemoria->numero);
             resultado = atenderResultadoInsert(

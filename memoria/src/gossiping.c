@@ -218,6 +218,7 @@ void *pthreadGossping() {
         sleep(configMemoria->TIEMPO_GOSSIPING/1000);
         log_info(file_log, "[gossiping] Limpiando memorias");
         cleanListaMemorias(listaCloneTabla);
+        list_destroy(listaCloneTabla);
     }
     pthread_exit(NULL);
 }

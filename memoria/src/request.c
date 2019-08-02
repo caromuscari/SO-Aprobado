@@ -166,9 +166,7 @@ st_messageResponse* mandarDescribe(st_describe * describe){
 	mensajeResp->cabezera.letra = head2.letra;
 	mensajeResp->cabezera.sizeData = head2.sizeData;
 
-	mensajeResp->buffer = strdup(buffer);
-
-	free(buffer);
+	mensajeResp->buffer = buffer;
 
 	return mensajeResp;
 }

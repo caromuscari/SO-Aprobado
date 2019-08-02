@@ -130,12 +130,13 @@ void tratarCliente(cliente_t * cliente){
 				if(respuesta == 15){
 					free(buffer);
 					buffer = serealizarMetaData(meta, &size);
-				}//else size = 1;
-
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer)+1);
+                    enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
+				}else{
+                    enviarRespuesta(respuesta, buffer, cliente->socket, &status,string_length(buffer)+1);
+				}
 
 				destroyDescribe(describe);
-				free(buffer);
+                free(buffer);
 				break;
 
 			case DESCRIBEGLOBAL:
@@ -149,7 +150,7 @@ void tratarCliente(cliente_t * cliente){
 					//mostrarTabla(list_get(lista,0));
 					buffer = serealizarListaMetaData(lista,&size);
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,size);
-					destroyListaMetaData(lista);
+					//destroyListaMetaData(lista);
 					//list_destroy(lista);
 				}else{
 					enviarRespuesta(respuesta, buffer, cliente->socket, &status,string_length(buffer)+1);

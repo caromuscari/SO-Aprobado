@@ -75,10 +75,13 @@ void tratarCliente(cliente_t * cliente){
 				respuesta = realizarSelect(selectt, &registro);
 				if(registro != NULL){
 					reg = cargarRegistro(registro);
-					free(buffer);
-					buffer = serealizarRegistro(reg,&size);
+                    log_info(alog, registro);
+                    free(buffer);
+                    buffer = serealizarRegistro(reg,&size);
+				}else{
+				    size = string_length(buffer)+1;
 				}
-				enviarRespuesta(respuesta, buffer, cliente->socket, &status, string_length(buffer)+1);
+				enviarRespuesta(respuesta, buffer, cliente->socket, &status, size);
 
 				destoySelect(selectt);
 				if(registro != NULL){

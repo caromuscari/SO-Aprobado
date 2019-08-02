@@ -44,3 +44,4 @@ t_configuracionMemoria * leerConfiguracion(char* path){
     config_destroy(bufferConfig);
     return configuracion;
 }
+

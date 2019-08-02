@@ -364,7 +364,7 @@ void agregarMemoria(st_kernel_memoria *kernelMemoria) {
 
 void updateMemoria(st_kernel_memoria *kernelMemoria, st_memoria *stMemoria) {
     destroyMemoria(kernelMemoria->memoria);
-    st_memoria *memoria = malloc(sizeof(st_data_memoria));
+    st_memoria *memoria = malloc(sizeof(st_memoria));
     memoria->numero = stMemoria->numero;
     memoria->puerto = strdup(stMemoria->puerto);
     memoria->ip = strdup(stMemoria->ip);

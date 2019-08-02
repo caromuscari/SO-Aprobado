@@ -102,7 +102,9 @@ void calcularMetricas(bool printConsole){
 
 void pthreadLogMetricas(){
     while (1){
+        log_info(file_log, "[Metrics] Iniciando Proceso");
         calcularMetricas(false);
+        log_info(file_log, "[Metrics] Finalizando Proceso");
         sleep(30);
     }
 }

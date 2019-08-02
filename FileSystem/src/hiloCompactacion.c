@@ -51,8 +51,6 @@ void hilocompactacion(char * table){
 
 		sleep((tabla->meta->compaction_time)/1000);
 
-		printf("I=%d", i);
-
 		pathTabla = armar_path(tabla->meta->nameTable);
 
 		path = string_from_format("%s/%d.tmp", pathTabla, i);
@@ -110,7 +108,6 @@ void hilocompactacion(char * table){
 
 			sem_getvalue(&tabla->compactacion, &valor);
 
-			log_info(alog, string_itoa(valor));
 			while(valor != 1){
 				sem_post(&tabla->compactacion);
 				sem_getvalue(&tabla->compactacion, &valor);

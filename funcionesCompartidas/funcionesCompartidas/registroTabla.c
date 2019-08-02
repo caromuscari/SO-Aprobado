@@ -19,7 +19,7 @@ st_registro *cargarRegistro(char *text) {
     char **splitText = string_split(text, ";");
     int cantidadPalabras = tamanioDeSplit(splitText);
     if (cantidadPalabras == 3) {
-        registro->timestamp = atoi(splitText[0]);
+        registro->timestamp = strtod(splitText[0]);
         registro->key = atoi(splitText[1]);
         registro->value = strdup(splitText[2]);
         string_iterate_lines(splitText, (void *) free);

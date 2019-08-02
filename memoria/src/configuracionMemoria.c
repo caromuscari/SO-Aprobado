@@ -7,13 +7,13 @@ t_configuracionMemoria * leerConfiguracion(char* path){
         return NULL;
     }
     t_configuracionMemoria *configuracion = malloc(sizeof(t_configuracionMemoria));
-    configuracion->PUERTO = config_get_string_value(bufferConfig, "PUERTO");
+    configuracion->PUERTO = strdup(config_get_string_value(bufferConfig, "PUERTO"));
     configuracion->TIEMPO_GOSSIPING = config_get_int_value(bufferConfig, "TIEMPO_GOSSIPING");
     //Hay una funcion para ints
     configuracion->NRO_MEMORIA = config_get_int_value(bufferConfig, "NRO_MEMORIA");
-    configuracion->IP_MEMORIA = config_get_string_value(bufferConfig, "IP_MEMORIA");
-    configuracion->IP_FS = config_get_string_value(bufferConfig, "IP_FS");
-    configuracion->PUERTO_FS = config_get_string_value(bufferConfig, "PUERTO_FS");
+    configuracion->IP_MEMORIA = strdup(config_get_string_value(bufferConfig, "IP_MEMORIA"));
+    configuracion->IP_FS = strdup(config_get_string_value(bufferConfig, "IP_FS"));
+    configuracion->PUERTO_FS = strdup(config_get_string_value(bufferConfig, "PUERTO_FS"));
     configuracion->RETARDO_FS = config_get_int_value(bufferConfig, "RETARDO_FS");
     configuracion->RETARDO_MEM = config_get_int_value(bufferConfig, "RETARDO_MEM");
     configuracion->TIEMPO_JOURNAL = config_get_int_value(bufferConfig, "TIEMPO_JOURNAL");

@@ -38,7 +38,7 @@ bool buscarValueMaximo(){
     request.letra = 'M';
     request.codigo = 1;
     request.sizeData = 1;
-    char* msgDefault = " ";
+    char* msgDefault = strdup(" ");
     void * paqueteDeMensaje = createMessage(&request,msgDefault);
     if(enviar_message(fdFileSystem,paqueteDeMensaje,file_log,&control) < 0){
         log_error(file_log,"No se pudo enviar el mensaje");
@@ -82,7 +82,7 @@ int inicializar(char *pathConfig){
     char* numeroMemoria = string_itoa(configMemoria->NRO_MEMORIA);
     string_append(&nombreLog, numeroMemoria);
     free(numeroMemoria);
-    char* logExtension = ".log";
+    char* logExtension = strdup(".log");
     string_append(&nombreLog, logExtension);
     free(logExtension);
     file_log = crear_archivo_log("Memoria", false, nombreLog);

@@ -68,18 +68,18 @@ int atenderResultadoSelect(st_messageResponse *mensaje,
         }
         case SUCCESS: {
             st_registro *registro = deserealizarRegistro(mensaje->buffer);
-            printf("[SELECT] key=[%d] value=[%s] \n",registro->key,registro->value);
+            log_info(file_log,"[SELECT] key=[%d] value=[%s]",registro->key,registro->value);
             destroyRegistro(registro);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
             resultado = NO_HAY_RESULTADO_EN_SELECT;
-            printf("[SELECT] no se pudo encontra ese select\n");
+            log_info(file_log,"[SELECT] no se pudo encontra ese select");
             break;
         }
         default: {
-            printf("[SELECT] no entiendo el codigo de respuesta\n");
+            log_info(file_log,"[SELECT] no entiendo el codigo de respuesta");
         }
     }
     destroyStMessageResponse(mensaje);
@@ -106,12 +106,13 @@ int atenderResultadoInsert(st_messageResponse *mensaje,
             break;
         }
         case SUCCESS: {
-            printf("[INSERT] se inserto correctamente\n");
+            log_info(file_log,"[INSERT] se inserto correctamente");
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
-            printf("[INSERT] no se pudo realizer el insert\n");
+            printf("[INSERT] no se pudo realizer el insert");
+            log_info(file_log,"[INSERT] no se pudo realizer el insert");
             break;
         }
     }
@@ -128,13 +129,14 @@ int atenderResultadoSDrop(st_messageResponse *mensaje, char *nameTable) {
     }
     switch (mensaje->cabezera.codigo) {
         case SUCCESS: {
-            printf("[DROP] se puedo eliminar la tabla sin problemas\n");
+            log_info(file_log,"[DROP] se puedo eliminar la tabla sin problemas");
             removeTablaByName(nameTable);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
             printf("[DROP] no se puedo eliminar la tabla\n");
+            log_info(file_log,"[DROP] no se puedo eliminar la tabla");
             break;
         }
 
@@ -152,7 +154,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
     }
     switch (mensaje->cabezera.codigo) {
         case SUCCESS: {
-            printf("[CREATE] se creo la tabla sin problemas\n");
+            log_info(file_log,"[CREATE] se creo la tabla sin problemas");
             st_metadata *newMetadata = malloc(sizeof(st_metadata));
             newMetadata->nameTable = strdup(_create->nameTable);
             newMetadata->consistency = strdup(_create->tipoConsistencia);
@@ -164,6 +166,7 @@ int atenderResultadoCreate(st_messageResponse *mensaje, st_create *_create) {
         }
         case NOSUCCESS: {
             printf("[CREATE] no se pudo crear la tabla\n");
+            log_info(file_log,"[CREATE] no se pudo crear la tabla");
             break;
         }
 
@@ -183,17 +186,18 @@ int atenderResultadoDescribe(st_messageResponse *mensaje) {
         case SUCCESS: {
             size_t size;
             st_metadata *metadata = deserealizarMetaData(mensaje->buffer, &size);
-            printf("[DESCRIBE] tabla = [%s]; Consistencia = [%s] \n",metadata->nameTable,metadata->consistency);
+            log_info(file_log,"[DESCRIBE] tabla = [%s]; Consistencia = [%s]",metadata->nameTable,metadata->consistency);
             addNuevaTabla(metadata);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
             printf("[DESCRIBE] no hay respuesta para esta tabla\n");
+            log_info(file_log,"[DESCRIBE] no hay respuesta para esta tabla");
             break;
         }
         default: {
-            printf("[DESCRIBE] no entiendo el codigo de respuesta\n");
+            log_info(file_log,"[DESCRIBE] no entiendo el codigo de respuesta");
         }
     }
     destroyStMessageResponse(mensaje);
@@ -215,18 +219,19 @@ int atenderResultadoDescribeGlobal(st_messageResponse *mensaje) {
             t_list * listMetadata = deserealizarListaMetaData(mensaje->buffer, mensaje->cabezera.sizeData);
             for (i = 0; i < listMetadata->elements_count; ++i) {
                 metadata = list_get(listMetadata, i);
-                printf("[DESCRIBE GLOBAL] tabla = [%s]; Consistencia = [%s] \n",metadata->nameTable,metadata->consistency);
+                log_info(file_log,"[DESCRIBE GLOBAL] tabla = [%s]; Consistencia = [%s]",metadata->nameTable,metadata->consistency);
             }
             updateListaMetadata(listMetadata);
             resultado = SALIO_OK;
             break;
         }
         case NOSUCCESS: {
-            printf("DESCRIBE GLOBAL] no hay respuesta para describe global \n");
+            printf("[DESCRIBE GLOBAL] no hay respuesta para describe global \n");
+            log_info(file_log,"[DESCRIBE GLOBAL] no hay respuesta para describe global");
             break;
         }
         default: {
-            printf("DESCRIBE GLOBAL] no entiendo el codigo de respuesta\n");
+            log_info(file_log,"[DESCRIBE GLOBAL] no entiendo el codigo de respuesta");
         }
     }
     destroyStMessageResponse(mensaje);

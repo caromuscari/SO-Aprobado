@@ -50,6 +50,7 @@ int main() {
     void *buffer = serealizarListaMetaData(listametadata, &size_buffer);
 
     /// senviar
+    /*
     t_log *log = crear_archivo_log("Server", true, "./loggMetada.log");
     int control = 0;
     int socketServer = makeListenSock("8000",log,&control);
@@ -67,7 +68,7 @@ int main() {
 
     enviar_message(socketClient,buffer3,log,&control);
 
-
+    */
     t_list *lista_metadata_deserealizado = deserealizarListaMetaData(buffer, size_buffer);
     showLista(lista_metadata_deserealizado);
     //liberar memoria

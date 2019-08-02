@@ -102,7 +102,7 @@ void ejecutarScript() {
     bool hayError;
     TypeCriterio typeCriterio;
     st_history_request * historyRequest = NULL;
-    printf("\n[Planificador] Ejecutando Script [%s]\n", script->id);
+    log_info(file_log,"\n[Planificador] Ejecutando Script [%s]\n", script->id);
     t_list *instrucciones = tomarInstrucciones(script->listaDeInstrucciones);
     //ejecutamos instruciones tomadas
     for (i = 0; i < instrucciones->elements_count; ++i) {
@@ -112,7 +112,6 @@ void ejecutarScript() {
         typeCriterio = getCriterioBYInstruccion(instruccionScript->instruccion, instruccionScript->operacion);
         if (typeCriterio == NO_SE_ENCONTRO_TABLA) {
             hayError = true;
-            printf("[Planificador] No se encontro tabla\n");
             log_error(file_log,"[Planificador] No se encontro la tabla");
         }else {
             tag = generarTag(typeCriterio, instruccionScript->instruccion, instruccionScript->operacion);
@@ -131,13 +130,14 @@ void ejecutarScript() {
                 }
                 destroyMemoria(datomemoria);
             } else {
-                printf("[Planificador] No hay memoria disponible\n");
+                log_info(file_log,"[Planificador] No hay memoria disponible");
                 resultado = MEMORIA_NO_DISPONIBLE;
                 hayError = true;
             }
             free(tag);
         }
         if(hayError){
+            printf("[Planificador] Hubo un error en la Ejecuccion se cancela el script\n");
             log_error(file_log,"[Planificador] Hubo un error en la Ejecuccion se cancela el script");
             if(historyRequest){
                 free(historyRequest);
@@ -146,13 +146,14 @@ void ejecutarScript() {
         }
         sleep(getSLEEP_EJECUCION() / 1000);
     }
-    printf("[Planificador] Fin Ejecucion de Script [%s]\n", script->id);
+    log_info(file_log,"[Planificador] Fin Ejecucion de Script [%s]", script->id);
     //Evaluar resultado de Ejecucion
     if (resultado == SALIO_OK || resultado == NO_HAY_RESULTADO_EN_SELECT) {
         if (script->listaDeInstrucciones->elements_count > 0) {
             log_info(file_log,"[Planificador] agregando de nuevo el script");
             cargarNuevoScript(script);
         }else{
+            printf("Se Finalizo correctamente\n");
             log_info(file_log,"[Planificador] Se finalizo todo el script");
             destroyScript(script);
         }

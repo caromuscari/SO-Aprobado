@@ -4,21 +4,21 @@
 
 #include "threadPoolMemoria.h"
 
-t_list *poolMemoria;
+t_list *poolMemoria = NULL;
 extern config *configuracion;
-t_log *file_log_poolMemoria;
+extern t_log *file_log;
 pthread_mutex_t mutex;
 
 void logStatusListaMemoria(){
     st_kernel_memoria * memoriaK;
-    log_info(file_log_poolMemoria,"----Estado de Memoria---");
+    log_info(file_log, "----Estado de Memoria---");
     for (int i = 0; i < poolMemoria->elements_count ; ++i) {
         memoriaK = list_get(poolMemoria,i);
         if(memoriaK->activo){
         	char * num = string_itoa(memoriaK->memoria->numero);
-            log_info(file_log_poolMemoria,"Numero = [%s]",num);
-            log_info(file_log_poolMemoria,"Puerto [%s]", memoriaK->memoria->puerto);
-            log_info(file_log_poolMemoria,"IP [%s]",memoriaK->memoria->ip);
+            log_info(file_log, "Numero = [%s]", num);
+            log_info(file_log, "Puerto [%s]", memoriaK->memoria->puerto);
+            log_info(file_log, "IP [%s]", memoriaK->memoria->ip);
             free(num);
         }
 
@@ -352,7 +352,7 @@ bool setTipoConsistencia(int number, TypeCriterio tipo) {
         *auxTipo = tipo;
         list_add(memoria->tipos, auxTipo);
     } else {
-        log_info(file_log_poolMemoria, "no se encontro esa memoria");
+        log_info(file_log, "no se encontro esa memoria");
     }
     pthread_mutex_unlock(&mutex);
     return flagSolucion;
@@ -374,7 +374,7 @@ void updateMemoria(st_kernel_memoria *kernelMemoria, st_memoria *stMemoria) {
 
 void updateListaMemorias(st_data_memoria *dataMemoria) {
     //crear la memoria que consulto
-    log_info(file_log_poolMemoria,"[gossiping] Actulizando lista de memorias");
+    log_info(file_log, "[gossiping] Actulizando lista de memorias");
     st_kernel_memoria *newKernelMemoria;
     st_memoria *stMemoria;
     pthread_mutex_lock(&mutex);
@@ -403,13 +403,13 @@ st_history_request * newHistory(enum OPERACION operacion, TypeCriterio criterio)
 }
 
 void addHistory(st_history_request * historyRequest, int numeroMemoria){
-    log_info(file_log_poolMemoria,"[historyMemoria] agregando historial en memoria [%d]",numeroMemoria);
+    log_info(file_log, "[historyMemoria] agregando historial en memoria [%d]", numeroMemoria);
     pthread_mutex_lock(&mutex);
     st_kernel_memoria * kernelMemoria = existeMemoria(poolMemoria,numeroMemoria);
     if(kernelMemoria){
         list_add(kernelMemoria->history,historyRequest);
     }else{
-        log_info(file_log_poolMemoria,"[historyMemoria] no se encontro la memoria %d", numeroMemoria);
+        log_info(file_log, "[historyMemoria] no se encontro la memoria %d", numeroMemoria);
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -422,6 +422,9 @@ t_list * getHistoryByRange(double start, double end){
     t_list * listaMemoriaHistory = list_create();
     TypeCriterio * criterio = NULL;
     TypeCriterio * newCriterio = NULL;
+    if(poolMemoria == NULL){
+        return listaMemoriaHistory;
+    }
     pthread_mutex_lock(&mutex);
     for (i = 0; i < poolMemoria->elements_count ; ++i) {
         kernelMemoria = list_get(poolMemoria, i);
@@ -473,7 +476,7 @@ int journalMemoria(st_memoria * memoria){
         return resultado;
     }else{
         free(buffer);
-        log_error(file_log_poolMemoria,"[Journal] No hubo respuesta en el Journal");
+        log_error(file_log, "[Journal] No hubo respuesta en el Journal");
         return SE_DESCONECTO_SOCKET;
     }
 
@@ -508,7 +511,6 @@ void *devolverListaMemoria(size_t *size_paquetes) {
 void *loadPoolMemori() {
     //conectarse con la memoria y pelirle la lista
     poolMemoria = list_create();
-    file_log_poolMemoria = crear_archivo_log("PoolMemoria", false, "./PoolMemoria.log");
     st_messageResponse * respuestaMesanje = NULL;
     void *buffer = NULL;
     if (pthread_mutex_init(&mutex, NULL) != 0) {
@@ -518,7 +520,8 @@ void *loadPoolMemori() {
     while (1) {
         size_t  size;
         buffer = devolverListaMemoria(&size);
-        log_info(file_log_poolMemoria,"[gossiping] Haciendo Gossiping");
+        log_info(file_log, "[gossiping] Iniciando Proceso");
+        log_info(file_log, "[gossiping] Haciendo Gossiping");
         respuestaMesanje = consultarAMemoria(configuracion->IP_MEMORIA, configuracion->PUERTO_MEMORIA,BUSCARTABLAGOSSIPING,buffer,size);
         if(respuestaMesanje){
             switch (respuestaMesanje->cabezera.codigo){
@@ -530,15 +533,16 @@ void *loadPoolMemori() {
                     break;
                 }
                 default:{
-                    log_info(file_log_poolMemoria,"[gossiping] no entiendo el codigo re respuesta\n");
+                    log_info(file_log, "[gossiping] no entiendo el codigo re respuesta\n");
                     break;
                 }
             }
         }else{
-            log_error(file_log_poolMemoria,"[gossiping] No hubo respuesta en el gossiping");
+            log_error(file_log, "[gossiping] No hubo respuesta en el gossiping");
         }
         free(buffer);
         logStatusListaMemoria();
+        log_info(file_log, "[gossiping] Finalizando Proceso");
         sleep(configuracion->REFRESH_GOSSIPING / 1000);
     }
 }

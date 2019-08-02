@@ -24,7 +24,7 @@ int comandoInsert(st_insert* comandoInsert){
         if(paginaDeTablaEncontrada){
             log_info(file_log, "[proceso Insert]Pagina encontrada");
             log_info(file_log, "[proceso Insert]Actualizando pagina");
-            memcpy(paginaDeTablaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
+            memcpy(paginaDeTablaEncontrada->pagina + sizeof(double) + sizeof(uint16_t), comandoInsert->value, string_length(comandoInsert->value)+1);
             memcpy(paginaDeTablaEncontrada->pagina, &comandoInsert->timestamp, sizeof(double));
             paginaDeTablaEncontrada->flagModificado = 1;
             log_info(file_log,"[proceso Insert] Finalizar proceso");
@@ -47,7 +47,7 @@ int comandoInsert(st_insert* comandoInsert){
         memcpy(paginaLibre + sizeof(double), &comandoInsert->key, sizeof(uint16_t));
         int largo_value = strlen(comandoInsert->value);
         comandoInsert->value[largo_value]='\0';
-        memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
+        memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, string_length(comandoInsert->value)+1);
 
         st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
         paginaDeTabla->nroDePagina = posMarcoLibre;
@@ -83,7 +83,7 @@ int comandoInsert(st_insert* comandoInsert){
     memcpy(paginaLibre + sizeof(double), &comandoInsert->key, sizeof(uint16_t));
     int largo_value = strlen(comandoInsert->value);
     comandoInsert->value[largo_value]='\0';
-    memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, tamanioValue);
+    memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), comandoInsert->value, string_length(comandoInsert->value)+1);
     st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
     paginaDeTabla->nroDePagina = posMarcoLibre;
     paginaDeTabla->pagina = paginaLibre;
@@ -207,7 +207,8 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
 
     int largo_value = strlen(registro->value);
     registro->value[largo_value]='\0';
-    memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), registro->value, tamanioValue);
+    largo_value += 1;
+    memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), registro->value, largo_value);
 
     st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
     paginaDeTabla->nroDePagina = posMarcoLibre;

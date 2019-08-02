@@ -37,8 +37,9 @@ bool buscarValueMaximo(){
     header request;
     request.letra = 'M';
     request.codigo = 1;
-    request.sizeData = 1;
     char* msgDefault = strdup(" ");
+    request.sizeData = string_length(msgDefault)+1;
+
     void * paqueteDeMensaje = createMessage(&request,msgDefault);
     if(enviar_message(fdFileSystem,paqueteDeMensaje,file_log,&control) < 0){
         log_error(file_log,"No se pudo enviar el mensaje");

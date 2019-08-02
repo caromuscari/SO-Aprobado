@@ -93,7 +93,7 @@ int mandarDrop(st_drop * drop){
 st_registro* obtenerSelect(st_select * comandoSelect){
     int control = 0;
     header request;
-    void* paqueteDeRespuesta;
+    char* paqueteDeRespuesta;
     header respuesta;
     request.letra = 'M';
     request.codigo = SELECT;

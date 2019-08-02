@@ -5,6 +5,7 @@
 #include "threadMetadata.h"
 #include "threadPoolMemoria.h"
 #include "threadPlanificador.h"
+#include "threadNotify.h"
 #include <commons/collections/list.h>
 #include <pthread.h>
 #include "metricas.h"
@@ -16,6 +17,7 @@ pthread_t plafinifcador;
 pthread_t pthreadMemoria;
 pthread_t pthreadMetadata;
 pthread_t pthreadMetricas;
+pthread_t pthreadNotify;
 
 
 
@@ -43,11 +45,14 @@ int main(int argc, char **argv) {
     pthread_detach(pthreadMetadata);
     pthread_create(&pthreadMetricas, NULL, (void*)pthreadLogMetricas, NULL);
     pthread_detach(pthreadMetricas);
+    pthread_create(&pthreadNotify, NULL, (void*)hiloinotify, argv[1]);
+    pthread_detach(pthreadNotify);
     consola();
     pthread_cancel(plafinifcador);
     pthread_cancel(pthreadMemoria);
     pthread_cancel(pthreadMetadata);
     pthread_cancel(pthreadMetricas);
+    pthread_cancel(pthreadNotify);
     free(configuracion->IP_MEMORIA);
     free(configuracion->PUERTO_MEMORIA);
     free(configuracion);

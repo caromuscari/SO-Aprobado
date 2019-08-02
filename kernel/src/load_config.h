@@ -6,8 +6,11 @@
 #define KERNEL_LOAD_CONFIG_H
 
 #include <commons/config.h>
+#include <funcionesCompartidas/log.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 typedef  struct {
     char * IP_MEMORIA;
@@ -19,5 +22,8 @@ typedef  struct {
     int REFRESH_GOSSIPING;
 } config;
 config * load_config(char * path);
-
+void updateConfiguracion(char* rutaConfig);
+int getSLEEP_EJECUCION();
+int getMETADATA_REFRESH();
+int getQUANTUM();
 #endif //KERNEL_LOAD_CONFIG_H

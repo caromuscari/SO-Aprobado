@@ -116,6 +116,6 @@ void *schedulerMetadata() {
         free(buffer);
         logStatusListaMetadata();
         log_info(file_log, "[MetaData] Finalizando Proceso");
-        sleep(configuracion->METADATA_REFRESH / 1000);
+        sleep(getMETADATA_REFRESH() / 1000);
     }
 }

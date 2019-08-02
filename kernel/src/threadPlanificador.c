@@ -68,8 +68,9 @@ void destroyScript(st_script *stScript) {
 }
 
 t_list *tomarInstrucciones(t_list *listaInstrucciones) {
-    if (listaInstrucciones->elements_count > configuracion->QUANTUM) {
-        return list_take_and_remove(listaInstrucciones, configuracion->QUANTUM);
+    int quantum = getQUANTUM();
+    if (listaInstrucciones->elements_count > quantum) {
+        return list_take_and_remove(listaInstrucciones, quantum);
     } else {
         return list_take_and_remove(listaInstrucciones, listaInstrucciones->elements_count);
     }
@@ -125,7 +126,7 @@ void ejecutarScript() {
                     hayError = true;
                 }
                 if(historyRequest && resultado == SALIO_OK){
-                    historyRequest->endTime = obtenerMilisegundosDeHoy() + configuracion->SLEEP_EJECUCION;
+                    historyRequest->endTime = obtenerMilisegundosDeHoy() + getSLEEP_EJECUCION();
                     addHistory(historyRequest,datomemoria->numero);
                 }
                 destroyMemoria(datomemoria);
@@ -143,7 +144,7 @@ void ejecutarScript() {
             }
             break;
         }
-        sleep(configuracion->SLEEP_EJECUCION / 1000);
+        sleep(getSLEEP_EJECUCION() / 1000);
     }
     printf("[Planificador] Fin Ejecucion de Script [%s]\n", script->id);
     //Evaluar resultado de Ejecucion

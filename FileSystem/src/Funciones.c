@@ -228,8 +228,6 @@ void finalizar(){
 		dictionary_clean_and_destroy_elements(memtable, (void*)limpiarMem);
 	}
 
-	queue_destroy(nombre);
-
 	dictionary_destroy(clientes);
 
 	dictionary_destroy(memtable);

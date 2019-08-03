@@ -34,8 +34,7 @@ void hilocompactacion(char * table){
 	//sem_wait(&sNombre);
 	//char * nomTabla = queue_pop(nombre);
 	//sem_post(&sNombre);
-	printf("Hilo compactacion\n");
-	printf("Nombre de tabla: %s\n", table);
+	log_info(alog,"Hilo compactacion: Nombre de tabla: %s\n", table);
 	//char * nomTabla = strdup(table);
 	char * pathTabla;
 	char * path, *new;
@@ -95,6 +94,7 @@ void hilocompactacion(char * table){
 			}*/
 
 			sem_wait(&tabla->compactacion);
+			log_info(alog,"Se bloquea compactacion de tabla %s", tabla->meta->nameTable);
 			if(tabla->contador != 0) sem_wait(&tabla->opcional);
 
 			eliminarTemporalesC(pathTabla);
@@ -103,15 +103,22 @@ void hilocompactacion(char * table){
 				generarParticion(pathTabla,j,lista);
 			}
 			//Desbloquear la tabla
-			log_info(alog, "Se desbloquea la compactacion");
+
 			sem_post(&tabla->compactacion);
 
-			sem_getvalue(&tabla->compactacion, &valor);
+			//list_clean_and_destroy_elements(tabla->sem, (void*)desbloquear);
 
-			while(valor != 1){
+			//int ret = sem_getvalue(&tabla->compactacion, &valor);
+
+			//log_info(alog, "Retorno get value: %d", ret);
+
+			while(getContador(tabla) != 0){
 				sem_post(&tabla->compactacion);
-				sem_getvalue(&tabla->compactacion, &valor);
+				restarContador(tabla);
+				//sem_getvalue(&tabla->compactacion, &valor);
 			}
+
+			log_info(alog, "Se desbloquea la compactacion de la tabla %s", tabla->meta->nameTable);
 
 			dictionary_destroy_and_destroy_elements(lista, (void*)limpiarList);
 		}
@@ -138,7 +145,7 @@ void limpiarReg(structRegistro * reg){
 void desbloquear(sem_t *semaforo){
 	sem_post(semaforo);
 	log_info(alog, "Se desbloquea la tabla");
-	sem_destroy(semaforo);
+	//sem_destroy(semaforo);
 }
 
 t_list * llenarTabla(char * path){
@@ -232,7 +239,8 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 		while(getline(&linea, &tamBuffer, archivo) != -1){
 			if(flag != NULL){
 				char * value = string_from_format("%s%s",flag, linea);
-				//free(flag);
+				free(flag);
+				flag = NULL;
 				split = string_split(value,";");
 				if(split[0] != NULL){
 					if(split[1] == NULL) flag = strdup(value);
@@ -311,6 +319,8 @@ void leerTemporal(char * path, t_dictionary * lista, int totalPart){
 			free(split);
 			free(linea);
 
+			flag2 = 0;
+
 			linea = malloc(sizeof(char) * tamBuffer);
 		}
 		i++;
@@ -377,6 +387,7 @@ void generarParticion(char * path, int part, t_dictionary * lista){
     			char* strBloque = string_substring(strParticion, cantidadCaracteresPorString * iBloque, cantidadCaracteresPorString);
     			char * next = string_itoa(*siguienteBloque);
     			bloque = armar_PathBloque(next);
+    			remove(bloque);
     			archivo = fopen(bloque,"w");
     			fputs(strBloque, archivo);
     			fclose(archivo);

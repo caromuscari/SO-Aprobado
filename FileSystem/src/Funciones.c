@@ -51,7 +51,7 @@ void inicializar(){
 	clientes = dictionary_create();
 	memtable = dictionary_create();
 	tablas = dictionary_create();
-	alog = crear_archivo_log("File System", true, "./FileSystem.log");
+	alog = crear_archivo_log("File System", false, "./FileSystem.log");
 
 	sem_init(&sMemtable,0,1);
 	sem_init(&sTablas,0,1);

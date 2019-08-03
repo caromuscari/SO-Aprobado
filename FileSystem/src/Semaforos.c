@@ -86,6 +86,26 @@ bool tablasVacia(){
 	return resp;
 }
 
+//Compactacion
+int getContador(st_tablaCompac * tabla){
+	sem_wait(&tabla->mutexC);
+	int ret = tabla->cont2;
+	sem_post(&tabla->mutexC);
+	return ret;
+}
+
+void restarContador(st_tablaCompac * tabla){
+	sem_wait(&tabla->mutexC);
+	tabla->cont2--;
+	sem_post(&tabla->mutexC);
+}
+
+void sumarContador(st_tablaCompac * tabla){
+	sem_wait(&tabla->mutexC);
+	tabla->cont2++;
+	sem_post(&tabla->mutexC);
+}
+
 //Config
 int getRetardo(){
 	int retardo;

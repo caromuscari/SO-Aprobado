@@ -86,7 +86,7 @@ void* hiloconsola(){
 						mostrarRespuesta(respuesta);
 					}else{
 						log_info(alog, value);
-						printf("Value: %s\n",value);
+						printf("Resultado: %s\n",value);
 					}
 
 					destoySelect(selectt);

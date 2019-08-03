@@ -12,7 +12,7 @@ extern t_dictionary *memtable;
 extern int tBloques;
 extern int loop;
 extern sem_t sMemtable;
-//extern t_log* alog;
+extern t_log* alog;
 
 void crearTemporal(char * key, st_tabla* data){
 	sem_wait(&data->semaforo);
@@ -35,9 +35,10 @@ void crearTemporal(char * key, st_tabla* data){
             free(bloque);
             FILE *write_ptr;
 
+            remove(path);
             write_ptr = fopen(path,"w");
             char* strBloque = string_substring(str, iElem * caracteresPorString, caracteresPorString);
-            write(1, strBloque, strlen(strBloque)+1);
+            //write(1, strBloque, strlen(strBloque)+1);
             //fwrite(strBloque,sizeof(strBloque),string_length(strBloque),write_ptr);
             fputs(strBloque, write_ptr);
             fclose(write_ptr);
@@ -85,8 +86,10 @@ void* hilodump(){
 	while(loop){
 		sleep(getDump());
 		sem_wait(&sMemtable);
+		log_info(alog,"Empieza el dump");
 		dictionary_iterator(memtable,(void*)crearTemporal);
 		dictionary_clean_and_destroy_elements(memtable, (void*)limpiarMemtable);
+		log_info(alog, "Termina el dump");
 		sem_post(&sMemtable);
 
 	}

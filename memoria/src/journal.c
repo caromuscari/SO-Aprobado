@@ -3,9 +3,10 @@
 
 extern t_configuracionMemoria *configMemoria;
 extern t_log *file_log;
+extern int loop;
 
 void * hiloJournal(){
-	while(1){
+	while(loop){
 		log_info(file_log, "[theadJournal]Iniciando hilo Journal");
 		comandoJournal();
 		log_info(file_log, "[theadJournal]Termino hilo Journal");

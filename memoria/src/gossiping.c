@@ -3,6 +3,7 @@
 //
 
 #include "gossiping.h"
+extern int loop;
 
 t_list * seedFallidas;
 pthread_mutex_t mutex;
@@ -188,7 +189,7 @@ void *pthreadGossping() {
         pthread_exit(NULL);
     }
     int i;
-    while (true) {
+    while (loop) {
         log_info(file_log, "[gossiping] Iniciando --> busqueda de data de otras memorias");
         for (i = 0; i < configMemoria->IP_SEEDS->elements_count; ++i) {
             consultarEstadoMemoria(list_get(configMemoria->IP_SEEDS, i), list_get(configMemoria->PUERTO_SEEDS, i));

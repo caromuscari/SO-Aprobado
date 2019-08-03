@@ -14,6 +14,7 @@
 #include "request.h"
 #include "contrato.h"
 #include "console.h"
+#include "hiloInotify.h"
 
 extern int fdFileSystem;
 extern t_log * file_log;
@@ -38,6 +39,7 @@ int mandarCreate(st_create * create){
 
 	if(controlador != 0){
 		log_error(file_log, "No se pudo enviar el mensaje");
+		sleep(getRetardoFile()/1000);
 		return NOOK;
 	}
 
@@ -47,12 +49,12 @@ int mandarCreate(st_create * create){
 
 	if(buffer == NULL){
 		log_error(file_log, "Fallo la conexion con el File System");
-
+		sleep(getRetardoFile()/1000);
 		return SOCKETDESCONECTADO;
 	}
 
 	free(buffer);
-
+	sleep(getRetardoFile()/1000);
 	return respuesta.codigo;
 }
 
@@ -77,16 +79,19 @@ int mandarDrop(st_drop * drop){
 	free(buffer);
     if(controlador != 0){
         log_error(file_log, "No se pudo enviar el mensaje al File System");
+        sleep(getRetardoFile()/1000);
         return NOOK;
     }
 
 	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
     if(buffer == NULL){
         log_error(file_log, "Fallo la conexion con File System");
+        sleep(getRetardoFile()/1000);
         return SOCKETDESCONECTADO;
     }
 
 	free(buffer);
+	sleep(getRetardoFile()/1000);
 	return respuesta.codigo;
 }
 
@@ -110,20 +115,24 @@ st_registro* obtenerSelect(st_select * comandoSelect){
     free(mensaje);
     if(control != 0){
         log_error(file_log, "No se pudo enviar el mensaje del select");
+        sleep(getRetardoFile()/1000);
         return NULL;
     }
 
     paqueteDeRespuesta = getMessage(fdFileSystem, &respuesta, &control);
     if(paqueteDeRespuesta== NULL){
         log_error(file_log, "Fallo la conexion con el File System");
+        sleep(getRetardoFile()/1000);
         return NULL;
     }
     if(respuesta.codigo == 14){
     	st_registro * reg = deserealizarRegistro(paqueteDeRespuesta);
     	free(paqueteDeRespuesta);
+    	sleep(getRetardoFile()/1000);
         return reg;
     } else {
     	free(paqueteDeRespuesta);
+    	sleep(getRetardoFile()/1000);
         return NULL;
     }
 }
@@ -151,6 +160,7 @@ st_messageResponse* mandarDescribe(st_describe * describe){
 
 	if(controlador != 0){
 		log_error(file_log, "No se pudo enviar el mensaje");
+		sleep(getRetardoFile()/1000);
 		return NULL;
 	}
 
@@ -158,6 +168,7 @@ st_messageResponse* mandarDescribe(st_describe * describe){
 
 	if(buffer == NULL){
 		log_error(file_log, "Se desconecto file system");
+		sleep(getRetardoFile()/1000);
 		return NULL;
 	}
 
@@ -167,7 +178,7 @@ st_messageResponse* mandarDescribe(st_describe * describe){
 	mensajeResp->cabezera.sizeData = head2.sizeData;
 
 	mensajeResp->buffer = buffer;
-
+	sleep(getRetardoFile()/1000);
 	return mensajeResp;
 }
 
@@ -193,12 +204,14 @@ st_messageResponse* mandarDescribeGlobal(){
 
 	if(controlador != 0){
 		log_error(file_log, "No se pudo enviar el mensaje");
+		sleep(getRetardoFile()/1000);
 		return NULL;
 	}
 
 	buffer = getMessage(fdFileSystem,&respuesta,&controlador);
 	if(buffer == NULL){
 		log_error(file_log, "Se desconecto file system");
+		sleep(getRetardoFile()/1000);
         return NULL;
 	}
 
@@ -208,7 +221,7 @@ st_messageResponse* mandarDescribeGlobal(){
 		mensajeResp->cabezera.sizeData = respuesta.sizeData;
 
 		mensajeResp->buffer = buffer;
-
+		sleep(getRetardoFile()/1000);
 		return mensajeResp;
 }
 
@@ -236,16 +249,18 @@ int mandarInsert(st_insert * insert){
     if(controlador != 0){
     	printf("No se pudo enviar el mensaje al File System\n");
         log_error(file_log, "No se pudo enviar el mensaje al File System");
+        sleep(getRetardoFile()/1000);
         return -1;
     }
 
     buffer = getMessage(fdFileSystem,&head2,&controlador);
     if(buffer == NULL){
         log_error(file_log, "Se desconecto file system");
+        sleep(getRetardoFile()/1000);
         return -1;
     }
-    printf("El codigo de respuesta de Insert es %d", head2.codigo);
     free(buffer);
+    sleep(getRetardoFile()/1000);
     return head2.codigo;
 }
 

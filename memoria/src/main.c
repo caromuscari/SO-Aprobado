@@ -9,6 +9,7 @@
 #include "socketServer.h"
 #include <funcionesCompartidas/funcionesNET.h>
 #include "journal.h"
+#include "hiloInotify.h"
 
 t_log *file_log;
 t_list *listaDeMarcos;
@@ -17,12 +18,14 @@ t_configuracionMemoria *configMemoria;
 pthread_t server;
 pthread_t gossiping;
 pthread_t journal;
+pthread_t inotify;
 int fdFileSystem;
 int cantPaginas;
 int tamanioValue;
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
 pthread_mutex_t mutexMemPrinc, mutex, mutexSeeds, mutexConfig;
+int loop;
 
 bool buscarValueMaximo(){
     int control = 0;
@@ -127,6 +130,10 @@ void liberarSegmentos(st_segmento* segmento){
 
 void finalizar(){
 	pthread_cancel(server);
+	pthread_cancel(journal);
+	pthread_cancel(inotify);
+	pthread_cancel(gossiping);
+	loop = 0;
 	liberar_log(file_log);
 	liberarConfig(configMemoria);
 	free(memoriaPrincipal);
@@ -141,6 +148,8 @@ int main(int argc, char *argv[]){
         return -1;
     }
     log_info(file_log, "La memoria se inicio correctamente");
+    pthread_create(&inotify, NULL, (void*)hiloinotify, NULL);
+	pthread_detach(inotify);
     pthread_create(&journal, NULL, hiloJournal, NULL);
     pthread_detach(journal);
     pthread_create(&server, NULL,start_server, NULL);

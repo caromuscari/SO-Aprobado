@@ -6,6 +6,7 @@ extern t_configuracionMemoria * configMemoria;
 #include <funcionesCompartidas/API.h>
 #include <funcionesCompartidas/listaMetadata.h>
 #include <commons/collections/list.h>
+extern int loop;
 
 void atenderMensaje(int * fdClient){
     int control = 0;
@@ -22,10 +23,10 @@ void atenderMensaje(int * fdClient){
     switch (request.codigo) {
     	case INSERT: {
     		st_insert *insert = desserealizarInsert(paqueteDeRespuesta);
-    		printf("El comando es un Insert\n");
-    		printf("Table [%s]\n", insert->nameTable);
-    		printf("Key [%d]\n", insert->key);
-    		printf("Value [%s]\n", insert->value);
+    		log_info(file_log, "El comando es un Insert");
+    		log_info(file_log, "Table [%s]", insert->nameTable);
+    		log_info(file_log, "Key [%d]", insert->key);
+    		log_info(file_log, "Value [%s]", insert->value);
 
     		buffer = strdup("1");
 
@@ -45,7 +46,6 @@ void atenderMensaje(int * fdClient){
     	}
         case SELECT: {
             st_select * select = deserealizarSelect(paqueteDeRespuesta);
-            printf("El comando es un Select\n");
             enum_resultados resultado = NOOK;
 
             st_registro* registro = comandoSelect(select, &resultado);
@@ -73,7 +73,7 @@ void atenderMensaje(int * fdClient){
     	case CREATE:{
             st_create * create = deserealizarCreate(paqueteDeRespuesta);
             int respuesta;
-            printf("El comando es un Create\n");
+            log_info(file_log, "El comando es un Create");
 
             respuesta = mandarCreate(create);
 
@@ -92,7 +92,6 @@ void atenderMensaje(int * fdClient){
     	case DROP:{
             st_drop * drop = deserealizarDrop(paqueteDeRespuesta);
             int respuesta;
-            printf("El comando es un Drop\n");
 
             respuesta = mandarDrop(drop);
             buffer = strdup("1");
@@ -110,7 +109,7 @@ void atenderMensaje(int * fdClient){
     	case DESCRIBE:{
     		st_messageResponse* respuesta;
             st_describe * describe = deserealizarDescribe(paqueteDeRespuesta);
-            printf("El comando es un Describe \n");
+            log_info(file_log, "El comando es un Describe");
 
             respuesta = mandarDescribe(describe);
             if(respuesta){
@@ -133,7 +132,7 @@ void atenderMensaje(int * fdClient){
     	}
     	case DESCRIBEGLOBAL:{
     		st_messageResponse* respuesta;
-    		printf("El comando es un Describe Global\n");
+    		log_info(file_log, "El comando es un Describe Global");
     		respuesta = mandarDescribeGlobal();
     		if(respuesta){
     			if(respuesta->cabezera.codigo == 13){
@@ -163,7 +162,7 @@ void atenderMensaje(int * fdClient){
             break;
         }
     	case JOURNAL:{
-    		printf("Realizando Journal\n");
+    		log_info(file_log, "Realizando Journal");
     		int respuesta = comandoJournal();
     		buffer = strdup("1");
     		if(respuesta == OK){
@@ -189,7 +188,7 @@ void * start_server() {
 		pthread_exit(NULL);
 	}
 	int  * fdClient;
-	while (true){
+	while (loop){
         fdClient = malloc(sizeof(int));
         *fdClient = aceptar_conexion(socketServer, file_log, &control);
         if (control != 0) {

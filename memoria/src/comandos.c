@@ -170,7 +170,8 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
 
         int largo_value = strlen(registro->value);
         registro->value[largo_value]='\0';
-        memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), registro->value, tamanioValue);
+        largo_value += 1;
+        memcpy(paginaLibre + sizeof(double) + sizeof(uint16_t), registro->value, largo_value);
 
         st_tablaDePaginas* paginaDeTabla = malloc(sizeof(st_tablaDePaginas));
         paginaDeTabla->nroDePagina = posMarcoLibre;

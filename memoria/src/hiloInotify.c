@@ -56,21 +56,20 @@ void hiloinotify(char* rutaConfig){
 }
 
 void cambioConfiguracion(char* rutaConfig){
-    t_configuracionMemoria *configuracion;
-    configuracion = config_create(rutaConfig);
+	 t_config *bufferConfig = config_create(rutaConfig);
     pthread_mutex_lock(&mutexConfig);
-    if(configMemoria->RETARDO_FS != config_get_int_value(configuracion, "RETARDO_FS")){
-    	configMemoria->RETARDO_FS = config_get_int_value(configuracion, "RETARDO_FS");
+    if(configMemoria->RETARDO_FS != config_get_int_value(bufferConfig, "RETARDO_FS")){
+    	configMemoria->RETARDO_FS = config_get_int_value(bufferConfig, "RETARDO_FS");
         log_info(file_log, "[CONFIG] Cambió el valor de RETARDO FILESYSTEM");
     }
 
-    if(configMemoria->RETARDO_MEM != config_get_int_value(configuracion, "RETARDO_MEM")){
-    	configMemoria->RETARDO_MEM = config_get_int_value(configuracion, "RETARDO_MEM");
+    if(configMemoria->RETARDO_MEM != config_get_int_value(bufferConfig, "RETARDO_MEM")){
+    	configMemoria->RETARDO_MEM = config_get_int_value(bufferConfig, "RETARDO_MEM");
         log_info(file_log, "[CONFIG] Cambió el valor de RETARDO de MEMORIA");
     }
     pthread_mutex_unlock(&mutexConfig);
 
-    config_destroy(configuracion);
+    config_destroy(bufferConfig);
 }
 
 int getRetardoMem(){

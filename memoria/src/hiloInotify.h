@@ -16,6 +16,7 @@
 #include <sys/inotify.h>
 #include <commons/log.h>
 #include <commons/config.h>
+#include <pthread.h>
 
 void hiloinotify(char* rutaConfig);
 

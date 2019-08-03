@@ -8,6 +8,13 @@ extern t_list* listaDeSegmentos;
 extern pthread_mutex_t mutexMemPrinc;
 extern t_configuracionMemoria* configMemoria;
 
+void statusSegmento(){
+	st_segmento * segmento = NULL;
+	for(int i = 0; i < listaDeSegmentos->elements_count; i++){
+		segmento = list_get(listaDeSegmentos,i);
+		printf("segmento [%s] cantidad de paginas [%d]",segmento->nombreTabla, segmento->tablaDePaginas->elements_count);
+	}
+}
 
 //COMANDO INSERT
 int comandoInsert(st_insert* comandoInsert){
@@ -28,6 +35,7 @@ int comandoInsert(st_insert* comandoInsert){
             memcpy(paginaDeTablaEncontrada->pagina, &comandoInsert->timestamp, sizeof(double));
             paginaDeTablaEncontrada->flagModificado = 1;
             log_info(file_log,"[proceso Insert] Finalizar proceso");
+            statusSegmento();
             sleep(configMemoria->RETARDO_MEM/1000);
             pthread_mutex_unlock(&mutexMemPrinc);
             return OK;
@@ -38,6 +46,7 @@ int comandoInsert(st_insert* comandoInsert){
         if(posMarcoLibre == -1){
             log_info(file_log, "proceso Insert]Memoria full");
             log_info(file_log,"[proceso Insert] Finalizar proceso");
+            statusSegmento();
             pthread_mutex_unlock(&mutexMemPrinc);
             return FULLMEMORY;
         }
@@ -59,6 +68,7 @@ int comandoInsert(st_insert* comandoInsert){
         st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
         marco->condicion = OCUPADO;
         log_info(file_log,"[proceso Insert] Finalizar proceso");
+        statusSegmento();
         sleep(configMemoria->RETARDO_MEM/1000);
         pthread_mutex_unlock(&mutexMemPrinc);
         return OK;
@@ -70,6 +80,7 @@ int comandoInsert(st_insert* comandoInsert){
     if(posMarcoLibre == -1){
         log_info(file_log, "proceso Insert]Memoria full");
         log_info(file_log,"[proceso Insert] Finalizar proceso");
+        statusSegmento();
         pthread_mutex_unlock(&mutexMemPrinc);
         return FULLMEMORY;
     }
@@ -96,6 +107,7 @@ int comandoInsert(st_insert* comandoInsert){
     st_marco* marco = list_get(listaDeMarcos, posMarcoLibre);
     marco->condicion = OCUPADO;
     log_info(file_log,"[proceso Insert] Finalizar proceso");
+    statusSegmento();
     sleep(configMemoria->RETARDO_MEM/1000);
     pthread_mutex_unlock(&mutexMemPrinc);
     return OK;
@@ -124,6 +136,7 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
             sleep(configMemoria->RETARDO_MEM/1000);
             *resultado = OK;
             log_info(file_log,"[proceso Select] Finalizando Proceso");
+            statusSegmento();
             pthread_mutex_unlock(&mutexMemPrinc);
             return registro;
         }
@@ -134,6 +147,7 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
             log_info(file_log, "[proceso Select] No se encontro dato en el FileSystem");
             *resultado = NOOK;
             log_info(file_log,"[proceso Select] Finalizando Proceso");
+            statusSegmento();
             pthread_mutex_unlock(&mutexMemPrinc);
             return NULL;
         }
@@ -144,6 +158,7 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
             log_info(file_log, "[proceso Select] Memoria full");
             *resultado = FULLMEMORY;
             log_info(file_log,"[proceso Select] Finalizando Proceso");
+            statusSegmento();
             pthread_mutex_unlock(&mutexMemPrinc);
             return NULL;
         }
@@ -171,6 +186,7 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
         sleep(configMemoria->RETARDO_MEM/1000);
         *resultado = OK;
         log_info(file_log,"[proceso Select] Finalizando Proceso");
+        statusSegmento();
         pthread_mutex_unlock(&mutexMemPrinc);
         return registro;
     }
@@ -182,6 +198,7 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
         log_info(file_log, "[proceso Select] No se encontro dato en el FileSystem");
         *resultado = NOOK;
         log_info(file_log,"[proceso Select] Finalizando Proceso");
+        statusSegmento();
         pthread_mutex_unlock(&mutexMemPrinc);
         return NULL;
     }
@@ -192,6 +209,7 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
         log_info(file_log, "[proces Select] Memoria Full");
         *resultado = FULLMEMORY;
         log_info(file_log,"[proceso Select] Finalizando Proceso");
+        statusSegmento();
         pthread_mutex_unlock(&mutexMemPrinc);
         return NULL;
     }
@@ -227,6 +245,7 @@ st_registro* comandoSelect(st_select* comandoSelect, enum_resultados* resultado)
     sleep(configMemoria->RETARDO_MEM/1000);
     *resultado = OK;
     log_info(file_log,"[proceso Select] Finalizando Proceso");
+    statusSegmento();
     pthread_mutex_unlock(&mutexMemPrinc);
     return registro;
 }
@@ -250,9 +269,11 @@ void enviarPaginas(t_list * list_Paginas, char * nameTable){
         stInsert->nameTable = strdup(nameTable);
 
         if(mandarInsert(stInsert) == 5){
+        	log_info(file_log, "Value que mando %s", stInsert->value);
             stMarco->condicion = LIBRE;
             free(auxPagina);
         }else {
+        	log_info(file_log, "Value que vuelvo a insertar %s", stInsert->value);
             list_add(list_paginas_fallidas, auxPagina);
         }
         destroyInsert(stInsert);

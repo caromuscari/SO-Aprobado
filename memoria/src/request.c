@@ -244,6 +244,7 @@ int mandarInsert(st_insert * insert){
         log_error(file_log, "Se desconecto file system");
         return -1;
     }
+    printf("El codigo de respuesta de Insert es %d", head2.codigo);
     free(buffer);
     return head2.codigo;
 }

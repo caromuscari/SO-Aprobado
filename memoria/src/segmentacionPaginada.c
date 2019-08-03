@@ -38,6 +38,7 @@ int buscarMarcoLibre(){
 int algoritmoLRU(){
 	log_info(file_log, "Iniciando LRU, size listaSegmento %d", listaDeSegmentos->elements_count);
 	t_list* paginasConFlagEnCero = list_create();
+	int nro;
 	for(int i = 0; i < listaDeSegmentos->elements_count; i++){
 		st_segmento* segmento = list_get(listaDeSegmentos, i);
 		t_list * pagsAUnir = list_filter(segmento->tablaDePaginas, (void*)tieneFlagEnCero);
@@ -45,15 +46,32 @@ int algoritmoLRU(){
 		list_destroy(pagsAUnir);
 	}
 	if(!list_is_empty(paginasConFlagEnCero)){
-		st_tablaDePaginas* paginaAReemplazar = list_fold(paginasConFlagEnCero, paginasConFlagEnCero->head->data, (void*)paginaConMenorTiempo);
+		st_tablaDePaginas* paginaAReemplazar = list_get(paginasConFlagEnCero, 0);
+		for(int j = 0; j < paginasConFlagEnCero->elements_count; j++){
+			paginaAReemplazar = paginaConMenorTiempo(paginaAReemplazar, list_get(paginasConFlagEnCero, j));
+		}
+		nro = paginaAReemplazar->nroDePagina;
 		list_destroy(paginasConFlagEnCero);
-		return paginaAReemplazar->nroDePagina;
+		bool condicionRemove(st_tablaDePaginas* tabla){
+			return paginaAReemplazar->nroDePagina == tabla->nroDePagina;
+		}
+		for(int j =0; j<listaDeSegmentos->elements_count; j++){
+			st_segmento * segmento2= list_get(listaDeSegmentos, j);
+			st_tablaDePaginas* pagina = list_remove_by_condition(segmento2->tablaDePaginas, (bool (*)(void *))condicionRemove);
+			if(pagina != NULL){
+				free(pagina);
+			}
+		}
+		log_info(file_log, "Nro de pagina encontrada %d", paginaAReemplazar->nroDePagina);
+		return nro;
 
 	}else{
 		log_info(file_log, "No se encontro pagina a reemplazar MEMORIA LLENA");
         return -1;
 	}
 }
+
+
 
 bool tieneFlagEnCero(st_tablaDePaginas* pag){
 	return 0 == pag->flagModificado;

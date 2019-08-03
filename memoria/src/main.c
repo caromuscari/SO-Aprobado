@@ -25,7 +25,7 @@ int tamanioValue;
 int tamanioTotalDePagina;
 void *memoriaPrincipal;
 pthread_mutex_t mutexMemPrinc, mutex, mutexSeeds, mutexConfig;
-int loop;
+int loop = 1;
 
 bool buscarValueMaximo(){
     int control = 0;

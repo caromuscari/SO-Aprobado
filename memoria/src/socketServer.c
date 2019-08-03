@@ -185,6 +185,7 @@ void * start_server() {
 	int control = 0;
 	int socketServer = makeListenSock(configMemoria->PUERTO, file_log, &control);
 	if(control != 0){
+	    log_error(file_log,"[server] no se pudo inicializar el server");
 		pthread_exit(NULL);
 	}
 	int  * fdClient;

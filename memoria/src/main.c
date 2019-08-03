@@ -104,7 +104,6 @@ int inicializar(char *pathConfig){
     log_info(file_log, "Inicializando Memoria");
     tamanioTotalDePagina = (sizeof(double) + sizeof(uint16_t) + tamanioValue);
     cantPaginas = configMemoria->TAM_MEM / tamanioTotalDePagina;
-    printf("Cantidad de paginas %d", cantPaginas);
     memoriaPrincipal = malloc(configMemoria->TAM_MEM);
     listaDeSegmentos = list_create();
     listaDeMarcos = list_create();

@@ -458,16 +458,16 @@ int journalMemoria(st_memoria * memoria){
         int resultado = NO_SALIO_OK;
         switch (respuestPeticion->cabezera.codigo){
             case SUCCESS:{
-                printf("se realizo correctamente el journal\n");
+                log_info(file_log,"se realizo correctamente el journal");
                 resultado = SALIO_OK;
                 break;
             }
             case NOSUCCESS:{
-                printf("no se puedo relizar el journal\n");
+                log_info(file_log,"no se puedo relizar el journal");
                 break;
             }
             default:{
-                printf("no entiendo el codigo de respuesta\n");
+                log_info(file_log,"no entiendo el codigo de respuesta");
                 break;
             }
         }
@@ -533,7 +533,7 @@ void *loadPoolMemori() {
                     break;
                 }
                 default:{
-                    log_info(file_log, "[gossiping] no entiendo el codigo re respuesta\n");
+                    log_info(file_log, "[gossiping] no entiendo el codigo re respuesta");
                     break;
                 }
             }

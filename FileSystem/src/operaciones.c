@@ -331,7 +331,9 @@ void actualizar_size(char * path,int size){
 
         		sem_init(&tabla->compactacion,0,1);
         		sem_init(&tabla->opcional,0,0);
+        		sem_init(&tabla->mutexC,0,1);
         		tabla->contador = 0;
+        		tabla->cont2 = 0;
         		//tabla->sem = list_create();
 
         		char * table = strdup(name);

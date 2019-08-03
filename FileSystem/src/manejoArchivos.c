@@ -24,6 +24,7 @@
 #include "Semaforos.h"
 
 extern t_dictionary * tablas;
+extern t_log* alog;
 //extern t_queue * nombre;
 extern sem_t /*sNombre,*/ sTablas;
 
@@ -47,7 +48,7 @@ int realizarInsert(st_insert * insert){
 		registro->key = insert->key;
 		registro->value = strdup(insert->value);
 
-		printf("%f;%d;%s\n", registro->time, registro->key, registro->value);
+		log_info(alog,"Insert: %.0f;%d;%s\n", registro->time, registro->key, registro->value);
 
 		if(existeEnMemtable(insert->nameTable)){
 			data = leerDeMemtable(insert->nameTable);
@@ -81,7 +82,8 @@ int realizarSelect(st_select * select, char ** value){
 	int respuesta;
 	int particion;
 	st_tablaCompac * tabla;
-	int valor;
+	int *valor = malloc(sizeof(int));
+	//sem_t *sem;
 
 	if(validarArchivos(select->nameTable, &respuesta)){
 
@@ -89,16 +91,22 @@ int realizarSelect(st_select * select, char ** value){
 
 		/*sem_getvalue(&tabla->compactacion, &valor);
 		if(valor != 1){
-			sem_t *sem= malloc(sizeof(sem_t));
+			sem= malloc(sizeof(sem_t));
 			sem_init(sem,0,0);
 			list_add(tabla->sem,sem);
 			log_info(alog, "Se bloquea la tabla");
 			sem_wait(sem);
-		}else{*/
+		}else{
+			sem= malloc(sizeof(sem_t));
+			sem_init(sem,0,0);
+			list_add(tabla->sem,sem);
+		}*/
 
+		sumarContador(tabla);
 		sem_wait(&tabla->compactacion);
 		sem_post(&tabla->compactacion);
 		tabla->contador += 1;
+		restarContador(tabla);
 
 			particion = select->key % tabla->meta->partitions;
 
@@ -109,16 +117,19 @@ int realizarSelect(st_select * select, char ** value){
 			}else{
 				respuesta = 14;
 			}
-			/*
-			if(list_size(tabla->sem) == 1){
-				sem_post(tabla->opcional);
-			}*/
+
+
+		/*if(list_size(tabla->sem) == 1){
+			sem_post(tabla->opcional);
+		}*/
 
 			tabla->contador -= 1;
-			sem_getvalue(&tabla->opcional, &valor);
-			if(tabla->contador == 0 && valor != 0){
+			sem_getvalue(&tabla->opcional, valor);
+			log_info(alog, "VALOR: %d", *valor);
+			if(tabla->contador == 0 && *valor != 0){
 				sem_post(&tabla->opcional);
 			}
+			free(valor);
 	}
 
 	return respuesta;
@@ -159,7 +170,9 @@ int realizarCreate(st_create * create){
 
 			sem_init(&tabla->compactacion,0,1);
 			sem_init(&tabla->opcional,0,0);
+			sem_init(&tabla->mutexC,0,1);
 			tabla->contador = 0;
+			tabla->cont2 = 0;
 
 			//sem_wait(&sNombre);
 			//queue_push(nombre, name);

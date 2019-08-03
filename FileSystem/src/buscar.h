@@ -15,7 +15,9 @@
 typedef struct {
 	sem_t compactacion;
 	sem_t opcional;
+	sem_t mutexC;
 	int contador;
+	int cont2;
 	t_list * sem;
 	st_metadata * meta;
 	pthread_t hilo;
